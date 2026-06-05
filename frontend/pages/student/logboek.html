@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Logboek — Student</title>
+  <link rel="stylesheet" href="/css/stijl.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <span class="logo">Stage Monitor</span>
+    <div class="nav-links">
+      <a href="/pages/student/dashboard.html">Dashboard</a>
+      <a href="/pages/student/stage-indienen.html">Stage indienen</a>
+      <a href="/pages/student/logboek.html">Logboek</a>
+      <a href="/pages/student/evaluatie.html">Evaluatie</a>
+      <span class="rol-badge">Student</span>
+      <a href="#" id="uitlogBtn">Uitloggen</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1>Dagelijks logboek</h1>
+    <p>Vul elke dag je logboek in. Je mentor en docent kunnen dit bekijken.</p>
+
+    <form id="logboekForm">
+      <label>Datum</label>
+      <input type="date" id="datum" required />
+
+      <label>Uitgevoerde taken vandaag</label>
+      <textarea id="taken" rows="4" placeholder="Wat heb je gedaan?" required></textarea>
+
+      <label>Reflectie</label>
+      <textarea id="reflectie" rows="3" placeholder="Wat vond je goed of moeilijk?"></textarea>
+
+      <label>Problemen / leerpunten</label>
+      <textarea id="problemen" rows="3" placeholder="Wat liep er mis? Wat heb je bijgeleerd?"></textarea>
+
+      <button type="submit">Logboek opslaan</button>
+      <p id="melding"></p>
+    </form>
+
+    <hr />
+
+    <h2>Mijn eerdere logboeken</h2>
+    <div id="logboekenLijst">Laden...</div>
+  </div>
+
+  <script src="/js/nav.js"></script>
+  <script>
+    // Datum van vandaag automatisch invullen
+    document.getElementById('datum').value = new Date().toISOString().split('T')[0]
+
+    document.getElementById('logboekForm').addEventListener('submit', async function (e) {
+      e.preventDefault()
+      // TODO: stuur logboek naar /api/logboeken
+      document.getElementById('melding').textContent = '— nog te bouwen'
+    })
+
+    async function laadLogboeken() {
+      // TODO: haal logboeken op via /api/logboeken/mijn
+      document.getElementById('logboekenLijst').textContent = '— nog te bouwen'
+    }
+    laadLogboeken()
+  </script>
+</body>
+</html>

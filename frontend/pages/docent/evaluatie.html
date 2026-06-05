@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Evaluaties — Docent</title>
+  <link rel="stylesheet" href="/css/stijl.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <span class="logo">Stage Monitor</span>
+    <div class="nav-links">
+      <a href="/pages/docent/dashboard.html">Dashboard</a>
+      <a href="/pages/docent/studenten.html">Mijn studenten</a>
+      <a href="/pages/docent/logboeken.html">Logboeken</a>
+      <a href="/pages/docent/evaluatie.html">Evaluaties</a>
+      <span class="rol-badge">Docent</span>
+      <a href="#" id="uitlogBtn">Uitloggen</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1>Evaluaties invullen</h1>
+    <p>Geef per competentie een score en feedback voor je student. Dit kan tussentijds en finaal.</p>
+
+    <label>Student kiezen</label>
+    <select id="studentKeuze">
+      <option value="">— Kies een student —</option>
+      <!-- TODO: dynamisch vullen -->
+    </select>
+
+    <label style="margin-top:16px">Type evaluatie</label>
+    <select id="evalType">
+      <option value="tussentijds">Tussentijdse evaluatie</option>
+      <option value="finaal">Finale evaluatie</option>
+    </select>
+
+    <form id="evaluatieForm" style="margin-top: 24px;">
+      <div id="competentiesLijst">Kies eerst een student.</div>
+      <button type="submit" style="margin-top:16px">Scores opslaan</button>
+      <p id="melding"></p>
+    </form>
+  </div>
+
+  <script src="/js/nav.js"></script>
+  <script>
+    document.getElementById('studentKeuze').addEventListener('change', async function () {
+      // TODO: laad competenties en eventuele bestaande scores
+      // voor elk: toon een score-invoer (0–20) + feedbackveld
+      document.getElementById('competentiesLijst').textContent = '— nog te bouwen'
+    })
+
+    document.getElementById('evaluatieForm').addEventListener('submit', async function (e) {
+      e.preventDefault()
+      // TODO: stuur scores op naar /api/evaluaties
+      document.getElementById('melding').textContent = '— nog te bouwen'
+    })
+  </script>
+</body>
+</html>

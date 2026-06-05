@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard — Student</title>
+  <link rel="stylesheet" href="/css/stijl.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <span class="logo">Stage Monitor</span>
+    <div class="nav-links">
+      <a href="/pages/student/dashboard.html">Dashboard</a>
+      <a href="/pages/student/stage-indienen.html">Stage indienen</a>
+      <a href="/pages/student/logboek.html">Logboek</a>
+      <a href="/pages/student/evaluatie.html">Evaluatie</a>
+      <span class="rol-badge">Student</span>
+      <a href="#" id="uitlogBtn">Uitloggen</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1>Mijn Dashboard</h1>
+    <p>Welkom. Hier zie je een overzicht van je stage.</p>
+
+    <div class="kaarten">
+      <div class="kaart">
+        <strong>Mijn stage</strong>
+        <p id="stageStatus">—</p>
+        <a href="/pages/student/stage-indienen.html">Bekijken / Indienen</a>
+      </div>
+      <div class="kaart">
+        <strong>Logboek</strong>
+        <p>Dagelijks invullen</p>
+        <a href="/pages/student/logboek.html">Naar logboek</a>
+      </div>
+      <div class="kaart">
+        <strong>Evaluatie</strong>
+        <p>Jouw competenties</p>
+        <a href="/pages/student/evaluatie.html">Bekijken</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/nav.js"></script>
+  <script>
+    // TODO: haal de actieve stage van deze student op en toon de status
+    // fetch('/api/stages/mijn', { headers: { Authorization: 'Bearer ' + localStorage.getItem('token') } })
+    //   .then(r => r.json()).then(data => {
+    //     document.getElementById('stageStatus').textContent = data.status || 'Geen stage'
+    //   })
+  </script>
+</body>
+</html>

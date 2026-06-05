@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Evaluatie — Student</title>
+  <link rel="stylesheet" href="/css/stijl.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <span class="logo">Stage Monitor</span>
+    <div class="nav-links">
+      <a href="/pages/student/dashboard.html">Dashboard</a>
+      <a href="/pages/student/stage-indienen.html">Stage indienen</a>
+      <a href="/pages/student/logboek.html">Logboek</a>
+      <a href="/pages/student/evaluatie.html">Evaluatie</a>
+      <span class="rol-badge">Student</span>
+      <a href="#" id="uitlogBtn">Uitloggen</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1>Mijn evaluatie</h1>
+    <p>Per competentie kan je een beschrijving geven van je vorderingen. De docent en mentor geven feedback en een score.</p>
+
+    <form id="evaluatieForm">
+      <!-- Competenties worden hier dynamisch ingeladen vanuit de database -->
+      <div id="competentiesLijst">Laden...</div>
+      <button type="submit">Beschrijvingen opslaan</button>
+      <p id="melding"></p>
+    </form>
+
+    <hr />
+
+    <h2>Scores en feedback van docent/mentor</h2>
+    <div id="scoresLijst">Laden...</div>
+  </div>
+
+  <script src="/js/nav.js"></script>
+  <script>
+    async function laadCompetencies() {
+      // TODO: haal competenties op via /api/competenties
+      // Bouw voor elke competentie een tekstveld zodat de student een beschrijving kan geven
+      // Voorbeeld opbouw:
+      // const res = await fetch('/api/competenties', { headers: { Authorization: 'Bearer ' + localStorage.getItem('token') } })
+      // const competenties = await res.json()
+      // competenties.forEach(c => {
+      //   const blok = document.createElement('div')
+      //   blok.innerHTML = `<label>${c.naam}</label><textarea name="comp_${c.id}" rows="3" placeholder="Beschrijf je vorderingen..."></textarea>`
+      //   document.getElementById('competentiesLijst').appendChild(blok)
+      // })
+      document.getElementById('competentiesLijst').textContent = '— nog te bouwen'
+    }
+    laadCompetencies()
+
+    document.getElementById('evaluatieForm').addEventListener('submit', async function (e) {
+      e.preventDefault()
+      // TODO: stuur beschrijvingen op naar /api/evaluaties
+      document.getElementById('melding').textContent = '— nog te bouwen'
+    })
+  </script>
+</body>
+</html>

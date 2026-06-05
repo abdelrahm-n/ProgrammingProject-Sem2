@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Alle stages — Administratie</title>
+  <link rel="stylesheet" href="/css/stijl.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <span class="logo">Stage Monitor</span>
+    <div class="nav-links">
+      <a href="/pages/admin/dashboard.html">Dashboard</a>
+      <a href="/pages/admin/gebruikers.html">Gebruikers</a>
+      <a href="/pages/admin/stages.html">Alle stages</a>
+      <span class="rol-badge">Administratie</span>
+      <a href="#" id="uitlogBtn">Uitloggen</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1>Alle stages</h1>
+    <p>Volledig overzicht van alle ingediende stages.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Student</th>
+          <th>Bedrijf</th>
+          <th>Docent</th>
+          <th>Periode</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="stagesLijst">
+        <tr><td colspan="5">Laden...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script src="/js/nav.js"></script>
+  <script>
+    async function laadStages() {
+      // TODO: GET /api/admin/stages — alle stages met student- en docentnaam
+      document.getElementById('stagesLijst').innerHTML = '<tr><td colspan="5">— nog te bouwen</td></tr>'
+    }
+    laadStages()
+  </script>
+</body>
+</html>

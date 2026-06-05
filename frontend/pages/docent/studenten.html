@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mijn studenten — Docent</title>
+  <link rel="stylesheet" href="/css/stijl.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <span class="logo">Stage Monitor</span>
+    <div class="nav-links">
+      <a href="/pages/docent/dashboard.html">Dashboard</a>
+      <a href="/pages/docent/studenten.html">Mijn studenten</a>
+      <a href="/pages/docent/logboeken.html">Logboeken</a>
+      <a href="/pages/docent/evaluatie.html">Evaluaties</a>
+      <span class="rol-badge">Docent</span>
+      <a href="#" id="uitlogBtn">Uitloggen</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1>Mijn studenten</h1>
+    <p>Overzicht van alle studenten die aan jou toegewezen zijn.</p>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Student</th>
+          <th>Bedrijf</th>
+          <th>Periode</th>
+          <th>Status</th>
+          <th>Acties</th>
+        </tr>
+      </thead>
+      <tbody id="studentenLijst">
+        <tr><td colspan="5">Laden...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script src="/js/nav.js"></script>
+  <script>
+    async function laadStudenten() {
+      // TODO: haal studenten op via /api/docent/studenten
+      // const res = await fetch('/api/docent/studenten', { headers: { Authorization: 'Bearer ' + localStorage.getItem('token') } })
+      // const studenten = await res.json()
+      // const tbody = document.getElementById('studentenLijst')
+      // tbody.innerHTML = ''
+      // studenten.forEach(s => {
+      //   tbody.innerHTML += `<tr>
+      //     <td>${s.voornaam} ${s.achternaam}</td>
+      //     <td>${s.bedrijf_naam}</td>
+      //     <td>${s.start_datum} – ${s.eind_datum}</td>
+      //     <td><span class="status ${s.status}">${s.status}</span></td>
+      //     <td><a href="/pages/docent/logboeken.html?stageId=${s.stage_id}">Logboek</a></td>
+      //   </tr>`
+      // })
+      document.getElementById('studentenLijst').innerHTML = '<tr><td colspan="5">— nog te bouwen</td></tr>'
+    }
+    laadStudenten()
+  </script>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Competenties — Stagecommissie</title>
+  <link rel="stylesheet" href="/css/stijl.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <span class="logo">Stage Monitor</span>
+    <div class="nav-links">
+      <a href="/pages/stagecommissie/dashboard.html">Dashboard</a>
+      <a href="/pages/stagecommissie/aanvragen.html">Aanvragen</a>
+      <a href="/pages/stagecommissie/competenties.html">Competenties</a>
+      <span class="rol-badge">Stagecommissie</span>
+      <a href="#" id="uitlogBtn">Uitloggen</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1>Competenties beheren</h1>
+    <p>Voeg competenties toe, pas ze aan of verwijder ze. Wijzigingen gelden meteen voor alle evaluaties.</p>
+
+    <h2>Nieuwe competentie toevoegen</h2>
+    <form id="competentieForm">
+      <label>Naam</label>
+      <input type="text" id="naam" required />
+
+      <label>Omschrijving</label>
+      <textarea id="omschrijving" rows="3"></textarea>
+
+      <label>Gewicht (hoe zwaar telt deze mee?)</label>
+      <input type="number" id="gewicht" value="1" min="1" max="5" step="0.5" required />
+
+      <button type="submit">Toevoegen</button>
+      <p id="melding"></p>
+    </form>
+
+    <hr />
+
+    <h2>Huidige competenties</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Naam</th>
+          <th>Omschrijving</th>
+          <th>Gewicht</th>
+          <th>Acties</th>
+        </tr>
+      </thead>
+      <tbody id="competentiesLijst">
+        <tr><td colspan="4">Laden...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script src="/js/nav.js"></script>
+  <script>
+    async function laadCompetenties() {
+      // TODO: haal competenties op via GET /api/competenties
+      // Toon per rij een "Bewerken" en "Verwijderen" knop
+      document.getElementById('competentiesLijst').innerHTML = '<tr><td colspan="4">— nog te bouwen</td></tr>'
+    }
+    laadCompetenties()
+
+    document.getElementById('competentieForm').addEventListener('submit', async function (e) {
+      e.preventDefault()
+      // TODO: POST /api/competenties
+      document.getElementById('melding').textContent = '— nog te bouwen'
+    })
+  </script>
+</body>
+</html>

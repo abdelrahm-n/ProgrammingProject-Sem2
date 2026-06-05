@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Stage indienen — Student</title>
+  <link rel="stylesheet" href="/css/stijl.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <span class="logo">Stage Monitor</span>
+    <div class="nav-links">
+      <a href="/pages/student/dashboard.html">Dashboard</a>
+      <a href="/pages/student/stage-indienen.html">Stage indienen</a>
+      <a href="/pages/student/logboek.html">Logboek</a>
+      <a href="/pages/student/evaluatie.html">Evaluatie</a>
+      <span class="rol-badge">Student</span>
+      <a href="#" id="uitlogBtn">Uitloggen</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1>Stage indienen</h1>
+    <p>Vul het stagevoorstel in. De stagecommissie beoordeelt je aanvraag.</p>
+
+    <form id="stageForm">
+
+      <h2>Gegevens student</h2>
+      <label>Naam</label>
+      <input type="text" id="studentNaam" placeholder="Automatisch ingevuld" disabled />
+
+      <h2>Gegevens bedrijf</h2>
+      <label>Naam bedrijf</label>
+      <input type="text" id="bedrijfNaam" required />
+
+      <label>Adres bedrijf</label>
+      <input type="text" id="bedrijfAdres" />
+
+      <label>Naam stagementor</label>
+      <input type="text" id="mentorNaam" />
+
+      <label>E-mail stagementor</label>
+      <input type="email" id="mentorEmail" />
+
+      <h2>Stagegegevens</h2>
+      <label>Omschrijving van de opdracht</label>
+      <textarea id="opdracht" rows="5" required></textarea>
+
+      <label>Startdatum</label>
+      <input type="date" id="startdatum" required />
+
+      <label>Einddatum</label>
+      <input type="date" id="einddatum" required />
+
+      <button type="submit">Stage indienen</button>
+      <p id="melding"></p>
+    </form>
+
+    <hr />
+
+    <h2>Status van mijn aanvraag</h2>
+    <div id="statusBlok">Laden...</div>
+  </div>
+
+  <script src="/js/nav.js"></script>
+  <script>
+    // Stage indienen
+    document.getElementById('stageForm').addEventListener('submit', async function (e) {
+      e.preventDefault()
+      const body = {
+        bedrijfNaam:  document.getElementById('bedrijfNaam').value,
+        bedrijfAdres: document.getElementById('bedrijfAdres').value,
+        mentorNaam:   document.getElementById('mentorNaam').value,
+        mentorEmail:  document.getElementById('mentorEmail').value,
+        opdracht:     document.getElementById('opdracht').value,
+        startdatum:   document.getElementById('startdatum').value,
+        einddatum:    document.getElementById('einddatum').value,
+      }
+      // TODO: stuur naar /api/stages
+      // const res = await fetch('/api/stages', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + localStorage.getItem('token') }, body: JSON.stringify(body) })
+      // const data = await res.json()
+      // document.getElementById('melding').textContent = data.bericht
+      document.getElementById('melding').textContent = '— nog te bouwen'
+    })
+
+    // Status ophalen
+    async function laadStatus() {
+      // TODO: haal de stage op via /api/stages/mijn
+      document.getElementById('statusBlok').textContent = '— nog te bouwen'
+    }
+    laadStatus()
+  </script>
+</body>
+</html>

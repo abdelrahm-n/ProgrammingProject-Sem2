@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gebruikers — Administratie</title>
+  <link rel="stylesheet" href="/css/stijl.css" />
+</head>
+<body>
+
+  <nav class="navbar">
+    <span class="logo">Stage Monitor</span>
+    <div class="nav-links">
+      <a href="/pages/admin/dashboard.html">Dashboard</a>
+      <a href="/pages/admin/gebruikers.html">Gebruikers</a>
+      <a href="/pages/admin/stages.html">Alle stages</a>
+      <span class="rol-badge">Administratie</span>
+      <a href="#" id="uitlogBtn">Uitloggen</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1>Gebruikersbeheer</h1>
+    <p>Voeg gebruikers toe en stel hun rol in.</p>
+
+    <h2>Nieuwe gebruiker toevoegen</h2>
+    <form id="gebruikerForm">
+      <label>Voornaam</label>
+      <input type="text" id="voornaam" required />
+
+      <label>Achternaam</label>
+      <input type="text" id="achternaam" required />
+
+      <label>E-mailadres</label>
+      <input type="email" id="email" required />
+
+      <label>Tijdelijk wachtwoord</label>
+      <input type="password" id="wachtwoord" required />
+
+      <label>Rol</label>
+      <select id="rol">
+        <option value="student">Student</option>
+        <option value="docent">Docent</option>
+        <option value="stagecommissie">Stagecommissie</option>
+        <option value="mentor">Stagementor</option>
+        <option value="admin">Administratie</option>
+      </select>
+
+      <button type="submit">Gebruiker aanmaken</button>
+      <p id="melding"></p>
+    </form>
+
+    <hr />
+
+    <h2>Alle gebruikers</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Naam</th>
+          <th>E-mail</th>
+          <th>Rol</th>
+          <th>Acties</th>
+        </tr>
+      </thead>
+      <tbody id="gebruikersLijst">
+        <tr><td colspan="4">Laden...</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script src="/js/nav.js"></script>
+  <script>
+    async function laadGebruikers() {
+      // TODO: GET /api/admin/gebruikers
+      document.getElementById('gebruikersLijst').innerHTML = '<tr><td colspan="4">— nog te bouwen</td></tr>'
+    }
+    laadGebruikers()
+
+    document.getElementById('gebruikerForm').addEventListener('submit', async function (e) {
+      e.preventDefault()
+      // TODO: POST /api/admin/gebruikers
+      document.getElementById('melding').textContent = '— nog te bouwen'
+    })
+  </script>
+</body>
+</html>
