@@ -41,3 +41,61 @@ body {
   font-size: 14px;
   line-height: 1.6;
 }
+
+/* Header */
+.header {
+  background: var(--color-primary);
+  color: var(--color-white);
+  height: 84px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--sp-5);
+  flex-shrink: 0;
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  color: var(--color-white);
+  text-decoration: none;
+}
+
+.header-logo-text { font-size: 20px; font-weight: bold; }
+.header-tagline   { font-size: 13px; color: rgba(255,255,255,0.7); }
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.header-rol-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.15);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 20px;
+  padding: 5px 14px;
+  font-size: 13px;
+  color: var(--color-white);
+}
+
+.btn-terug {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: var(--radius-sm);
+  color: var(--color-white);
+  font-size: 13px;
+  padding: 8px 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+  margin: 0;
+}
+
+.btn-terug:hover { background: rgba(255,255,255,0.22); }
