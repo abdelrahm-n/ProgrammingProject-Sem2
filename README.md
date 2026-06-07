@@ -6,8 +6,13 @@ Platform voor stagebeheer bij EhB Toegepaste Informatica.
 
 - `frontend/` - statische HTML, CSS en JavaScript
 - `backend/`  - Node.js/Express API
-- `database/` - SQL scripts
+- `database/` - SQL scripts voor de database
 
-## Installatie
+## Installatie backend
 
-Zie de README in de `backend/` map voor instructies.
+```bash
+cd backend
+cp .env.example .env
+npm install
+npm run dev
+```
