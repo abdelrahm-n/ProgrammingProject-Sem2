@@ -4,22 +4,53 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Stageplatform</title>
+  <link rel="stylesheet" href="/css/stijl.css" />
 </head>
-<body>
+<body class="rol-keuze-pagina">
 
-  <header>
-    <h1>Stageplatform</h1>
-    <p>EhB - Toegepaste Informatica</p>
+  <header class="header">
+    <div class="header-logo">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+      </svg>
+      <span class="header-logo-text">Stageplatform</span>
+    </div>
+    <span class="header-tagline">EhB - Toegepaste Informatica</span>
   </header>
 
-  <main>
-    <h2>Kies je rol</h2>
-    <div id="rol-keuze">
-      <button data-rol="student">Student</button>
-      <button data-rol="docent">Docent</button>
-      <button data-rol="stagecommissie">Stagecommissie</button>
-      <button data-rol="mentor">Stagementor</button>
-      <button data-rol="admin">Admin</button>
+  <main class="rol-keuze-wrapper">
+    <div class="rol-keuze-intro">
+      <h1>Welkom bij het Stageplatform</h1>
+      <p>Selecteer hieronder je rol om naar je dashboard te gaan</p>
+    </div>
+
+    <div class="rol-keuze-grid">
+
+      <button class="rol-kaart rol-kaart--student" data-rol="student">
+        <span class="rol-kaart__label">Student</span>
+        <span class="rol-kaart__desc">Bekijk je stage, logboek en evaluaties</span>
+      </button>
+
+      <button class="rol-kaart rol-kaart--docent" data-rol="docent">
+        <span class="rol-kaart__label">Docent</span>
+        <span class="rol-kaart__desc">Beheer je studenten, logboeken en evaluaties</span>
+      </button>
+
+      <button class="rol-kaart rol-kaart--stagecommissie" data-rol="stagecommissie">
+        <span class="rol-kaart__label">Stagecommissie</span>
+        <span class="rol-kaart__desc">Beoordeel aanvragen en beheer competenties</span>
+      </button>
+
+      <button class="rol-kaart rol-kaart--mentor" data-rol="mentor">
+        <span class="rol-kaart__label">Stagementor</span>
+        <span class="rol-kaart__desc">Volg stagiairs op en geef feedback</span>
+      </button>
+
+      <button class="rol-kaart rol-kaart--admin" data-rol="admin">
+        <span class="rol-kaart__label">Admin</span>
+        <span class="rol-kaart__desc">Volledig beheer van gebruikers en het platform</span>
+      </button>
+
     </div>
   </main>
 
