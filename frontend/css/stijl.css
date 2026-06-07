@@ -1,0 +1,43 @@
+/* STAGEPLATFORM - basisstijlen */
+
+/* Reset */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+/* Kleurvariabelen */
+:root {
+  --color-primary:        #8B0015;
+  --color-primary-hover:  #750012;
+  --color-bg-page:        #F7F7F7;
+  --color-bg-card:        #FFFFFF;
+  --color-bg-sidebar:     #FFFFFF;
+  --color-bg-table-head:  #F3F3F3;
+  --color-border:         #D8D8D8;
+  --color-border-light:   #E4E4E4;
+  --color-text:           #1E1E1E;
+  --color-text-secondary: #555555;
+  --color-text-muted:     #7A7A7A;
+  --color-white:          #FFFFFF;
+  --color-success:        #2E9E49;
+  --color-warning:        #E58A12;
+  --color-error:          #990018;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 16px;
+  --sp-4: 24px;
+  --sp-5: 32px;
+  --rol-accent:       var(--color-primary);
+  --rol-accent-hover: var(--color-primary-hover);
+  --rol-accent-licht: #FFF0F1;
+}
+
+/* Body */
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-bg-page);
+  color: var(--color-text);
+  font-size: 14px;
+  line-height: 1.6;
+}
