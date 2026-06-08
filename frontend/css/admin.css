@@ -1,0 +1,19 @@
+/* admin - accentkleur rood (merkkleur) */
+:root {
+  --rol-accent:       #8B0015;
+  --rol-accent-hover: #750012;
+  --rol-accent-licht: #FFF0F1;
+}
+
+.nav-item.actief    { background: var(--rol-accent); }
+.stat-kaart__icon   { color: var(--rol-accent); }
+.btn--primair       { background: var(--rol-accent); }
+.btn--primair:hover { background: var(--rol-accent-hover); }
+.actie-kaart:hover  { border-color: var(--rol-accent); color: var(--rol-accent); }
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--rol-accent);
+  box-shadow: 0 0 0 3px rgba(139, 0, 21, 0.12);
+}
