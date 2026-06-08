@@ -1,178 +1,53 @@
+﻿/* ===================================================
+   STAGEPLATFORM — Stijlgids
+   Kleurenpalet per REQIUREMENT WEBSITE.md
+   =================================================== */
+
 /* ── Reset ── */
-* { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  /* Brand */
+  --color-primary:        #8B0015;
+  --color-primary-hover:  #750012;
+
+  /* Achtergronden */
+  --color-bg-page:        #F7F7F7;
+  --color-bg-card:        #FFFFFF;
+  --color-bg-sidebar:     #FFFFFF;
+  --color-bg-table-head:  #F3F3F3;
+
+  /* Randen */
+  --color-border:         #D8D8D8;
+  --color-border-light:   #E4E4E4;
+
+  /* Tekst */
+  --color-text-primary:   #1E1E1E;
+  --color-text-secondary: #555555;
+  --color-text-muted:     #7A7A7A;
+  --color-white:          #FFFFFF;
+
+  /* Statussen */
+  --color-success:        #2E9E49;
+  --color-warning:        #E58A12;
+  --color-error:          #990018;
+
+  /* Border radius */
+  --radius-sm:   4px;
+  --radius-md:   8px;
+
+  /* Spacing */
+  --space-xs:    4px;
+  --space-sm:    8px;
+  --space-md:    16px;
+  --space-lg:    24px;
+  --space-xl:    32px;
+}
 
 body {
-  font-family: Arial, sans-serif;
-  background: #f4f6f9;
-  color: #333;
-}
-
-/* ── Login pagina ── */
-.login-wrapper {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.login-box {
-  background: white;
-  padding: 40px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  width: 100%;
-  max-width: 400px;
-}
-
-.login-box h1 {
-  font-size: 24px;
-  color: #003882;
-  margin-bottom: 4px;
-}
-
-.subtitel {
-  color: #888;
-  font-size: 13px;
-  margin-bottom: 24px;
-}
-
-/* ── Navigatie ── */
-.navbar {
-  background: #003882;
-  color: white;
-  padding: 14px 32px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.navbar .logo { font-size: 17px; font-weight: bold; }
-
-.navbar .nav-links a {
-  color: white;
-  text-decoration: none;
-  margin-left: 20px;
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-bg-page);
+  color: var(--color-text-primary);
   font-size: 14px;
+  line-height: 1.5;
 }
-
-.navbar .nav-links a:hover { text-decoration: underline; }
-
-.navbar .rol-badge {
-  background: rgba(255,255,255,0.2);
-  font-size: 12px;
-  padding: 3px 10px;
-  border-radius: 20px;
-  margin-left: 16px;
-}
-
-/* ── Pagina-inhoud ── */
-.container {
-  max-width: 860px;
-  margin: 40px auto;
-  padding: 0 24px;
-}
-
-h1 { font-size: 24px; margin-bottom: 8px; color: #003882; }
-h2 { font-size: 17px; margin: 28px 0 12px; color: #333; }
-hr { border: none; border-top: 1px solid #e0e0e0; margin: 28px 0; }
-p  { line-height: 1.6; margin-bottom: 10px; }
-
-/* ── Kaarten ── */
-.kaarten {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 16px;
-  margin-top: 20px;
-}
-
-.kaart {
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 20px;
-  text-align: center;
-}
-
-.kaart a {
-  display: block;
-  margin-top: 12px;
-  color: #003882;
-  text-decoration: none;
-  font-weight: bold;
-  font-size: 14px;
-}
-
-/* ── Tabel ── */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: white;
-  border-radius: 6px;
-  overflow: hidden;
-  font-size: 14px;
-}
-
-th {
-  background: #003882;
-  color: white;
-  padding: 10px 14px;
-  text-align: left;
-}
-
-td { padding: 10px 14px; border-bottom: 1px solid #eee; }
-tr:last-child td { border-bottom: none; }
-tr:hover td { background: #f9f9f9; }
-
-/* ── Status badges ── */
-.status {
-  display: inline-block;
-  padding: 3px 10px;
-  border-radius: 20px;
-  font-size: 12px;
-  font-weight: bold;
-}
-
-.status.ingediend        { background: #fff3cd; color: #856404; }
-.status.goedgekeurd      { background: #d1e7dd; color: #0a5e38; }
-.status.afgekeurd        { background: #f8d7da; color: #842029; }
-.status.actief           { background: #cfe2ff; color: #084298; }
-.status.afgerond         { background: #e2e3e5; color: #41464b; }
-.status.aanpassingen_vereist { background: #ffe5d0; color: #7c3300; }
-
-/* ── Formulieren ── */
-form { display: flex; flex-direction: column; gap: 10px; }
-
-label { font-weight: bold; font-size: 14px; margin-top: 4px; }
-
-input, textarea, select {
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 14px;
-  width: 100%;
-}
-
-input:focus, textarea:focus, select:focus {
-  outline: none;
-  border-color: #003882;
-}
-
-button {
-  margin-top: 8px;
-  padding: 10px 22px;
-  background: #003882;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  font-size: 14px;
-  cursor: pointer;
-  align-self: flex-start;
-}
-
-button:hover { background: #0057b8; }
-button.rood  { background: #c0392b; }
-button.rood:hover { background: #a93226; }
-
-/* ── Foutmelding / succesmelding ── */
-.fout    { color: #c0392b; font-size: 14px; margin-top: 6px; }
-.succes  { color: #0a5e38; font-size: 14px; margin-top: 6px; }
