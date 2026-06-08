@@ -51,3 +51,108 @@ body {
   font-size: 14px;
   line-height: 1.5;
 }
+
+/* ===================================================
+   HEADER
+   =================================================== */
+.header {
+  background: var(--color-primary);
+  color: var(--color-white);
+  height: 84px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-xl);
+  border-radius: 0;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  color: var(--color-white);
+}
+
+.header-logo-text {
+  font-size: 20px;
+  font-weight: bold;
+  letter-spacing: 0.01em;
+}
+
+/* ── Rol-dropdown rechtsboven ── */
+.header-actions { position: relative; }
+
+.rol-dropdown-wrapper { position: relative; }
+
+.rol-dropdown-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: var(--radius-sm);
+  color: var(--color-white);
+  padding: 10px 16px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background 0.15s ease;
+  white-space: nowrap;
+  margin: 0;
+  align-self: auto;
+}
+
+.rol-dropdown-btn:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.rol-dropdown-btn .dropdown-arrow {
+  transition: transform 0.2s ease;
+  color: var(--color-white);
+}
+
+.rol-dropdown-wrapper.open .dropdown-arrow {
+  transform: rotate(180deg);
+}
+
+.rol-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  min-width: 200px;
+  list-style: none;
+  padding: var(--space-xs) 0;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  display: none;
+  z-index: 200;
+}
+
+.rol-dropdown-wrapper.open .rol-dropdown-menu {
+  display: block;
+}
+
+.rol-dropdown-menu li {
+  padding: 12px 18px;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  transition: background 0.1s;
+}
+
+.rol-dropdown-menu li:hover {
+  background: var(--color-bg-page);
+}
+
+.rol-dropdown-menu li.selected {
+  background: #FFF0F1;
+  color: var(--color-primary);
+  font-weight: bold;
+}
