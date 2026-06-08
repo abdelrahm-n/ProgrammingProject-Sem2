@@ -305,3 +305,153 @@ body {
 /* ── Meldingen ── */
 .fout   { color: var(--color-error);   font-size: 13px; margin-top: 6px; min-height: 20px; }
 .succes { color: var(--color-success); font-size: 13px; margin-top: 6px; }
+
+/* ===================================================
+   ALGEMENE COMPONENTEN (navigatie, tabellen, kaarten)
+   =================================================== */
+
+/* ── Sidebar navigatie ── */
+.sidebar {
+  background: var(--color-bg-sidebar);
+  width: 280px;
+  min-height: 100vh;
+  border-right: 1px solid var(--color-border);
+  padding: var(--space-lg) 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  padding: 20px 24px;
+  border: none;
+  background: var(--color-bg-card);
+  color: var(--color-text-primary);
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: none;
+  width: 100%;
+  transition: background 0.12s ease;
+  height: 72px;
+}
+
+.nav-item:hover    { background: var(--color-bg-page); }
+.nav-item.actief   { background: var(--color-primary); color: var(--color-white); }
+.nav-item svg      { width: 24px; height: 24px; flex-shrink: 0; }
+
+/* ── Content area ── */
+.content-area {
+  flex: 1;
+  background: var(--color-bg-page);
+  padding: var(--space-xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xl);
+}
+
+/* ── Dashboard kaarten ── */
+.dashboard-kaarten {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--space-lg);
+}
+
+.dashboard-kaart {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-lg);
+  height: 130px;
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.dashboard-kaart .kaart-icon {
+  color: var(--color-primary);
+  flex-shrink: 0;
+}
+
+.dashboard-kaart .kaart-getal {
+  font-size: 28px;
+  font-weight: bold;
+  color: var(--color-text-primary);
+}
+
+/* ── Tabellen ── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  font-size: 14px;
+}
+
+th {
+  background: var(--color-bg-table-head);
+  color: var(--color-text-primary);
+  padding: 14px 18px;
+  text-align: left;
+  font-weight: bold;
+  border-bottom: 1px solid var(--color-border);
+}
+
+td { padding: 15px 18px; border-bottom: 1px solid var(--color-border-light); }
+tr:last-child td  { border-bottom: none; }
+tr:hover td       { background: #FAFAFA; }
+
+/* ── Status badges ── */
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.status.ingediend        { background: #FFF3CD; color: #856404; }
+.status.goedgekeurd      { background: #D6F5E0; color: #1A6633; }
+.status.afgekeurd        { background: #FDDDE0; color: #990018; }
+.status.actief           { background: #CFE2FF; color: #084298; }
+.status.afgerond         { background: #E2E3E5; color: #41464B; }
+
+/* ── Algemene knoppen ── */
+button, .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  background: var(--color-primary);
+  color: var(--color-white);
+  transition: background 0.15s ease;
+}
+
+button:hover { background: var(--color-primary-hover); }
+
+button.secundair {
+  background: var(--color-bg-card);
+  border-color: var(--color-border);
+  color: var(--color-text-primary);
+}
+
+button.secundair:hover { background: var(--color-bg-page); }
+
+/* ── Responsief ── */
+@media (max-width: 768px) {
+  .header { padding: 0 var(--space-lg); height: 68px; }
+  .header-logo-text { font-size: 16px; }
+  .login-box { padding: var(--space-lg); }
+  .sidebar { width: 100%; min-height: auto; }
+  .content-area { padding: var(--space-lg); }
+}
