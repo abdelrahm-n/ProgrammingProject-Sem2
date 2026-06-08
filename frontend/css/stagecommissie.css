@@ -1,0 +1,25 @@
+/**
+ * stagecommissie.css — Stijlen specifiek voor de Stagecommissie-rol
+ *
+ * Accentkleur: paars (#7C3AED)
+ */
+
+:root {
+  --rol-accent:       #7C3AED;
+  --rol-accent-hover: #6D28D9;
+  --rol-accent-licht: #F5F3FF;
+}
+
+.nav-item.actief         { background: var(--rol-accent); }
+.stat-kaart__icon        { color: var(--rol-accent); }
+.btn--primair            { background: var(--rol-accent); }
+.btn--primair:hover      { background: var(--rol-accent-hover); }
+.actie-kaart:hover       { border-color: var(--rol-accent); color: var(--rol-accent); }
+.filter-tab.actief       { background: var(--rol-accent); border-color: var(--rol-accent); color: #fff; }
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--rol-accent);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
+}

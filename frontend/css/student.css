@@ -1,0 +1,52 @@
+/**
+ * student.css — Stijlen specifiek voor de Student-rol
+ * Laadt na stijl.css en overschrijft/breidt uit waar nodig.
+ *
+ * Accentkleur: blauw (#1D4ED8)
+ */
+
+:root {
+  --rol-accent:       #1D4ED8;
+  --rol-accent-hover: #1E40AF;
+  --rol-accent-licht: #EFF6FF;
+  --rol-naam:         "Student";
+}
+
+/* ── Sidebar actief item ── */
+.nav-item.actief {
+  background: var(--rol-accent);
+}
+
+/* ── Login/rol-kaart accent ── */
+.rol-kaart--student {
+  --kaart-kleur: var(--rol-accent);
+}
+
+/* ── Stat-kaart icoon kleur ── */
+.stat-kaart__icon { color: var(--rol-accent); }
+
+/* ── Actie-kaart hover ── */
+.actie-kaart:hover {
+  border-color: var(--rol-accent);
+  color: var(--rol-accent);
+}
+
+/* ── Primaire knop ── */
+.btn--primair {
+  background: var(--rol-accent);
+}
+
+.btn--primair:hover {
+  background: var(--rol-accent-hover);
+}
+
+/* ── Sterren evaluatie ── */
+.ster--vol { color: var(--rol-accent); }
+
+/* ── Focus-kleur op inputs ── */
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--rol-accent);
+  box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.12);
+}
