@@ -1,0 +1,28 @@
+/**
+ * mentor.css — Stijlen specifiek voor de Stagementor-rol
+ *
+ * Accentkleur: amber (#D97706)
+ */
+
+:root {
+  --rol-accent:       #D97706;
+  --rol-accent-hover: #B45309;
+  --rol-accent-licht: #FFFBEB;
+}
+
+.nav-item.actief         { background: var(--rol-accent); }
+.stat-kaart__icon        { color: var(--rol-accent); }
+.btn--primair            { background: var(--rol-accent); }
+.btn--primair:hover      { background: var(--rol-accent-hover); }
+.actie-kaart:hover       { border-color: var(--rol-accent); color: var(--rol-accent); }
+
+/* Ongelezen logboek-rijen markeren */
+.rij-ongelezen td:first-child { font-weight: bold; }
+.rij-ongelezen               { background: #FFFBEB; }
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--rol-accent);
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.12);
+}

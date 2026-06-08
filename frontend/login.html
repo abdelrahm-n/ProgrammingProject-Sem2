@@ -1,88 +1,11 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="nl">
 <head>
   <meta charset="UTF-8" />
-  <title>Inloggen — Stage Monitor</title>
-  <link rel="stylesheet" href="/css/stijl.css" />
+  <meta http-equiv="refresh" content="0; url=/index.html" />
+  <title>Doorsturen…</title>
 </head>
 <body>
-
-  <div class="login-wrapper">
-    <div class="login-box">
-      <h1>Stage Monitor</h1>
-      <p class="subtitel">EhB — Toegepaste Informatica</p>
-
-      <form id="loginForm">
-
-        <label>Inloggen als</label>
-        <select id="rol" required>
-          <option value="">— Kies je rol —</option>
-          <option value="student">Student</option>
-          <option value="docent">Docent</option>
-          <option value="stagecommissie">Stagecommissie</option>
-          <option value="mentor">Stagementor</option>
-          <option value="admin">Administratie</option>
-        </select>
-
-        <label>E-mailadres</label>
-        <input type="email" id="email" placeholder="voornaam@ehb.be" required />
-
-        <label>Wachtwoord</label>
-        <input type="password" id="wachtwoord" required />
-
-        <button type="submit">Inloggen</button>
-
-        <p id="foutmelding" class="fout"></p>
-      </form>
-    </div>
-  </div>
-
-  <script>
-    document.getElementById('loginForm').addEventListener('submit', async function (e) {
-      e.preventDefault()
-
-      const rol        = document.getElementById('rol').value
-      const email      = document.getElementById('email').value
-      const wachtwoord = document.getElementById('wachtwoord').value
-
-      if (!rol) {
-        document.getElementById('foutmelding').textContent = 'Kies eerst je rol.'
-        return
-      }
-
-      try {
-        const res  = await fetch('/api/auth/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, wachtwoord })
-        })
-        const data = await res.json()
-
-        if (!res.ok) {
-          document.getElementById('foutmelding').textContent = data.fout || 'Inloggen mislukt.'
-          return
-        }
-
-        // Token en rol opslaan
-        localStorage.setItem('token', data.token)
-        localStorage.setItem('rol',   data.rol)
-
-        // Doorsturen naar de juiste dashboard per rol
-        const dashboards = {
-          student:         '/pages/student/dashboard.html',
-          docent:          '/pages/docent/dashboard.html',
-          stagecommissie:  '/pages/stagecommissie/dashboard.html',
-          mentor:          '/pages/mentor/dashboard.html',
-          admin:           '/pages/admin/dashboard.html',
-        }
-
-        window.location.href = dashboards[data.rol] || '/login.html'
-
-      } catch (err) {
-        document.getElementById('foutmelding').textContent = 'Kan de server niet bereiken.'
-      }
-    })
-  </script>
-
+  <p><a href="/index.html">Klik hier als je niet automatisch wordt doorgestuurd.</a></p>
 </body>
 </html>

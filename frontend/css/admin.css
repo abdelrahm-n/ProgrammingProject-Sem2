@@ -1,0 +1,31 @@
+/**
+ * admin.css — Stijlen specifiek voor de Admin-rol
+ *
+ * Accentkleur: merkrood (#8B0015) — identiek aan de globale brandkleur
+ */
+
+:root {
+  --rol-accent:       #8B0015;
+  --rol-accent-hover: #750012;
+  --rol-accent-licht: #FFF0F1;
+}
+
+.nav-item.actief         { background: var(--rol-accent); }
+.stat-kaart__icon        { color: var(--rol-accent); }
+.btn--primair            { background: var(--rol-accent); }
+.btn--primair:hover      { background: var(--rol-accent-hover); }
+.actie-kaart:hover       { border-color: var(--rol-accent); color: var(--rol-accent); }
+.filter-tab.actief       { background: var(--rol-accent); border-color: var(--rol-accent); color: #fff; }
+
+/* Rol-badge kleuren in gebruikerstabel */
+.badge--info        { background: #DBEAFE; color: #1D4ED8; }
+.badge--waarschuwing{ background: #F5F3FF; color: #7C3AED; }
+.badge--mentor      { background: #FEF3C7; color: #B45309; }
+.badge--gevaar      { background: #FFF0F1; color: #8B0015; }
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--rol-accent);
+  box-shadow: 0 0 0 3px rgba(139, 0, 21, 0.10);
+}
