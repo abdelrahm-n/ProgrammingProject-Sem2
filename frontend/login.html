@@ -2,84 +2,10 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Inloggen — Stageplatform</title>
-  <link rel="stylesheet" href="/programming_project/frontend/css/stijl.css" />
+  <meta http-equiv="refresh" content="0; url=/index.html" />
+  <title>Doorsturen…</title>
 </head>
 <body>
-
-  <!-- Header -->
-  <header class="header">
-    <div class="header-logo">
-      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
-      </svg>
-      <span class="header-logo-text">Stageplatform</span>
-    </div>
-    <div class="header-actions">
-      <div class="rol-dropdown-wrapper" id="rolDropdownWrapper">
-        <button class="rol-dropdown-btn" id="rolDropdownBtn" type="button">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-          </svg>
-          <span id="rolLabel">Kies je rol</span>
-          <svg class="dropdown-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <polyline points="6 9 12 15 18 9"/>
-          </svg>
-        </button>
-        <ul class="rol-dropdown-menu" id="rolDropdownMenu">
-          <li data-rol="student">Student</li>
-          <li data-rol="docent">Docent</li>
-          <li data-rol="stagecommissie">Stagecommissie</li>
-          <li data-rol="mentor">Stagementor</li>
-          <li data-rol="admin">Admin</li>
-        </ul>
-      </div>
-    </div>
-  </header>
-
-  <!-- Login -->
-  <main class="login-wrapper">
-    <div class="login-box">
-      <div class="login-brand">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#8B0015" stroke-width="1.5">
-          <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
-        </svg>
-        <h1>Stageplatform</h1>
-        <p class="subtitel">EhB — Toegepaste Informatica</p>
-      </div>
-      <form id="loginForm" novalidate>
-        <div class="form-group">
-          <label>Inloggen als</label>
-          <div class="rol-display" id="rolDisplay">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
-            </svg>
-            <span id="rolDisplayText">Selecteer je rol via de knop rechtsboven</span>
-          </div>
-          <input type="hidden" id="rolHidden" name="rol" />
-        </div>
-        <div class="form-group">
-          <label for="email">E-mailadres</label>
-          <input type="email" id="email" name="email" placeholder="voornaam@ehb.be" required autocomplete="email" />
-        </div>
-        <div class="form-group">
-          <label for="wachtwoord">Wachtwoord</label>
-          <div class="input-password-wrapper">
-            <input type="password" id="wachtwoord" name="wachtwoord" placeholder="••••••••" required autocomplete="current-password" />
-            <button type="button" class="toggle-pw" id="togglePw" tabindex="-1" aria-label="Wachtwoord tonen">
-              <svg id="eyeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
-              </svg>
-            </button>
-          </div>
-        </div>
-        <button type="submit" class="btn-login" id="btnLogin">Inloggen</button>
-        <p id="foutmelding" class="fout" role="alert"></p>
-      </form>
-    </div>
-  </main>
-
-  <script src="/programming_project/frontend/js/login.js"></script>
+  <p><a href="/index.html">Klik hier als je niet automatisch wordt doorgestuurd.</a></p>
 </body>
 </html>
