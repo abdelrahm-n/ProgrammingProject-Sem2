@@ -1,0 +1,19 @@
+/* docent - accentkleur groen */
+:root {
+  --rol-accent:       #059669;
+  --rol-accent-hover: #047857;
+  --rol-accent-licht: #ECFDF5;
+}
+
+.nav-item.actief    { background: var(--rol-accent); }
+.stat-kaart__icon   { color: var(--rol-accent); }
+.btn--primair       { background: var(--rol-accent); }
+.btn--primair:hover { background: var(--rol-accent-hover); }
+.actie-kaart:hover  { border-color: var(--rol-accent); color: var(--rol-accent); }
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--rol-accent);
+  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.12);
+}
