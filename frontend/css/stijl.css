@@ -156,3 +156,152 @@ body {
   color: var(--color-primary);
   font-weight: bold;
 }
+
+/* ===================================================
+   LOGIN PAGINA
+   =================================================== */
+.login-wrapper {
+  min-height: calc(100vh - 84px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xl) var(--space-md);
+  background: var(--color-bg-page);
+}
+
+.login-box {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-xl);
+  width: 100%;
+  max-width: 440px;
+}
+
+/* Merkidentiteit boven het formulier */
+.login-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: var(--space-xl);
+  gap: var(--space-sm);
+}
+
+.login-brand h1 {
+  font-size: 24px;
+  color: var(--color-text-primary);
+  font-weight: bold;
+}
+
+.subtitel {
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+/* ── Formuliervelden ── */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: var(--space-md);
+}
+
+.form-group label {
+  font-weight: bold;
+  font-size: 13px;
+  color: var(--color-text-primary);
+}
+
+.form-group input[type="email"],
+.form-group input[type="password"],
+.form-group input[type="text"] {
+  padding: 11px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  color: var(--color-text-primary);
+  background: var(--color-bg-card);
+  width: 100%;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(139, 0, 21, 0.10);
+}
+
+/* Rol-weergave in het formulier */
+.rol-display {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: 11px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-table-head);
+  color: var(--color-text-muted);
+  font-size: 14px;
+  transition: border-color 0.15s ease;
+}
+
+.rol-display.rol-geselecteerd {
+  background: #FFF0F1;
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+  font-weight: bold;
+}
+
+/* Wachtwoord met toon/verberg knop */
+.input-password-wrapper {
+  position: relative;
+}
+
+.input-password-wrapper input {
+  padding-right: 46px;
+}
+
+.toggle-pw {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-muted);
+  padding: 4px;
+  margin: 0;
+  align-self: auto;
+  font-size: 0;
+  transition: color 0.15s ease;
+}
+
+.toggle-pw:hover { color: var(--color-primary); background: transparent; }
+
+/* ── Login-knop ── */
+.btn-login {
+  width: 100%;
+  padding: 12px 24px;
+  background: var(--color-primary);
+  color: var(--color-white);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: var(--space-sm);
+  transition: background 0.15s ease;
+  align-self: auto;
+}
+
+.btn-login:hover   { background: var(--color-primary-hover); }
+.btn-login:disabled {
+  background: var(--color-text-muted);
+  cursor: not-allowed;
+}
+
+/* ── Meldingen ── */
+.fout   { color: var(--color-error);   font-size: 13px; margin-top: 6px; min-height: 20px; }
+.succes { color: var(--color-success); font-size: 13px; margin-top: 6px; }
