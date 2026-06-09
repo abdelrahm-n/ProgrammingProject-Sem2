@@ -1,7 +1,7 @@
 export function render() {
   return `
     <div class="view-header">
-      <h1 class="view-titel">Stage indienen</h1>
+      <h1 class="view-titel">profiel</h1>
       <p class="view-subtitel">Dien hier je stageplaats in ter goedkeuring.</p>
     </div>
 
@@ -53,7 +53,7 @@ export function render() {
         </div>
 
         <div class="form-acties">
-          <button type="submit" class="btn btn--primair">Stage indienen</button>
+          <button type="submit" class="btn btn--primair">profiel</button>
           <button type="reset" class="btn btn--secundair">Formulier wissen</button>
         </div>
 

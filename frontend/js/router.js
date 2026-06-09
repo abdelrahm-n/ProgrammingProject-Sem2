@@ -16,9 +16,10 @@ import { buildHeader, buildSidebar } from './layout.js';
 const ROUTES = {
   /* Student */
   'student/dashboard':      () => import('./views/student/dashboard.js'),
-  'student/stage-indienen': () => import('./views/student/stage-indienen.js'),
   'student/logboek':        () => import('./views/student/logboek.js'),
   'student/evaluatie':      () => import('./views/student/evaluatie.js'),
+  'student/profiel': () => import('./views/student/profiel.js'),
+
 
   /* Docent */
   'docent/dashboard':  () => import('./views/docent/dashboard.js'),

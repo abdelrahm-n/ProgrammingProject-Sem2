@@ -20,9 +20,10 @@ const ico = {
 const NAV = {
   student: [
     { hash: 'student/dashboard',      label: 'Dashboard',       icon: ico.dashboard  },
-    { hash: 'student/stage-indienen', label: 'Stage indienen',  icon: ico.stage      },
     { hash: 'student/logboek',        label: 'Logboek',         icon: ico.logboek    },
     { hash: 'student/evaluatie',      label: 'Evaluatie',       icon: ico.evaluatie  },
+    { hash: 'student/stage-indienen', label: 'Profiel',         icon: ico.stage      },
+
   ],
   docent: [
     { hash: 'docent/dashboard',  label: 'Dashboard',       icon: ico.dashboard  },
