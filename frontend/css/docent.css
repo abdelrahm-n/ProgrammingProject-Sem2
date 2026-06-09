@@ -1,24 +1,91 @@
-/**
- * docent.css — Stijlen specifiek voor de Docent-rol
- *
- * Accentkleur: groen (#059669)
- */
-
-:root {
-  --rol-accent:       #c5415c;
-  --rol-accent-hover: #c30808;
-  --rol-accent-licht: #ECFDF5;
+/* ── Zoekbalk ── */
+.zoekbalk-wrapper {
+  margin-bottom: 1rem;
 }
 
-.nav-item.actief         { background: var(--rol-accent); }
-.stat-kaart__icon        { color: var(--rol-accent); }
-.btn--primair            { background: var(--rol-accent); }
-.btn--primair:hover      { background: var(--rol-accent-hover); }
-.actie-kaart:hover       { border-color: var(--rol-accent); color: var(--rol-accent); }
+.zoekbalk-wrapper input {
+  padding: 0.5rem 1rem;
+  width: 100%;
+  box-sizing: border-box;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
 
-input:focus,
-textarea:focus,
-select:focus {
-  border-color: var(--rol-accent);
-  box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.12);
+/* ── Logboek detail ── */
+.detail-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+}
+
+.detail-kaart {
+  padding: 1.5rem;
+}
+
+.detail-titel {
+  margin-bottom: 1.5rem;
+  font-size: 1.3rem;
+}
+
+.detail-student-naam {
+  font-size: 1.1rem;
+  margin-bottom: 0.5rem;
+}
+
+.detail-meta {
+  margin-bottom: 1rem;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.detail-tekst {
+  line-height: 1.7;
+  color: #333;
+}
+
+.detail-status-lijst {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  margin-top: 1rem;
+}
+
+.detail-status-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.detail-status-label {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.detail-status-label--goedgekeurd        { color: #27ae60; }
+.detail-status-label--goedgekeurd.inactief { color: #aaa; }
+.detail-status-label--afgekeurd          { color: #c0392b; }
+.detail-status-label--afgekeurd.inactief   { color: #aaa; }
+
+.detail-status-icoon {
+  font-size: 1.3rem;
+}
+
+.detail-nog-niet {
+  color: #888;
+  font-size: 0.9rem;
+  margin-top: 0.5rem;
+}
+
+/* ── Terug-knop ── */
+.btn--terug {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  color: var(--rol-accent);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 1.5rem;
 }
