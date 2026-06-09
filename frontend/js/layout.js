@@ -22,7 +22,7 @@ const NAV = {
     { hash: 'student/dashboard',      label: 'Dashboard',       icon: ico.dashboard  },
     { hash: 'student/logboek',        label: 'Logboek',         icon: ico.logboek    },
     { hash: 'student/evaluatie',      label: 'Evaluatie',       icon: ico.evaluatie  },
-    { hash: 'student/stage-indienen', label: 'Profiel',         icon: ico.stage      },
+    { hash: 'student/profiel',        label: 'Profiel',         icon: ico.stage      },
 
   ],
   docent: [
