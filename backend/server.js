@@ -8,7 +8,7 @@ app.get('/', (req, res) => {
 });
 //naar andere input
 app.get('/backend', (req, res) => {
-    res.send('Welcome to the backend!');
+    res.send('Hello welkom bij dit ofzo to the backend!');
 });
 
 // Start the server
