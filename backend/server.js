@@ -4,7 +4,7 @@ const PORT = 3000;
 
 //hello world
 app.get('/', (req, res) => {
-    res.send('Hello World');
+    res.send('Hello World, this is me');
 });
 //naar andere input
 app.get('/backend', (req, res) => {
