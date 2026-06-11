@@ -3,13 +3,16 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
   <title>Stageplatform - Student - Stageovereenkomst</title>
+
   <link rel="stylesheet" href="../css/stijl.css" />
   <link rel="stylesheet" href="../css/student.css" />
 </head>
-<body>
 
+<body>
   <div id="app">
+
     <header class="header">
       <div class="header-logo">
         <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -22,11 +25,14 @@
 
       <div class="header-actions">
         <span class="header-rol-badge">Student</span>
-        <button class="btn-terug" onclick="window.location.href='../index.html'">Terug</button>
+        <button class="btn-terug" onclick="window.location.href='../index.html'">
+          Terug
+        </button>
       </div>
     </header>
 
     <div class="app-body">
+
       <nav class="sidebar">
         <a href="dashboard.html" class="nav-item">Dashboard</a>
         <a href="stage-indienen.html" class="nav-item">Stage indienen</a>
@@ -45,7 +51,11 @@
       </nav>
 
       <main class="content-area">
-        <h1>Stageovereenkomst</h1>
+
+        <section class="page-header">
+          <h1>Stageovereenkomst</h1>
+          <p>Controleer je automatisch gegenereerde stageovereenkomst en plaats je handtekening.</p>
+        </section>
 
         <section class="student-card">
           <h2>Voortgang van je stage</h2>
@@ -80,87 +90,68 @@
         </section>
 
         <section class="student-card">
-          <h2>Stageovereenkomst indienen</h2>
-          <p class="muted-text">
-            Je stageaanvraag werd goedgekeurd. Vul hieronder de gegevens in en upload je stageovereenkomst.
-          </p>
 
-          <form id="stageovereenkomstForm" class="student-form">
-            <div class="form-group">
-              <label for="bedrijfsnaam">Bedrijfsnaam</label>
-              <input type="text" id="bedrijfsnaam" name="bedrijfsnaam" required />
-            </div>
+          <div class="contract-wrapper">
 
-            <div class="form-group">
-              <label for="ondernemingsnummer">Ondernemingsnummer</label>
-              <input type="text" id="ondernemingsnummer" name="ondernemingsnummer" required />
-            </div>
+            <div class="contract-document">
 
-            <div class="form-group">
-              <label for="adres">Adres bedrijf</label>
-              <input type="text" id="adres" name="adres" required />
-            </div>
+              <h2 class="contract-title">STAGEOVEREENKOMST</h2>
 
-            <div class="form-group">
-              <label for="stagebegeleider">Stagebegeleider</label>
-              <input type="text" id="stagebegeleider" name="stagebegeleider" required />
-            </div>
-
-            <div class="form-group">
-              <label for="begeleiderEmail">E-mail stagebegeleider</label>
-              <input type="email" id="begeleiderEmail" name="begeleiderEmail" required />
-            </div>
-
-            <div class="form-row">
-              <div class="form-group">
-                <label for="startdatum">Startdatum</label>
-                <input type="date" id="startdatum" name="startdatum" required />
+              <div class="contract-info">
+                <p><strong>Student:</strong> <span id="studentNaam">Laden...</span></p>
+                <p><strong>Opleiding:</strong> <span id="opleiding">Laden...</span></p>
+                <p><strong>Stagebedrijf:</strong> <span id="bedrijfNaam">Laden...</span></p>
+                <p><strong>Stageperiode:</strong> <span id="stagePeriode">Laden...</span></p>
+                <p><strong>Stagementor:</strong> <span id="stagementor">Laden...</span></p>
               </div>
 
-              <div class="form-group">
-                <label for="einddatum">Einddatum</label>
-                <input type="date" id="einddatum" name="einddatum" required />
-              </div>
+              <hr />
+
+              <p class="contract-text">
+                Deze stageovereenkomst werd automatisch opgesteld op basis van de goedgekeurde stageaanvraag.
+                Door te ondertekenen verklaart de student akkoord te gaan met de voorwaarden van de stage.
+              </p>
+
+              <form id="stageovereenkomstForm">
+
+                <div class="signature-field">
+                  <label for="handtekeningStudent">Handtekening student</label>
+                  <input
+                    type="text"
+                    id="handtekeningStudent"
+                    name="handtekeningStudent"
+                    placeholder="Typ je volledige naam"
+                    required
+                  />
+                </div>
+
+                <div class="signature-field">
+                  <label>Handtekening bedrijf</label>
+                  <input type="text" value="In afwachting" disabled />
+                </div>
+
+                <div class="signature-field">
+                  <label>Handtekening hogeschool</label>
+                  <input type="text" value="In afwachting" disabled />
+                </div>
+
+                <button type="submit" class="btn-primary">
+                  Opslaan
+                </button>
+
+              </form>
+
             </div>
 
-            <div class="form-group">
-              <label for="bestand">Upload stageovereenkomst</label>
-              <input type="file" id="bestand" name="bestand" accept=".pdf,.doc,.docx" required />
-              <small>Toegestane bestanden: PDF, DOC of DOCX.</small>
-            </div>
-
-            <button type="submit" class="btn-primary">
-              Stageovereenkomst indienen
-            </button>
-          </form>
-        </section>
-
-        <section class="student-card">
-          <h2>Status</h2>
-
-          <div class="status-list">
-            <div class="status-row">
-              <span>Stageaanvraag</span>
-              <span class="status-success">Goedgekeurd</span>
-            </div>
-
-            <div class="status-row">
-              <span>Stageovereenkomst</span>
-              <span class="status-warning">Nog niet ingediend</span>
-            </div>
-
-            <div class="status-row">
-              <span>Activatie stage</span>
-              <span class="status-muted">Wachtend</span>
-            </div>
           </div>
+
         </section>
+
       </main>
     </div>
   </div>
 
   <script src="../js/nav.js"></script>
   <script src="../js/stageovereenkomst.js"></script>
-
 </body>
 </html>
