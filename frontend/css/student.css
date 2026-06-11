@@ -1,19 +1,161 @@
 /* student - accentkleur blauw */
 :root {
-  --rol-accent:       #1D4ED8;
-  --rol-accent-hover: #1a44bf;
-  --rol-accent-licht: #EFF6FF;
+  --rol-accent: #8B0015;
+  --rol-accent-hover: #750012;
+  --rol-accent-licht: #F7F7F7;
 }
 
-.nav-item.actief    { background: var(--rol-accent); }
-.stat-kaart__icon   { color: var(--rol-accent); }
-.btn--primair       { background: var(--rol-accent); }
-.btn--primair:hover { background: var(--rol-accent-hover); }
-.actie-kaart:hover  { border-color: var(--rol-accent); color: var(--rol-accent); }
+.nav-item.actief {
+  background: var(--rol-accent);
+}
+
+.stat-kaart__icon {
+  color: var(--rol-accent);
+}
+
+.btn--primair {
+  background: var(--rol-accent);
+}
+
+.btn--primair:hover {
+  background: var(--rol-accent-hover);
+}
+
+.actie-kaart:hover {
+  border-color: var(--rol-accent);
+  color: var(--rol-accent);
+}
 
 input:focus,
 textarea:focus,
 select:focus {
   border-color: var(--rol-accent);
-  box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.12);
+  box-shadow: 0 0 0 3px rgba(139, 0, 21, 0.12);
+}
+
+/* student - accentkleur */
+:root {
+  --rol-accent: #8B0015;
+  --rol-accent-hover: #750012;
+  --rol-accent-licht: #F7F7F7;
+}
+
+.nav-item.actief {
+  background: var(--rol-accent);
+}
+
+.stat-kaart__icon {
+  color: var(--rol-accent);
+}
+
+.btn--primair {
+  background: var(--rol-accent);
+}
+
+.btn--primair:hover {
+  background: var(--rol-accent-hover);
+}
+
+.actie-kaart:hover {
+  border-color: var(--rol-accent);
+  color: var(--rol-accent);
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--rol-accent);
+  box-shadow: 0 0 0 3px rgba(139, 0, 21, 0.12);
+}
+
+/*CSS dashboard*/
+
+.content-area {
+  background: #F7F7F7;
+  padding: 32px;
+}
+
+.dashboard-welcome {
+  margin-bottom: 32px;
+}
+
+.dashboard-welcome h1 {
+  font-size: 32px;
+  margin-bottom: 8px;
+  color: #1E1E1E;
+}
+
+.dashboard-welcome p {
+  color: #555555;
+}
+
+.dashboard-card {
+  background: #FFFFFF;
+  border: 1px solid #D8D8D8;
+  border-radius: 4px;
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.dashboard-card h2 {
+  margin-top: 0;
+  margin-bottom: 12px;
+}
+
+.progress-overview {
+  display: flex;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.progress-step {
+  flex: 1;
+  background: #FFFFFF;
+  border: 1px solid #E4E4E4;
+  border-radius: 4px;
+  padding: 16px;
+  text-align: center;
+}
+
+.progress-step span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 36px;
+  height: 36px;
+
+  margin: 0 auto 10px auto;
+
+  border-radius: 50%;
+
+  background: var(--rol-accent);
+  color: white;
+  font-weight: bold;
+}
+
+.btn-primary {
+  display: inline-block;
+  background: var(--rol-accent);
+  color: white;
+  padding: 12px 20px;
+  border-radius: 4px;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.btn-primary:hover {
+  background: var(--rol-accent-hover);
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.btn-secondary {
+  color: var(--rol-accent);
+  text-decoration: none;
+  font-weight: bold;
 }
