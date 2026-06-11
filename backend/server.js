@@ -8,6 +8,7 @@ import logboekenRoutes    from './routes/logboeken.js'
 import evaluatiesRoutes   from './routes/evaluaties.js'
 import competentiesRoutes from './routes/competenties.js'
 import adminRoutes        from './routes/admin.js'
+import stageovereenkomstRoutes from "./routes/stageovereenkomst.js";
 
 dotenv.config()
 
@@ -23,6 +24,7 @@ app.use('/api/logboeken',    logboekenRoutes)
 app.use('/api/evaluaties',   evaluatiesRoutes)
 app.use('/api/competenties', competentiesRoutes)
 app.use('/api/admin',        adminRoutes)
+app.use("/api/stageovereenkomst", stageovereenkomstRoutes);
 
 app.listen(PORT, () => {
   console.log(`Server draait op http://localhost:${PORT}`)
