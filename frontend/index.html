@@ -3,73 +3,85 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Stageplatform - Inloggen</title>
-  <link rel="stylesheet" href="/frontend/css/stijl.css" />
+  <title>Stageplatform - Kies je rol</title>
+  <link rel="stylesheet" href="css/stijl.css" />
 </head>
-<body class="login-pagina">
+<body class="rol-keuze-pagina">
 
-  <div class="login-wrapper">
-    <div class="login-kaart">
+  <div class="rol-keuze-wrapper">
 
-      <div class="login-logo">
-        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-          <path d="M2 17l10 5 10-5"/>
-          <path d="M2 12l10 5 10-5"/>
-        </svg>
-        <span>Stageplatform</span>
-      </div>
+    <div class="rol-keuze-intro">
+      <h1>Stageplatform</h1>
+      <p>EhB – Toegepaste Informatica – Kies je rol om in te loggen</p>
+    </div>
 
-      <h1>Inloggen</h1>
-      <p class="login-subtitel">EhB – Toegepaste Informatica</p>
+    <div class="rol-keuze-grid">
 
-      <form id="loginForm" novalidate>
-
-        <div class="veld-groep">
-          <label for="email">E-mailadres</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            placeholder="naam.achternaam@student.ehb.be"
-            autocomplete="email"
-            required
-          />
-          <small>Gebruik je EhB-adres: naam.achternaam@<strong>rol</strong>.ehb.be</small>
+      <a href="login.html?rol=student" class="rol-kaart rol-kaart--student">
+        <div class="rol-kaart__icon">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
         </div>
+        <span class="rol-kaart__label">Student</span>
+        <span class="rol-kaart__desc">Logboek bijhouden, stage indienen, evaluaties bekijken</span>
+        <span class="rol-kaart__pijl">→</span>
+      </a>
 
-        <div class="veld-groep">
-          <label for="wachtwoord">Wachtwoord</label>
-          <div class="wachtwoord-wrapper">
-            <input
-              type="password"
-              id="wachtwoord"
-              name="wachtwoord"
-              placeholder="••••••••"
-              autocomplete="current-password"
-              required
-            />
-            <button type="button" id="toonWachtwoord" class="oog-knop" aria-label="Toon wachtwoord">
-              <svg id="oogIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                <circle cx="12" cy="12" r="3"/>
-              </svg>
-            </button>
-          </div>
+      <a href="login.html?rol=docent" class="rol-kaart rol-kaart--docent">
+        <div class="rol-kaart__icon">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="3" width="20" height="14" rx="2"/>
+            <path d="M8 21h8M12 17v4"/>
+          </svg>
         </div>
+        <span class="rol-kaart__label">Docent</span>
+        <span class="rol-kaart__desc">Studenten opvolgen, logboeken lezen, evaluaties invullen</span>
+        <span class="rol-kaart__pijl">→</span>
+      </a>
 
-        <p id="foutmelding" class="foutmelding" hidden></p>
+      <a href="login.html?rol=mentor" class="rol-kaart rol-kaart--mentor">
+        <div class="rol-kaart__icon">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <span class="rol-kaart__label">Stagementor</span>
+        <span class="rol-kaart__desc">Logboek nakijken, student begeleiden, evaluaties geven</span>
+        <span class="rol-kaart__pijl">→</span>
+      </a>
 
-        <button type="submit" id="loginKnop" class="login-knop">
-          <span id="knopTekst">Inloggen</span>
-          <span id="laadicoon" class="spinner" hidden></span>
-        </button>
+      <a href="login.html?rol=commissie" class="rol-kaart rol-kaart--stagecommissie">
+        <div class="rol-kaart__icon">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+            <path d="M2 17l10 5 10-5"/>
+            <path d="M2 12l10 5 10-5"/>
+          </svg>
+        </div>
+        <span class="rol-kaart__label">Stagecommissie</span>
+        <span class="rol-kaart__desc">Stageaanvragen beoordelen, competenties beheren</span>
+        <span class="rol-kaart__pijl">→</span>
+      </a>
 
-      </form>
+      <a href="login.html?rol=admin" class="rol-kaart rol-kaart--admin">
+        <div class="rol-kaart__icon">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
+          </svg>
+        </div>
+        <span class="rol-kaart__label">Administratie</span>
+        <span class="rol-kaart__desc">Gebruikers en overeenkomsten beheren</span>
+        <span class="rol-kaart__pijl">→</span>
+      </a>
 
     </div>
+
   </div>
 
-  <script src="js/login.js"></script>
 </body>
 </html>
