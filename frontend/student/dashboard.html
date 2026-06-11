@@ -75,7 +75,7 @@
 
         </section>
 
-        <section class="dashboard-card">
+        <section class="dashboard-card" id="stageprocesCard">
           <h2>Stageproces starten</h2>
           <p>Je hebt nog geen stageaanvraag ingediend. Start met het indienen van je stagevoorstel.</p>
 
@@ -84,6 +84,33 @@
           </a>
         </section>
 
+        <section class="dashboard-card" id="stageovereenkomstCard" style="display:none;">
+  <h2>Stageovereenkomst</h2>
+
+  <p>
+    Je stagevoorstel is goedgekeurd.
+    Je kan nu je stageovereenkomst bekijken en ondertekenen.
+  </p>
+
+  <a href="stageovereenkomst.html" class="btn-primary">
+    Stageovereenkomst openen
+  </a>
+</section>
+
+        <section class="dashboard-card" id="stageovereenkomstCard" style="display:none;">
+
+        <h2>Stageovereenkomst</h2>
+
+         <p id="stageovereenkomstTekst">
+         Je stageovereenkomst wordt beschikbaar zodra je stagevoorstel is goedgekeurd.
+        </p>
+
+  <a href="#" class="btn-secondary disabled-link" id="stageovereenkomstBtn">
+    Nog niet beschikbaar
+  </a>
+</section>
+
+        <section class="dashboard-grid">
       </main>
 
       <script>
@@ -95,7 +122,8 @@
       </script>
 
 
-      <script src="../js/nav.js"></script>
+  <script src="../js/nav.js"></script>
+  <script src="../js/dashboard-stageovereenkomst.js"></script>
 
 
 </body>
