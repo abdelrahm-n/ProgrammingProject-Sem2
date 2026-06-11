@@ -1,0 +1,151 @@
+/* Login en registratie pagina stijlen */
+
+.login-pagina {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-bg-page);
+  padding: var(--sp-3);
+}
+
+.login-wrapper {
+  width: 100%;
+  max-width: 420px;
+}
+
+.login-kaart {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.login-terug {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  text-decoration: none;
+  align-self: flex-start;
+}
+
+.login-terug:hover {
+  color: var(--color-primary);
+}
+
+.login-kaart h1 {
+  font-size: 22px;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.login-subtitel {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin: -8px 0 0;
+}
+
+/* Email veld met domein-suffix */
+.email-wrapper {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.email-wrapper input {
+  flex: 1;
+  border: none;
+  border-radius: 0;
+  padding: 10px 13px;
+  font-size: 14px;
+  color: var(--color-text);
+  background: var(--color-bg-card);
+  min-width: 0;
+}
+
+.email-wrapper input:focus {
+  outline: none;
+}
+
+.email-wrapper:focus-within {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(139, 0, 21, 0.10);
+}
+
+.email-domein {
+  padding: 10px 12px;
+  background: var(--color-bg-page);
+  border-left: 1px solid var(--color-border);
+  font-size: 13px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.email-preview {
+  background: var(--color-bg-page);
+  color: var(--color-text-muted);
+  cursor: default;
+}
+
+/* Wachtwoord veld met knop */
+.wachtwoord-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.wachtwoord-wrapper input {
+  padding-right: 44px;
+}
+
+.oog-knop {
+  position: absolute;
+  right: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+}
+
+.oog-knop:hover {
+  color: var(--color-text);
+}
+
+/* Login knop volle breedte */
+.btn--login {
+  width: 100%;
+  justify-content: center;
+  margin-top: var(--sp-1);
+}
+
+/* Registreer link onder het formulier */
+.mentor-register {
+  text-align: center;
+  font-size: 13px;
+  color: var(--color-text-muted);
+  padding-top: var(--sp-2);
+  border-top: 1px solid var(--color-border-light);
+}
+
+.mentor-register a {
+  color: var(--color-primary);
+  text-decoration: none;
+}
+
+.mentor-register a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 480px) {
+  .login-kaart {
+    padding: var(--sp-4);
+  }
+}
