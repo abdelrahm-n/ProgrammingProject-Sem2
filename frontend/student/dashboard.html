@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="../css/student.css" />
 </head>
 
+
 <body>
 
   <div id="app">
@@ -42,26 +43,21 @@
           Uitloggen
         </a>
       </nav>
-
       <main class="content-area">
-        <section class="dashboard-welcome">
-          <h1>Welkom, student</h1>
-          <p>Hier vind je een overzicht van je stageproces, documenten, logboeken en evaluaties.</p>
-        </section>
 
         <section class="dashboard-card">
           <h2>Status van je stageaanvraag</h2>
 
           <div class="stage-progress">
-
             <div class="progress-line"></div>
 
-            <div class="stage-step">
+            <div class="stage-step" id="step-ingediend">
               <span></span>
               <p>Ingediend</p>
             </div>
 
-            <div class="stage-step"> <span></span>
+            <div class="stage-step">
+              <span></span>
               <p>Aangekomen bij<br>administratie</p>
             </div>
 
@@ -74,15 +70,14 @@
               <span></span>
               <p>Goedgekeurd</p>
             </div>
-
           </div>
+
+
         </section>
 
         <section class="dashboard-card" id="stageprocesCard">
           <h2>Stageproces starten</h2>
-          <p>
-            Je hebt nog geen stageaanvraag ingediend. Start met het indienen van je stagevoorstel.
-          </p>
+          <p>Je hebt nog geen stageaanvraag ingediend. Start met het indienen van je stagevoorstel.</p>
 
           <a href="stagevoorstel.html" class="btn-primary">
             Stagevoorstel indienen
@@ -117,11 +112,19 @@
 
         <section class="dashboard-grid">
       </main>
-    </div>
-  </div>
+
+      <script>
+        const status = localStorage.getItem("stageStatus");
+
+        if (status === "ingediend") {
+          document.getElementById("step-ingediend").classList.add("active");
+        }
+      </script>
+
 
   <script src="../js/nav.js"></script>
   <script src="../js/dashboard-stageovereenkomst.js"></script>
+
 
 </body>
 
