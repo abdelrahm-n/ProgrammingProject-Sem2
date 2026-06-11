@@ -134,8 +134,12 @@
                 <section class="dashboard-card">
                     <h2>Indienen</h2>
                     <p>Controleer alle gegevens voor je het stagevoorstel indient.</p>
-                    <a href="dashboard.html" class="btn-primary">
-                        indienen</a>
+
+
+
+                    <button type="button" class="btn btn--primair" onclick="stagevoorstelIndienen()">
+                        Indienen
+                    </button>
 
                 </section>
 
@@ -143,14 +147,10 @@
         </div>
     </div>
 
-    <script>
-        function stagevoorstelIndienen() {
-            localStorage.setItem("stageStatus", "ingediend");
-            window.location.href = "dashboard.html";
-        }
-    </script>
-
+    <script src="../js/stagevoorstel.js"></script>
     <script src="../js/nav.js"></script>
+
+
 
 </body>
 
