@@ -25,7 +25,7 @@
 
       <div class="header-actions">
         <span class="header-rol-badge">Student</span>
-        <button class="btn-terug" onclick="window.location.href='../index.html'">
+        <button class="btn-terug" onclick="window.location.href='dashboard.html'">
           Terug
         </button>
       </div>
@@ -90,19 +90,35 @@
         </section>
 
         <section class="student-card">
-
           <div class="contract-wrapper">
-
             <div class="contract-document">
 
               <h2 class="contract-title">STAGEOVEREENKOMST</h2>
 
+              <p id="melding" class="form-message"></p>
+
               <div class="contract-info">
+                <p><strong>Status:</strong> <span id="status">Laden...</span></p>
+
+                <hr />
+
                 <p><strong>Student:</strong> <span id="studentNaam">Laden...</span></p>
+                <p><strong>Studentnummer:</strong> <span id="studentnummer">Laden...</span></p>
                 <p><strong>Opleiding:</strong> <span id="opleiding">Laden...</span></p>
+                <p><strong>E-mail student:</strong> <span id="emailStudent">Laden...</span></p>
+
+                <hr />
+
                 <p><strong>Stagebedrijf:</strong> <span id="bedrijfNaam">Laden...</span></p>
-                <p><strong>Stageperiode:</strong> <span id="stagePeriode">Laden...</span></p>
-                <p><strong>Stagementor:</strong> <span id="stagementor">Laden...</span></p>
+                <p><strong>Contactpersoon:</strong> <span id="contactpersoon">Laden...</span></p>
+                <p><strong>E-mail bedrijf:</strong> <span id="emailBedrijf">Laden...</span></p>
+                <p><strong>Telefoon:</strong> <span id="telefoon">Laden...</span></p>
+
+                <hr />
+
+                <p><strong>Stageperiode:</strong> <span id="stageperiode">Laden...</span></p>
+                <p><strong>Functie:</strong> <span id="functie">Laden...</span></p>
+                <p><strong>Stageopdracht:</strong> <span id="stageopdracht">Laden...</span></p>
               </div>
 
               <hr />
@@ -112,39 +128,27 @@
                 Door te ondertekenen verklaart de student akkoord te gaan met de voorwaarden van de stage.
               </p>
 
-              <form id="stageovereenkomstForm">
+              <div class="signature-field">
+                <label>Handtekening student</label>
+                <input type="text" id="studentCheck" value="Nog niet ondertekend" disabled />
+              </div>
 
-                <div class="signature-field">
-                  <label for="handtekeningStudent">Handtekening student</label>
-                  <input
-                    type="text"
-                    id="handtekeningStudent"
-                    name="handtekeningStudent"
-                    placeholder="Typ je volledige naam"
-                    required
-                  />
-                </div>
+              <div class="signature-field">
+                <label>Handtekening bedrijf</label>
+                <input type="text" id="bedrijfCheck" value="Nog niet ondertekend" disabled />
+              </div>
 
-                <div class="signature-field">
-                  <label>Handtekening bedrijf</label>
-                  <input type="text" value="In afwachting" disabled />
-                </div>
+              <div class="signature-field">
+                <label>Handtekening hogeschool</label>
+                <input type="text" id="schoolCheck" value="Nog niet ondertekend" disabled />
+              </div>
 
-                <div class="signature-field">
-                  <label>Handtekening hogeschool</label>
-                  <input type="text" value="In afwachting" disabled />
-                </div>
-
-                <button type="submit" class="btn-primary">
-                  Opslaan
-                </button>
-
-              </form>
+              <button type="button" id="ondertekenBtn" class="btn-primary">
+                Ondertekenen als student
+              </button>
 
             </div>
-
           </div>
-
         </section>
 
       </main>
