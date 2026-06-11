@@ -20,24 +20,51 @@ router.get("/:stagevoorstelId", async (req, res) => {
         os.naam AS overeenkomst_status,
 
         sv.id AS stagevoorstel_id,
-        sv.student_naam,
-        sv.studentnummer,
-        sv.opleiding,
-        sv.email_student,
-        sv.bedrijf_naam,
-        sv.contactpersoon,
-        sv.email_bedrijf,
-        sv.telefoon,
+        sv.omschrijving_opdracht,
         sv.startdatum,
         sv.einddatum,
-        sv.stageopdracht,
-        sv.functie
+
+        student_p.voornaam AS student_voornaam,
+        student_p.achternaam AS student_achternaam,
+        student_p.email AS email_student,
+        s.studentnummer,
+
+        o.naam AS opleiding,
+
+        b.naam AS bedrijf_naam,
+        b.email AS email_bedrijf,
+        b.telefoon AS telefoon,
+
+        mentor_p.voornaam AS mentor_voornaam,
+        mentor_p.achternaam AS mentor_achternaam,
+        sm.functie AS mentor_functie
 
       FROM stageovereenkomst so
-      JOIN stagevoorstel sv 
+
+      JOIN stagevoorstel sv
         ON so.stagevoorstel_id = sv.id
+
       JOIN overeenkomst_status os
         ON so.status_id = os.id
+
+      JOIN student s
+        ON sv.student_id = s.persoon_id
+
+      JOIN persoon student_p
+        ON s.persoon_id = student_p.id
+
+      JOIN opleiding o
+        ON s.opleiding_id = o.id
+
+      JOIN bedrijf b
+        ON sv.bedrijf_id = b.id
+
+      LEFT JOIN stagementor sm
+        ON sv.mentor_id = sm.persoon_id
+
+      LEFT JOIN persoon mentor_p
+        ON sm.persoon_id = mentor_p.id
+
       WHERE sv.id = ?
       `,
       [stagevoorstelId]

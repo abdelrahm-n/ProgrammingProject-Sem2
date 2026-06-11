@@ -1,9 +1,5 @@
 const API_URL = "http://localhost:3000/api/stageovereenkomst";
 
-/*
-  Tijdelijk hardcoded.
-  Later haal je dit uit de ingelogde student.
-*/
 const stagevoorstelId = 1;
 
 async function laadStageovereenkomst() {
@@ -18,31 +14,41 @@ async function laadStageovereenkomst() {
       return;
     }
 
-    document.getElementById("studentNaam").textContent = data.student_naam;
+    document.getElementById("studentNaam").textContent =
+      `${data.student_voornaam} ${data.student_achternaam}`;
+
     document.getElementById("studentnummer").textContent = data.studentnummer;
     document.getElementById("opleiding").textContent = data.opleiding;
     document.getElementById("emailStudent").textContent = data.email_student;
 
     document.getElementById("bedrijfNaam").textContent = data.bedrijf_naam;
-    document.getElementById("contactpersoon").textContent = data.contactpersoon;
+
+    document.getElementById("contactpersoon").textContent =
+      data.mentor_voornaam
+        ? `${data.mentor_voornaam} ${data.mentor_achternaam}`
+        : "Niet ingevuld";
+
     document.getElementById("emailBedrijf").textContent = data.email_bedrijf;
     document.getElementById("telefoon").textContent = data.telefoon;
 
     document.getElementById("stageperiode").textContent =
       `${formatDatum(data.startdatum)} - ${formatDatum(data.einddatum)}`;
 
-    document.getElementById("functie").textContent = data.functie;
-    document.getElementById("stageopdracht").textContent = data.stageopdracht;
+    document.getElementById("functie").textContent =
+      data.mentor_functie ?? "Niet ingevuld";
+
+    document.getElementById("stageopdracht").textContent =
+      data.omschrijving_opdracht;
 
     document.getElementById("status").textContent = data.overeenkomst_status;
 
-    document.getElementById("studentCheck").textContent =
+    document.getElementById("studentCheck").value =
       data.getekend_door_student ? "Ondertekend" : "Nog niet ondertekend";
 
-    document.getElementById("bedrijfCheck").textContent =
+    document.getElementById("bedrijfCheck").value =
       data.getekend_door_bedrijf ? "Ondertekend" : "Nog niet ondertekend";
 
-    document.getElementById("schoolCheck").textContent =
+    document.getElementById("schoolCheck").value =
       data.getekend_door_school ? "Ondertekend" : "Nog niet ondertekend";
 
     if (data.getekend_door_student) {
@@ -85,6 +91,8 @@ function formatDatum(datum) {
   return new Date(datum).toLocaleDateString("nl-BE");
 }
 
-document.getElementById("ondertekenBtn").addEventListener("click", ondertekenAlsStudent);
+document
+  .getElementById("ondertekenBtn")
+  .addEventListener("click", ondertekenAlsStudent);
 
 laadStageovereenkomst();
