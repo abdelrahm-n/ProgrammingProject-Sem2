@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stageplatform - Registreren</title>
+  <link rel="stylesheet" href="css/stijl.css" />
+  <link rel="stylesheet" href="css/login.css" />
+</head>
+<body class="login-pagina">
+
+  <div class="login-wrapper">
+    <div class="login-kaart">
+
+      <a href="login.html?rol=mentor" class="login-terug">← Terug naar inloggen</a>
+
+      <h1>Registreren als stagementor</h1>
+      <p class="login-subtitel">Maak een account aan voor het stageplatform</p>
+
+      <form id="registreerForm" novalidate>
+
+        <div class="form-rij form-rij--2">
+          <div class="form-group">
+            <label for="voornaam">Voornaam</label>
+            <input
+              type="text"
+              id="voornaam"
+              name="voornaam"
+              placeholder="Jan"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="achternaam">Achternaam</label>
+            <input
+              type="text"
+              id="achternaam"
+              name="achternaam"
+              placeholder="Janssen"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>E-mailadres (automatisch gegenereerd)</label>
+          <div class="email-wrapper">
+            <input type="text" id="emailPreview" class="email-preview" readonly placeholder="voornaam.achternaam" />
+            <span class="email-domein">@mentor.ehb.be</span>
+          </div>
+          <small>Wordt ingevuld op basis van je naam</small>
+        </div>
+
+        <div class="form-group">
+          <label for="wachtwoord">Wachtwoord</label>
+          <input
+            type="password"
+            id="wachtwoord"
+            name="wachtwoord"
+            placeholder="Minimaal 6 tekens"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="wachtwoordBevestig">Bevestig wachtwoord</label>
+          <input
+            type="password"
+            id="wachtwoordBevestig"
+            name="wachtwoordBevestig"
+            placeholder="Herhaal je wachtwoord"
+            required
+          />
+        </div>
+
+        <p id="foutmelding" class="melding melding--fout" hidden></p>
+        <p id="succesbericht" class="melding melding--succes" hidden></p>
+
+        <button type="submit" class="btn btn--primair btn--login">Account aanmaken</button>
+
+      </form>
+
+      <div class="mentor-register">
+        <p>Al een account? <a href="login.html?rol=mentor">Inloggen als mentor</a></p>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="js/registreren.js"></script>
+</body>
+</html>
