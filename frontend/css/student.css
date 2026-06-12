@@ -318,6 +318,15 @@ select:focus {
 }
 
 
+.stage-step.rejected span {
+  background-color: #dc3545;
+}
+
+.stage-step.rejected p {
+  color: #dc3545;
+  font-weight: bold;
+}
+
 
 /* ==========================================
    STAGEOVEREENKOMST

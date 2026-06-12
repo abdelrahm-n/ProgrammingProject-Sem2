@@ -63,16 +63,16 @@
 
             <div class="progress-line" id="line-ingediend-behandeling"></div>
 
-            <div class="stage-step" id="step-behandelng">
+            <div class="stage-step" id="step-behandeling">
               <span></span>
               <p>In behandeling</p>
             </div>
 
             <div class="progress-line" id="line-behandeling-goedgekeurd"></div>
 
-            <div class="stage-step">
+            <div class="stage-step" id="step-goedgekeurd">
               <span></span>
-              <p>Goedgekeurd</p>
+              <p id="laatste-status">Goedgekeurd</p>
             </div>
 
           </div>
@@ -88,10 +88,11 @@
         </section>
 
         <section class="dashboard-card" id="start-stage-card">
-          <h2>Stageproces starten</h2>
-          <p>Je hebt nog geen stageaanvraag ingediend. Start met het indienen van je stagevoorstel.</p>
-
-          <a href="stagevoorstel.html" class="btn btn--primair">
+          <h2 id="start-card-title">Stageproces starten</h2>
+          <p id="start-card-text">
+            Je hebt nog geen stageaanvraag ingediend. Start met het indienen van je stagevoorstel.
+          </p>
+          <a href="stagevoorstel.html" class="btn btn--primair" id="start-card-button">
             Stagevoorstel indienen
           </a>
         </section>

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="nl">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,13 +8,16 @@
   <link rel="stylesheet" href="../css/stijl.css" />
   <link rel="stylesheet" href="../css/stagecommissie.css" />
 </head>
+
 <body>
 
   <div id="app">
     <header class="header">
       <div class="header-logo">
         <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+          <path d="M12 2L2 7l10 5 10-5-10-5z" />
+          <path d="M2 17l10 5 10-5" />
+          <path d="M2 12l10 5 10-5" />
         </svg>
         <span class="header-logo-text">Stageplatform</span>
       </div>
@@ -30,20 +34,49 @@
         <a href="competenties.html" class="nav-item">Competenties</a>
         <a href="../index.html" class="nav-item" id="uitlogBtn" style="margin-top:auto">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-            <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
           </svg>
           Uitloggen
         </a>
       </nav>
-
       <main class="content-area">
-        <!-- inhoud komt hier -->
+
+        <section class="dashboard-card">
+          <h1>Stageaanvragen</h1>
+          <p>Bekijk en beoordeel de stageaanvragen van studenten.</p>
+        </section>
+
+        <section class="dashboard-card">
+          <h2>Stageaanvraag student</h2>
+
+          <p><strong>Student:</strong> Ranya Rabib</p>
+          <p><strong>Opleiding:</strong> Toegepaste Informatica</p>
+          <p><strong>Stagebedrijf:</strong> Voorbeeldbedrijf</p>
+          <p><strong>Functie:</strong> Junior Network Engineer</p>
+
+          <p>
+            <strong>Omschrijving opdracht:</strong><br>
+            De student zal ondersteunende IT-taken uitvoeren binnen het bedrijf.
+          </p>
+
+          <div class="actie-knoppen">
+            <button class="btn btn--primair" onclick="aanvraagGoedkeuren()">
+              Goedkeuren
+            </button>
+
+            <button class="btn btn--gevaar" onclick="aanvraagAfkeuren()">
+              Afkeuren
+            </button>
+          </div>
+        </section>
       </main>
     </div>
   </div>
 
+  <script src="../js/stagecommissieAanvragen.js"></script>
   <script src="../js/nav.js"></script>
-
 </body>
+
 </html>
