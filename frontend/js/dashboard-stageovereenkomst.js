@@ -1,38 +1,33 @@
-/*<const stagevoorstelStatus = "goedgekeurd"; 
-// later komt dit uit de database
+const API = "http://localhost:3000/api"
+const STUDENT_ID = 1 // voorlopig hardcoded
 
-const stageovereenkomstTekst = document.getElementById("stageovereenkomstTekst");
-const stageovereenkomstBtn = document.getElementById("stageovereenkomstBtn");
+document.addEventListener("DOMContentLoaded", function () {
+  laadDashboardStatus()
+})
 
-if (stagevoorstelStatus === "goedgekeurd") {
-  stageovereenkomstTekst.textContent =
-    "Je stagevoorstel is goedgekeurd. Je kan nu je stageovereenkomst controleren en ondertekenen.";
+async function laadDashboardStatus() {
+  try {
+    const res = await fetch(`${API}/stageovereenkomst/voorstel/${STUDENT_ID}`)
+    const data = await res.json()
 
-  stageovereenkomstBtn.textContent = "Stageovereenkomst openen";
-  stageovereenkomstBtn.href = "stageovereenkomst.html";
-  stageovereenkomstBtn.classList.remove("btn-secondary", "disabled-link");
-  stageovereenkomstBtn.classList.add("btn-primary");
-}>
+    if (!res.ok) {
+      // Geen voorstel gevonden → toon "stageproces starten"
+      return
+    }
 
+    const stageprocesCard = document.getElementById("stageprocesCard")
+    const stageovereenkomstCard = document.getElementById("stageovereenkomstCard")
 
-/*
-  TESTSTATUS
-
-  niet_ingediend
-  ingediend
-  in_behandeling
-  goedgekeurd
-*/
-
-const stagevoorstelStatus = "niet_ingediend";
-
-const stageprocesCard =
-  document.getElementById("stageprocesCard");
-
-const stageovereenkomstCard =
-  document.getElementById("stageovereenkomstCard");
-
-if (stagevoorstelStatus === "goedgekeurd") {
-  stageprocesCard.style.display = "none";
-  stageovereenkomstCard.style.display = "block";
+    if (data.status_naam === "goedgekeurd") {
+      // Verberg "stageproces starten", toon "stageovereenkomst"
+      if (stageprocesCard) stageprocesCard.style.display = "none"
+      if (stageovereenkomstCard) stageovereenkomstCard.style.display = "block"
+    } else if (data.status_naam === "ingediend") {
+      // Toon progress stap "ingediend"
+      const step = document.getElementById("step-ingediend")
+      if (step) step.classList.add("active")
+    }
+  } catch (error) {
+    console.error("Dashboard status laden mislukt:", error)
+  }
 }
