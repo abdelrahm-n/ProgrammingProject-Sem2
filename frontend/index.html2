@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stageplatform - Kies je rol</title>
+  <link rel="stylesheet" href="css/stijl.css" />
+</head>
+<body class="rol-keuze-pagina">
+
+  <header class="header">
+    <div class="header-logo">
+      <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+      </svg>
+      <span class="header-logo-text">Stageplatform</span>
+    </div>
+    <span class="header-tagline">EhB - Toegepaste Informatica</span>
+  </header>
+
+  <main class="rol-keuze-wrapper">
+    <div class="rol-keuze-intro">
+      <h1>Welkom bij het Stageplatform</h1>
+      <p>Selecteer hieronder je rol om naar je dashboard te gaan</p>
+    </div>
+
+    <div class="rol-keuze-grid">
+
+      <a href="student/dashboard.html" class="rol-kaart rol-kaart--student" data-rol="student">
+        <span class="rol-kaart__icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/>
+          </svg>
+        </span>
+        <span class="rol-kaart__label">Student</span>
+        <span class="rol-kaart__desc">Bekijk je stage, logboek en evaluaties</span>
+        <span class="rol-kaart__pijl">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </span>
+      </a>
+
+      <a href="docent/dashboard.html" class="rol-kaart rol-kaart--docent" data-rol="docent">
+        <span class="rol-kaart__icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </span>
+        <span class="rol-kaart__label">Docent</span>
+        <span class="rol-kaart__desc">Beheer je studenten, logboeken en evaluaties</span>
+        <span class="rol-kaart__pijl">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </span>
+      </a>
+
+      <a href="stagecommissie/dashboard.html" class="rol-kaart rol-kaart--stagecommissie" data-rol="stagecommissie">
+        <span class="rol-kaart__icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"/>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+          </svg>
+        </span>
+        <span class="rol-kaart__label">Stagecommissie</span>
+        <span class="rol-kaart__desc">Beoordeel aanvragen en beheer competenties</span>
+        <span class="rol-kaart__pijl">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </span>
+      </a>
+
+      <a href="mentor/dashboard.html" class="rol-kaart rol-kaart--mentor" data-rol="mentor">
+        <span class="rol-kaart__icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+            <polyline points="16 11 18 13 22 9"/>
+          </svg>
+        </span>
+        <span class="rol-kaart__label">Stagementor</span>
+        <span class="rol-kaart__desc">Volg stagiairs op en geef feedback</span>
+        <span class="rol-kaart__pijl">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </span>
+      </a>
+
+      <a href="admin/dashboard.html" class="rol-kaart rol-kaart--admin" data-rol="admin">
+        <span class="rol-kaart__icon">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14"/>
+            <path d="M12 1v3M12 20v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M1 12h3M20 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/>
+          </svg>
+        </span>
+        <span class="rol-kaart__label">Admin</span>
+        <span class="rol-kaart__desc">Volledig beheer van gebruikers en het platform</span>
+        <span class="rol-kaart__pijl">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+          </svg>
+        </span>
+      </a>
+
+    </div>
+  </main>
+
+  <script>
+    // sla de geselecteerde rol op in localStorage
+    document.querySelectorAll('.rol-kaart').forEach(function(kaart) {
+      kaart.addEventListener('click', function() {
+        localStorage.setItem('rol', kaart.dataset.rol);
+      });
+    });
+  </script>
+
+</body>
+</html>
