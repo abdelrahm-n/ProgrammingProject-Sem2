@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="nl">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Stageplatform - Student - Stagevoorstel</title>
+    <link rel="stylesheet" href="../css/stijl.css" />
+    <link rel="stylesheet" href="../css/student.css" />
+</head>
+
+<body>
+
+    <div id="app">
+        <header class="header">
+            <div class="header-logo">
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z" />
+                    <path d="M2 17l10 5 10-5" />
+                    <path d="M2 12l10 5 10-5" />
+                </svg>
+                <span class="header-logo-text">Stageplatform</span>
+            </div>
+
+            <div class="header-actions">
+                <span class="header-rol-badge">Student</span>
+                <button class="btn-terug" onclick="window.location.href='dashboard.html'">Terug</button>
+            </div>
+        </header>
+
+        <div class="app-body">
+            <nav class="sidebar">
+                <a href="dashboard.html" class="nav-item">Dashboard</a>
+                <a href="profiel.html" class="nav-item">Profiel</a>
+                <a href="logboek.html" class="nav-item">Logboek</a>
+                <a href="evaluatie.html" class="nav-item">Evaluatie</a>
+
+                <a href="../index.html" class="nav-item" id="uitlogBtn" style="margin-top:auto">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <polyline points="16 17 21 12 16 7" />
+                        <line x1="21" y1="12" x2="9" y2="12" />
+                    </svg>
+                    Uitloggen
+                </a>
+            </nav>
+
+            <main class="content-area">
+
+                <section class="dashboard-welcome">
+                    <h1>Stagevoorstel indienen</h1>
+                    <p>Dien hier je stageaanvraag in en volg daarna de goedkeuringsstatus op.</p>
+                </section>
+
+                <section class="dashboard-card">
+                    <h2>Studentgegevens</h2>
+                    <p>Deze gegevens worden later automatisch opgehaald uit je profiel.</p>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Naam student</label>
+                            <input type="text" placeholder="Bijvoorbeeld: Ranya Rabib" />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Studentnummer</label>
+                            <input type="text" placeholder="Bijvoorbeeld: 123456" />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Opleiding</label>
+                            <input type="text" placeholder="Toegepaste Informatica" />
+                        </div>
+
+                        <div class="form-group">
+                            <label>E-mailadres</label>
+                            <input type="email" placeholder="student@ehb.be" />
+                        </div>
+                    </div>
+                </section>
+
+                <section class="dashboard-card">
+                    <h2>Stagegegevens</h2>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Stagebedrijf</label>
+                            <input type="text" placeholder="Naam van het bedrijf" />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Contactpersoon bedrijf</label>
+                            <input type="text" placeholder="Naam contactpersoon" />
+                        </div>
+
+                        <div class="form-group">
+                            <label>E-mail bedrijf</label>
+                            <input type="email" placeholder="contact@bedrijf.be" />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Telefoon</label>
+                            <input type="text" placeholder="Telefoonnummer" />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Startdatum</label>
+                            <input type="date" />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Einddatum</label>
+                            <input type="date" />
+                        </div>
+                    </div>
+                </section>
+
+                <section class="dashboard-card">
+                    <h2>Omschrijving van de opdracht</h2>
+
+                    <div class="form-group">
+                        <label>Stageopdracht</label>
+                        <textarea rows="5"
+                            placeholder="Beschrijf kort welke taken je tijdens je stage zal uitvoeren."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Functie tijdens de stage</label>
+                        <input type="text" placeholder="Bijvoorbeeld: Junior Network Engineer" />
+                    </div>
+                </section>
+
+
+                <section class="dashboard-card">
+                    <h2>Indienen</h2>
+                    <p>Controleer alle gegevens voor je het stagevoorstel indient.</p>
+
+
+
+                    <button type="button" class="btn btn--primair" onclick="stagevoorstelIndienen()">
+                        Indienen
+                    </button>
+
+                </section>
+
+            </main>
+        </div>
+    </div>
+
+    <script src="../js/stagevoorstel.js"></script>
+    <script src="../js/nav.js"></script>
+
+
+
+</body>
+
+</html>
