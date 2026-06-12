@@ -47,31 +47,44 @@
 
         <section class="dashboard-card">
           <h2>Status van je stageaanvraag</h2>
-
           <div class="stage-progress">
-            <div class="progress-line"></div>
+
+            <div class="stage-step" id="step-aanmaak">
+              <span></span>
+              <p>Aanmaak</p>
+            </div>
+
+            <div class="progress-line" id="line-aanmaak-ingediend"></div>
 
             <div class="stage-step" id="step-ingediend">
               <span></span>
               <p>Ingediend</p>
             </div>
 
-            <div class="stage-step">
-              <span></span>
-              <p>Aangekomen bij<br>administratie</p>
-            </div>
+            <div class="progress-line" id="line-ingediend-behandeling"></div>
 
-            <div class="stage-step">
+            <div class="stage-step" id="step-behandelng">
               <span></span>
               <p>In behandeling</p>
             </div>
+
+            <div class="progress-line" id="line-behandeling-goedgekeurd"></div>
 
             <div class="stage-step">
               <span></span>
               <p>Goedgekeurd</p>
             </div>
+
           </div>
 
+        </section>
+
+
+
+
+        <section class="dashboard-card" id="status-card" style="display:none;">
+          <h2 id="status-titel">Stageaanvraag</h2>
+          <p id="status-tekst"></p>
         </section>
 
         <section class="dashboard-card" id="start-stage-card">
@@ -83,34 +96,6 @@
           </a>
         </section>
 
-
-        <section class="dashboard-card" id="stageovereenkomstCard" style="display:none;">
-          <h2>Stageovereenkomst</h2>
-
-          <p>
-            Je stagevoorstel is goedgekeurd.
-            Je kan nu je stageovereenkomst bekijken en ondertekenen.
-          </p>
-
-          <a href="stageovereenkomst.html" class="btn-primary">
-            Stageovereenkomst openen
-          </a>
-        </section>
-
-        <section class="dashboard-card" id="stageovereenkomstCard" style="display:none;">
-
-          <h2>Stageovereenkomst</h2>
-
-          <p id="stageovereenkomstTekst">
-            Je stageovereenkomst wordt beschikbaar zodra je stagevoorstel is goedgekeurd.
-          </p>
-
-          <a href="#" class="btn-secondary disabled-link" id="stageovereenkomstBtn">
-            Nog niet beschikbaar
-          </a>
-        </section>
-
-        <section class="dashboard-grid">
       </main>
 
 
