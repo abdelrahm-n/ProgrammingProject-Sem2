@@ -17,3 +17,370 @@ select:focus {
   border-color: var(--rol-accent);
   box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.12);
 }
+
+/* Logboeken Page Styles */
+.page-header {
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  padding: 40px 30px;
+  margin-bottom: 30px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.header-content {
+  flex: 1;
+}
+
+.page-header h1 {
+  margin: 0 0 20px 0;
+  font-size: 28px;
+  font-weight: 600;
+  color: #111;
+}
+
+.stats-container {
+  display: flex;
+  gap: 40px;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stat-label {
+  font-size: 13px;
+  color: #666;
+  text-transform: lowercase;
+  font-weight: 500;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--rol-accent);
+}
+
+.search-section {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.btn-terug-klein {
+  background: none;
+  border: none;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #666;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.btn-terug-klein:hover {
+  color: var(--rol-accent);
+}
+
+.search-input {
+  flex: 1;
+  max-width: 400px;
+  padding: 10px 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 14px;
+  background: white;
+}
+
+.table-container {
+  background: white;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.logboeken-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.logboeken-table thead {
+  background: #f9f9f9;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.logboeken-table th {
+  padding: 16px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  color: #333;
+  text-transform: capitalize;
+}
+
+.logboeken-table tbody tr {
+  border-bottom: 1px solid #e8e8e8;
+  transition: background 0.2s;
+}
+
+.logboeken-table tbody tr:hover {
+  background: #fafafa;
+}
+
+.logboeken-table td {
+  padding: 16px;
+  font-size: 14px;
+  color: #333;
+}
+
+.student-name {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.student-name .label-jaar {
+  font-size: 12px;
+  color: #999;
+  font-weight: 400;
+}
+
+.logboek-status {
+  display: inline-block;
+  padding: 4px 12px;
+  background: #f0fdf4;
+  color: var(--rol-accent);
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  width: fit-content;
+}
+
+.btn-open {
+  padding: 8px 16px;
+  background: white;
+  border: 1px solid #d0d0d0;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: #333;
+  transition: all 0.2s;
+}
+
+.btn-open:hover {
+  background: var(--rol-accent);
+  color: white;
+  border-color: var(--rol-accent);
+}
+
+/* Logboeken Detail Page Styles */
+.logboek-header {
+  margin-bottom: 40px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.logboek-header h1 {
+  margin: 0;
+  font-size: 32px;
+  font-weight: 700;
+  color: #111;
+}
+
+.logboek-header .btn-terug-klein {
+  padding: 8px 14px;
+  font-size: 13px;
+}
+
+.logboek-content {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 40px;
+  max-width: 1600px;
+}
+
+.logboek-section {
+  background: white;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.logboek-section h2 {
+  margin: 0 0 28px 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: #111;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logboek-section h2::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 24px;
+  background: var(--rol-accent);
+  border-radius: 2px;
+}
+
+.logboek-entries {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.logboek-entry {
+  padding: 24px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #ffffff 0%, #f9fafb 100%);
+  transition: all 0.3s ease;
+  border-left: 4px solid var(--rol-accent);
+}
+
+.logboek-entry:hover {
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.1);
+  border-left-color: var(--rol-accent-hover);
+}
+
+.logboek-entry-date {
+  font-weight: 700;
+  color: var(--rol-accent);
+  margin-bottom: 12px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.logboek-entry-text {
+  font-size: 14px;
+  color: #475569;
+  line-height: 1.7;
+  margin: 0;
+}
+
+/* Goedkeuring Section */
+.goedkeuring-section {
+  background: white;
+  border-radius: 12px;
+  padding: 32px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  height: fit-content;
+  position: sticky;
+  top: 20px;
+}
+
+.goedkeuring-section h2 {
+  margin: 0 0 24px 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #111;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.goedkeuring-section h2::before {
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 20px;
+  background: var(--rol-accent);
+  border-radius: 2px;
+}
+
+.goedkeuring-entries {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.goedkeuring-item {
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fafbfc;
+  transition: all 0.2s;
+}
+
+.goedkeuring-item:hover {
+  background: #f3f4f6;
+  border-color: var(--rol-accent);
+}
+
+.goedkeuring-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.goedkeuring-item-date {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 600;
+  flex: 1;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  border: none;
+}
+
+.status-goedgekeurd {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.status-afgeekeurd {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+@media (max-width: 1200px) {
+  .logboek-content {
+    grid-template-columns: 1fr;
+  }
+  
+  .goedkeuring-section {
+    position: static;
+  }
+}
+
+@media (max-width: 768px) {
+  .logboek-section,
+  .goedkeuring-section {
+    padding: 20px;
+  }
+  
+  .logboek-entry {
+    padding: 16px;
+  }
+  
+  .logboek-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .logboek-header h1 {
+    font-size: 24px;
+  }
+}

@@ -39,12 +39,121 @@
       </nav>
 
       <main class="content-area">
-        <!-- inhoud komt hier -->
+        <!-- Header Section -->
+        <div class="page-header">
+          <div class="header-content">
+            <h1>Naam docent</h1>
+            <div class="stats-container">
+              <div class="stat-item">
+                <span class="stat-label">aantal studenten</span>
+                <span class="stat-value">52</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">ingevulde logboeken</span>
+                <span class="stat-value">343</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Search and Navigation -->
+        <div class="search-section">
+          <input type="text" class="search-input" placeholder="Zoeken..." />
+        </div>
+
+        <!-- Logboeken Table -->
+        <div class="table-container">
+          <table class="logboeken-table">
+            <thead>
+              <tr>
+                <th>Naam</th>
+                <th>Richting</th>
+                <th>Logboek</th>
+                <th>Zie Logboek</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <div class="student-name">
+                    <div>Ryan Machiels</div>
+                    <span class="label-jaar">1ste jaar</span>
+                  </div>
+                </td>
+                <td>Toegepaste Informatica</td>
+                <td><span class="logboek-status">12/16 ingediend</span></td>
+                <td><button class="btn-open">Open</button></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="student-name">
+                    <div>Abdelrahman</div>
+                    <span class="label-jaar">1ste jaar</span>
+                  </div>
+                </td>
+                <td>Toegepaste Informatica</td>
+                <td><span class="logboek-status">13/16 ingediend</span></td>
+                <td><button class="btn-open">Open</button></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="student-name">
+                    <div>Iman Obenali</div>
+                    <span class="label-jaar">1ste jaar</span>
+                  </div>
+                </td>
+                <td>Toegepaste Informatica</td>
+                <td><span class="logboek-status">11/16 ingediend</span></td>
+                <td><button class="btn-open">Open</button></td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="student-name">
+                    <div>Ranya Rabib</div>
+                    <span class="label-jaar">1ste jaar</span>
+                  </div>
+                </td>
+                <td>Toegepaste Informatica</td>
+                <td><span class="logboek-status">14/16 ingediend</span></td>
+                <td><button class="btn-open">Open</button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </main>
     </div>
   </div>
 
   <script src="../js/nav.js"></script>
+  <script>
+    // Zoekfunctionaliteit
+    const searchInput = document.querySelector('.search-input');
+    const tableRows = document.querySelectorAll('.logboeken-table tbody tr');
+
+    searchInput.addEventListener('input', (e) => {
+      const searchTerm = e.target.value.toLowerCase();
+      
+      tableRows.forEach(row => {
+        const studentName = row.querySelector('.student-name div').textContent.toLowerCase();
+        const direction = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+        
+        if (studentName.includes(searchTerm) || direction.includes(searchTerm)) {
+          row.style.display = '';
+        } else {
+          row.style.display = 'none';
+        }
+      });
+    });
+
+    // Open knop functionaliteit
+    document.querySelectorAll('.btn-open').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const row = e.target.closest('tr');
+        const studentName = row.querySelector('.student-name div').textContent;
+        window.location.href = `logboeken-detail.html?student=${encodeURIComponent(studentName)}`;
+      });
+    });
+  </script>
 
 </body>
 </html>
