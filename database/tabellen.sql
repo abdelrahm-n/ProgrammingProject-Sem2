@@ -332,3 +332,95 @@ CREATE TABLE logboek_feedback (
     FOREIGN KEY (afzender_id)
         REFERENCES persoon(id)
 );
+
+-- EVALUATIE TYPE
+
+CREATE TABLE evaluatie_type (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    naam VARCHAR(50) UNIQUE,
+    beschrijving TEXT
+);
+
+-- EVALUATIE MOMENT
+
+CREATE TABLE evaluatie_moment (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    stage_id INT,
+    docent_id INT,
+    mentor_id INT,
+    type_id INT,
+
+    datum DATE,
+
+    eindresultaat_score DECIMAL(5,2),
+    algemene_feedback TEXT,
+
+    FOREIGN KEY (stage_id)
+        REFERENCES stage(id),
+
+    FOREIGN KEY (docent_id)
+        REFERENCES docent(persoon_id),
+
+    FOREIGN KEY (mentor_id)
+        REFERENCES stagementor(persoon_id),
+
+    FOREIGN KEY (type_id)
+        REFERENCES evaluatie_type(id)
+);
+
+-- COMPETENTIE
+
+CREATE TABLE competentie (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    opleiding_id INT,
+
+    naam VARCHAR(150),
+    beschrijving TEXT,
+    gewicht INT,
+
+    actief BOOLEAN DEFAULT TRUE,
+
+    FOREIGN KEY (opleiding_id)
+        REFERENCES opleiding(id)
+);
+
+-- COMPETENTIE BEOORDELING
+
+CREATE TABLE competentie_beoordeling (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    evaluatie_moment_id INT,
+    competentie_id INT,
+
+    student_reflectie TEXT,
+    mentor_score INT,
+    mentor_feedback TEXT,
+    docent_feedback TEXT,
+
+    FOREIGN KEY (evaluatie_moment_id)
+        REFERENCES evaluatie_moment(id),
+
+    FOREIGN KEY (competentie_id)
+        REFERENCES competentie(id)
+);
+
+-- NOTIFICATIE
+
+CREATE TABLE notificatie (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    ontvanger_id INT,
+
+    titel VARCHAR(255),
+    boodschap TEXT,
+
+    gelezen BOOLEAN DEFAULT FALSE,
+
+    aangemaakt_op TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (ontvanger_id)
+        REFERENCES persoon(id)
+);
