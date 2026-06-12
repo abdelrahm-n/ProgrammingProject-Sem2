@@ -106,24 +106,18 @@ select:focus {
   position: relative;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
 
   background: #FFFFFF;
-  border: 1px solid #D8D8D8;
+  border: 1px solid #E4E4E4;
   border-radius: 4px;
 
   padding: 32px 32px 18px 32px;
   margin-top: 16px;
 }
 
-.progress-line {
-  position: absolute;
-  top: 55px;
-  left: 140px;
-  right: 140px;
-  height: 4px;
-  background: #E9E9E9;
-}
+
+
 
 .stage-step {
   position: relative;
@@ -308,7 +302,7 @@ select:focus {
 }
 
 .progress-step.active .progress-circle {
-  background: #8B0015;
+  background: #2E9E49;
   color: white;
 }
 
@@ -320,8 +314,10 @@ select:focus {
 }
 
 .progress-line.active {
-  background: #8B0015;
+  background: #2E9E49;
 }
+
+
 
 /* ==========================================
    STAGEOVEREENKOMST
