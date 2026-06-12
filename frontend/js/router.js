@@ -18,6 +18,7 @@ const ROUTES = {
   'student/dashboard':      () => import('./views/student/dashboard.js'),
   'student/stage-indienen': () => import('./views/student/stage-indienen.js'),
   'student/logboek':        () => import('./views/student/logboek.js'),
+  'student/logboek-nieuw':  () => import('./views/student/logboek-nieuw.js'),
   'student/evaluatie':      () => import('./views/student/evaluatie.js'),
 
   /* Docent */

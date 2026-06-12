@@ -107,4 +107,9 @@ export function init() {
     document.getElementById('logboek-detail').classList.add('verborgen');
     document.getElementById('logboek-overzicht').classList.remove('verborgen');
   };
+<<<<<<< Updated upstream
 }
+=======
+}
+
+>>>>>>> Stashed changes

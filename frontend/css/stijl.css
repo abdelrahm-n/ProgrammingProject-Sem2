@@ -489,6 +489,60 @@ tr:hover td { background: #FAFAFA; }
   margin-top: var(--sp-1);
 }
 
+.form-acties--eind { justify-content: flex-end; }
+
+/* Actiebalk onder een view (bv. centrale knop) */
+.view-acties {
+  display: flex;
+  justify-content: center;
+  margin-top: var(--sp-4);
+}
+
+/* Terug-link bovenaan een detailpagina */
+.terug-link {
+  display: inline-block;
+  margin-bottom: var(--sp-3);
+  font-size: 14px;
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+.terug-link:hover { color: var(--color-text); text-decoration: underline; }
+
+/* Subtitel binnen een kaart (toelichting onder de titel) */
+.kaart-subtitel {
+  margin: calc(-1 * var(--sp-2)) 0 var(--sp-3);
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+/* Taak-kaartje binnen "Uitgevoerde taken" */
+.taak-kaart {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-page);
+  padding: var(--sp-3);
+  margin-bottom: var(--sp-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+.taak-kaart__kop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.taak-kaart__nr { font-size: 13px; font-weight: bold; color: var(--color-text); }
+.taak-verwijder {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  color: var(--color-text-muted);
+  padding: 0 4px;
+}
+.taak-verwijder:hover { color: var(--color-error); }
+
 /* ── Knoppen ── */
 .btn {
   display: inline-flex;
