@@ -2,6 +2,31 @@ const API_URL = "http://localhost:3000/api/stageovereenkomst";
 
 const stagevoorstelId = 1;
 
+const stapOverzicht = document.getElementById("stapOverzicht");
+const stapContract = document.getElementById("stapContract");
+const stapActivatie = document.getElementById("stapActivatie");
+
+const bekijkBtn = document.getElementById("bekijkBtn");
+const ondertekenBtn = document.getElementById("ondertekenBtn");
+
+function toonOverzicht() {
+  stapOverzicht.style.display = "block";
+  stapContract.style.display = "none";
+  stapActivatie.style.display = "none";
+}
+
+function toonContract() {
+  stapOverzicht.style.display = "none";
+  stapContract.style.display = "block";
+  stapActivatie.style.display = "none";
+}
+
+function toonActivatie() {
+  stapOverzicht.style.display = "none";
+  stapContract.style.display = "none";
+  stapActivatie.style.display = "block";
+}
+
 async function laadStageovereenkomst() {
   const melding = document.getElementById("melding");
 
@@ -49,11 +74,14 @@ async function laadStageovereenkomst() {
       data.getekend_door_bedrijf ? "Ondertekend" : "Nog niet ondertekend";
 
     document.getElementById("schoolCheck").value =
-      data.getekend_door_school ? "Ondertekend" : "Nog niet ondertekend";
+      data.getekend_door_stagecommissie ? "Ondertekend" : "Nog niet ondertekend";
 
     if (data.getekend_door_student) {
-      document.getElementById("ondertekenBtn").disabled = true;
-      document.getElementById("ondertekenBtn").textContent = "Al ondertekend";
+      ondertekenBtn.disabled = true;
+      ondertekenBtn.textContent = "Al ondertekend";
+      toonActivatie();
+    } else {
+      toonOverzicht();
     }
 
   } catch (error) {
@@ -78,7 +106,14 @@ async function ondertekenAlsStudent() {
     }
 
     melding.textContent = data.message;
-    laadStageovereenkomst();
+
+    document.getElementById("studentCheck").value = "Ondertekend";
+    document.getElementById("status").textContent = "Wacht op bedrijf";
+
+    ondertekenBtn.disabled = true;
+    ondertekenBtn.textContent = "Al ondertekend";
+
+    toonActivatie();
 
   } catch (error) {
     console.error(error);
@@ -91,8 +126,7 @@ function formatDatum(datum) {
   return new Date(datum).toLocaleDateString("nl-BE");
 }
 
-document
-  .getElementById("ondertekenBtn")
-  .addEventListener("click", ondertekenAlsStudent);
+bekijkBtn.addEventListener("click", toonContract);
+ondertekenBtn.addEventListener("click", ondertekenAlsStudent);
 
 laadStageovereenkomst();

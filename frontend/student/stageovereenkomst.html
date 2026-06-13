@@ -49,109 +49,167 @@
         </a>
       </nav>
 
-      <main class="content-area">
+<main class="content-area">
 
-        <section class="page-header">
-          <h1>Stageovereenkomst</h1>
-          <p>Controleer je automatisch gegenereerde stageovereenkomst en plaats je handtekening.</p>
-        </section>
+  <!-- STAP 1: OVERZICHT -->
+  <section id="stapOverzicht">
+    <section class="page-header">
+      <h1>Stageovereenkomst</h1>
+      <p>Je stageaanvraag is goedgekeurd. De stageovereenkomst is automatisch aangemaakt.</p>
+    </section>
 
-        <section class="student-card">
-          <h2>Voortgang van je stage</h2>
+    <section class="student-card">
+      <h2>Voortgang van je stage</h2>
 
-          <div class="progress-steps">
-            <div class="progress-step done">
-              <div class="progress-circle">✓</div>
-              <span>Aanvraag goedgekeurd</span>
-            </div>
+      <div class="progress-steps">
+        <div class="progress-step done">
+          <div class="progress-circle">✓</div>
+          <span>Aanvraag goedgekeurd</span>
+        </div>
 
-            <div class="progress-line active"></div>
+        <div class="progress-line active"></div>
 
-            <div class="progress-step active">
-              <div class="progress-circle">2</div>
-              <span>Overeenkomst</span>
-            </div>
+        <div class="progress-step active">
+          <div class="progress-circle">2</div>
+          <span>Overeenkomst</span>
+        </div>
 
-            <div class="progress-line"></div>
+        <div class="progress-line"></div>
 
-            <div class="progress-step">
-              <div class="progress-circle">3</div>
-              <span>Activatie</span>
-            </div>
+        <div class="progress-step">
+          <div class="progress-circle">3</div>
+          <span>Activatie</span>
+        </div>
 
-            <div class="progress-line"></div>
+        <div class="progress-line"></div>
 
-            <div class="progress-step">
-              <div class="progress-circle">4</div>
-              <span>Stage actief</span>
-            </div>
+        <div class="progress-step">
+          <div class="progress-circle">4</div>
+          <span>Stage actief</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="student-card">
+      <h2>Stageovereenkomst</h2>
+      <p>
+        Je stageovereenkomst is klaar om gecontroleerd en ondertekend te worden.
+        De gegevens komen automatisch uit je goedgekeurde stageaanvraag.
+      </p>
+
+      <button type="button" id="bekijkBtn" class="btn-primary">
+        Bekijk en onderteken
+      </button>
+    </section>
+  </section>
+
+
+  <!-- STAP 2: CONTRACT -->
+  <section id="stapContract" style="display: none;">
+    <section class="page-header">
+      <h1>Stageovereenkomst ondertekenen</h1>
+      <p>Controleer je stageovereenkomst en plaats je handtekening.</p>
+    </section>
+
+    <section class="student-card">
+      <div class="contract-wrapper">
+        <div class="contract-document">
+
+          <h2 class="contract-title">STAGEOVEREENKOMST</h2>
+
+          <p id="melding" class="form-message"></p>
+
+          <div class="contract-info">
+            <p><strong>Status:</strong> <span id="status">Wacht op student</span></p>
+
+            <hr />
+
+            <p><strong>Student:</strong> <span id="studentNaam">Iman Obenali</span></p>
+            <p><strong>Studentnummer:</strong> <span id="studentnummer">123456</span></p>
+            <p><strong>Opleiding:</strong> <span id="opleiding">Toegepaste Informatica</span></p>
+            <p><strong>E-mail student:</strong> <span id="emailStudent">iman@student.ehb.be</span></p>
+
+            <hr />
+
+            <p><strong>Stagebedrijf:</strong> <span id="bedrijfNaam">Orange Belgium NV</span></p>
+            <p><strong>Contactpersoon:</strong> <span id="contactpersoon">Steven De Vla</span></p>
+            <p><strong>E-mail bedrijf:</strong> <span id="emailBedrijf">stage@orange.be</span></p>
+            <p><strong>Telefoon:</strong> <span id="telefoon">02 000 00 00</span></p>
+
+            <hr />
+
+            <p><strong>Stageperiode:</strong> <span id="stageperiode">15/02/2026 - 31/05/2026</span></p>
+            <p><strong>Functie:</strong> <span id="functie">Webdeveloper stagiair</span></p>
+            <p><strong>Stageopdracht:</strong> <span id="stageopdracht">Meewerken aan een interne webapplicatie.</span></p>
           </div>
-        </section>
 
-        <section class="student-card">
-          <div class="contract-wrapper">
-            <div class="contract-document">
+          <hr />
 
-              <h2 class="contract-title">STAGEOVEREENKOMST</h2>
+          <p class="contract-text">
+            Deze stageovereenkomst werd automatisch opgesteld op basis van de goedgekeurde stageaanvraag.
+            Door te ondertekenen verklaart de student akkoord te gaan met de voorwaarden van de stage.
+          </p>
 
-              <p id="melding" class="form-message"></p>
-
-              <div class="contract-info">
-                <p><strong>Status:</strong> <span id="status">Laden...</span></p>
-
-                <hr />
-
-                <p><strong>Student:</strong> <span id="studentNaam">Laden...</span></p>
-                <p><strong>Studentnummer:</strong> <span id="studentnummer">Laden...</span></p>
-                <p><strong>Opleiding:</strong> <span id="opleiding">Laden...</span></p>
-                <p><strong>E-mail student:</strong> <span id="emailStudent">Laden...</span></p>
-
-                <hr />
-
-                <p><strong>Stagebedrijf:</strong> <span id="bedrijfNaam">Laden...</span></p>
-                <p><strong>Contactpersoon:</strong> <span id="contactpersoon">Laden...</span></p>
-                <p><strong>E-mail bedrijf:</strong> <span id="emailBedrijf">Laden...</span></p>
-                <p><strong>Telefoon:</strong> <span id="telefoon">Laden...</span></p>
-
-                <hr />
-
-                <p><strong>Stageperiode:</strong> <span id="stageperiode">Laden...</span></p>
-                <p><strong>Functie:</strong> <span id="functie">Laden...</span></p>
-                <p><strong>Stageopdracht:</strong> <span id="stageopdracht">Laden...</span></p>
-              </div>
-
-              <hr />
-
-              <p class="contract-text">
-                Deze stageovereenkomst werd automatisch opgesteld op basis van de goedgekeurde stageaanvraag.
-                Door te ondertekenen verklaart de student akkoord te gaan met de voorwaarden van de stage.
-              </p>
-
-              <div class="signature-field">
-                <label>Handtekening student</label>
-                <input type="text" id="studentCheck" value="Nog niet ondertekend" disabled />
-              </div>
-
-              <div class="signature-field">
-                <label>Handtekening bedrijf</label>
-                <input type="text" id="bedrijfCheck" value="Nog niet ondertekend" disabled />
-              </div>
-
-              <div class="signature-field">
-                <label>Handtekening hogeschool</label>
-                <input type="text" id="schoolCheck" value="Nog niet ondertekend" disabled />
-              </div>
-
-              <button type="button" id="ondertekenBtn" class="btn-primary">
-                Ondertekenen als student
-              </button>
-
-            </div>
+          <div class="signature-field">
+            <label>Handtekening student</label>
+            <input type="text" id="studentCheck" value="Nog niet ondertekend" disabled />
           </div>
-        </section>
 
-      </main>
-    </div>
+          <div class="signature-field">
+            <label>Handtekening bedrijf</label>
+            <input type="text" id="bedrijfCheck" value="Nog niet ondertekend" disabled />
+          </div>
+
+          <div class="signature-field">
+            <label>Handtekening hogeschool</label>
+            <input type="text" id="schoolCheck" value="Nog niet ondertekend" disabled />
+          </div>
+
+          <button type="button" id="ondertekenBtn" class="btn-primary">
+            Ondertekenen als student
+          </button>
+
+        </div>
+      </div>
+    </section>
+  </section>
+
+
+  <!-- STAP 3: ACTIVATIE -->
+  <section id="stapActivatie" style="display: none;">
+    <section class="page-header">
+      <h1>Stage wacht op activering</h1>
+      <p>Je hebt de stageovereenkomst succesvol ondertekend.</p>
+    </section>
+
+    <section class="student-card">
+      <h2>Stage wacht op activering</h2>
+
+      <p>
+        De stageovereenkomst werd door jou ondertekend.
+        Nu moeten het bedrijf en de hogeschool nog ondertekenen.
+      </p>
+
+      <div class="status-box">
+        Status: Wacht op bedrijf
+      </div>
+
+      <div class="signature-overview">
+        <p><strong>Handtekening student:</strong> <span class="status-ok">Ontvangen</span></p>
+        <p><strong>Handtekening bedrijf:</strong> <span class="status-wait">In afwachting</span></p>
+        <p><strong>Handtekening hogeschool:</strong> <span class="status-wait">In afwachting</span></p>
+      </div>
+
+      <p><strong>Startdatum stage:</strong> 10 maart 2026</p>
+
+      <p>
+        Zodra alle partijen hebben ondertekend en de startdatum bereikt is,
+        wordt je stage automatisch geactiveerd. Daarna krijg je toegang tot logboeken en evaluaties.
+      </p>
+    </section>
+  </section>
+
+</main>    </div>
   </div>
 
   <script src="../js/nav.js"></script>
