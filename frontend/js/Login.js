@@ -38,11 +38,6 @@ document.getElementById('loginTitel').textContent = 'Inloggen als ' + rolNamen[r
 document.getElementById('emailDomein').textContent = domein;
 document.getElementById('domeinHint').textContent = domein;
 
-/* Toon de registratie-link alleen voor stagementoren */
-if (rol === 'mentor') {
-  document.getElementById('mentorRegistreer').hidden = false;
-}
-
 /* Toon of verberg het wachtwoord bij klikken op het oogicoon */
 document.getElementById('toonWachtwoord').addEventListener('click', function () {
   const veld = document.getElementById('wachtwoord');
