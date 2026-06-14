@@ -39,12 +39,27 @@
       </nav>
 
       <main class="content-area">
-        <!-- inhoud komt hier -->
+
+        <div class="view-header">
+          <h1 class="view-titel">Evaluaties</h1>
+          <p class="view-subtitel">Geef feedback per competentie en stel de eindscore in voor jouw studenten</p>
+        </div>
+
+        <div class="form-group" style="max-width:320px;margin-bottom:24px">
+          <label for="stageSelectie">Student kiezen</label>
+          <select id="stageSelectie">
+            <option value="">Laden...</option>
+          </select>
+        </div>
+
+        <div id="evaluatieInhoud"></div>
+
       </main>
     </div>
   </div>
 
   <script src="../js/nav.js"></script>
+  <script src="../js/evaluatie-docent.js"></script>
 
 </body>
 </html>
