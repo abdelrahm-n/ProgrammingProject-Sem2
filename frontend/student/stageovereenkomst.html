@@ -35,9 +35,9 @@
 
       <nav class="sidebar">
         <a href="dashboard.html" class="nav-item">Dashboard</a>
-        <a href="profiel.html" class="nav-item">Profiel</a>
         <a href="logboek.html" class="nav-item">Logboek</a>
         <a href="evaluatie.html" class="nav-item">Evaluatie</a>
+        <a href="profiel.html" class="nav-item">Profiel</a>
 
         <a href="../index.html" class="nav-item" id="uitlogBtn" style="margin-top:auto">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -55,36 +55,38 @@
   <section id="stapOverzicht">
     <section class="page-header">
       <h1>Stageovereenkomst</h1>
-      <p>Je stageaanvraag is goedgekeurd. De stageovereenkomst is automatisch aangemaakt.</p>
+
     </section>
 
     <section class="student-card">
       <h2>Voortgang van je stage</h2>
 
-      <div class="progress-steps">
-        <div class="progress-step done">
-          <div class="progress-circle">✓</div>
-          <span>Aanvraag goedgekeurd</span>
+      <div class="progress-box">
+          <div class="progress-container">
+
+            <div class="progress-track"></div>
+            <div class="progress-track-active"></div>
+
+
+            <div class="progress-step done">
+              <div class="progress-circle"></div>
+              <span>Aanvraag goedgekeurd</span>
         </div>
 
-        <div class="progress-line active"></div>
-
         <div class="progress-step active">
-          <div class="progress-circle">2</div>
+          <div class="progress-circle"></div>
           <span>Overeenkomst</span>
         </div>
 
-        <div class="progress-line"></div>
 
         <div class="progress-step">
-          <div class="progress-circle">3</div>
+          <div class="progress-circle"></div>
           <span>Activatie</span>
         </div>
 
-        <div class="progress-line"></div>
 
         <div class="progress-step">
-          <div class="progress-circle">4</div>
+          <div class="progress-circle"></div>
           <span>Stage actief</span>
         </div>
       </div>
@@ -94,7 +96,6 @@
       <h2>Stageovereenkomst</h2>
       <p>
         Je stageovereenkomst is klaar om gecontroleerd en ondertekend te worden.
-        De gegevens komen automatisch uit je goedgekeurde stageaanvraag.
       </p>
 
       <button type="button" id="bekijkBtn" class="btn-primary">
