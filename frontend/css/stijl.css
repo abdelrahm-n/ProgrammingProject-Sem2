@@ -813,3 +813,52 @@ tr:hover td {
     grid-template-columns: 1fr;
   }
 }
+
+.signature-status {
+  margin: 28px 0;
+}
+
+.signature-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #dddddd;
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 14px;
+  background: #fafafa;
+}
+
+.signature-row p {
+  margin: 6px 0 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.active-signature {
+  border-color: #8B0015;
+  background: #fff7f8;
+}
+
+.signature-badge {
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.signature-badge.waiting {
+  background: #ffe8e8;
+  color: #8B0015;
+}
+
+.signature-badge.pending {
+  background: #f1f1f1;
+  color: #777;
+}
+
+.signature-badge.done {
+  background: #d8f3df;
+  color: #2e7d32;
+}

@@ -151,26 +151,32 @@
             Door te ondertekenen verklaart de student akkoord te gaan met de voorwaarden van de stage.
           </p>
 
-          <div class="signature-field">
-            <label>Handtekening student</label>
-            <input type="text" id="studentCheck" value="Nog niet ondertekend" disabled />
-          </div>
+<div class="signature-status">
+  <div class="signature-row active-signature">
+    <div>
+      <strong>Handtekening student</strong>
+    </div>
+    <span id="studentCheck" class="signature-badge waiting">Nog niet ondertekend</span>
+  </div>
 
-          <div class="signature-field">
-            <label>Handtekening bedrijf</label>
-            <input type="text" id="bedrijfCheck" value="Nog niet ondertekend" disabled />
-          </div>
+  <div class="signature-row">
+    <div>
+      <strong>Handtekening bedrijf</strong>
+    </div>
+    <span id="bedrijfCheck" class="signature-badge pending">In afwachting</span>
+  </div>
 
-          <div class="signature-field">
-            <label>Handtekening hogeschool</label>
-            <input type="text" id="schoolCheck" value="Nog niet ondertekend" disabled />
-          </div>
-
-          <button type="button" id="ondertekenBtn" class="btn-primary">
-            Ondertekenen als student
-          </button>
-
-        </div>
+  <div class="signature-row">
+    <div>
+      <strong>Handtekening hogeschool</strong>
+    </div>
+    <span id="schoolCheck" class="signature-badge pending">In afwachting</span>
+  </div>
+</div>       
+ <button type="button" class="btn-primary" onclick="window.location.href='stageovereenkomst-getekend.html'">
+  Ondertekenen als student
+</button>
+</div>
       </div>
     </section>
   </section>

@@ -101,13 +101,16 @@ async function ondertekenAlsStudent() {
     const data = await response.json();
 
     if (!response.ok) {
-      melding.textContent = data.message;
+      melding.textContent = data.message || "Ondertekenen is niet gelukt.";
       return;
     }
 
-    melding.textContent = data.message;
+    melding.textContent = "";
 
-    document.getElementById("studentCheck").value = "Ondertekend";
+    document.getElementById("studentCheck").textContent = "Ondertekend";
+    document.getElementById("studentCheck").classList.remove("waiting");
+    document.getElementById("studentCheck").classList.add("done");
+
     document.getElementById("status").textContent = "Wacht op bedrijf";
 
     ondertekenBtn.disabled = true;

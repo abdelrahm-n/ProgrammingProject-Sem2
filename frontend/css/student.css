@@ -313,3 +313,38 @@ select:focus {
 .student-card p {
   margin-bottom: 25px;
 }
+
+.status-box {
+  display: inline-block;
+  background: #fff2b8;
+  color: #8B0015;
+  padding: 10px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  margin: 16px 0 24px;
+}
+
+.signature-overview {
+  margin: 20px 0 28px;
+}
+
+.signature-overview p {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #dddddd;
+  border-radius: 6px;
+  padding: 16px;
+  margin-bottom: 12px;
+  background: #fafafa;
+}
+
+.status-ok {
+  color: #2e7d32;
+  font-weight: 700;
+}
+
+.status-wait {
+  color: #f59e0b;
+  font-weight: 700;
+}
