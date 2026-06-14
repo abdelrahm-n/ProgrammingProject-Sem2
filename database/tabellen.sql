@@ -15,6 +15,7 @@ CREATE TABLE persoon (
     achternaam VARCHAR(100),
     email VARCHAR(255) UNIQUE,
     wachtwoord_hash VARCHAR(255),
+    rol VARCHAR(50),
     actief BOOLEAN DEFAULT TRUE
 );
 

@@ -22,9 +22,9 @@ router.get('/mijn', controleerToken, async (req, res) => {
 router.get('/', controleerToken, async (req, res) => {
   try {
     const [rijen] = await db.query(
-      `SELECT s.*, g.naam AS student_naam
+      `SELECT s.*, CONCAT(p.voornaam, ' ', p.achternaam) AS student_naam
        FROM stages s
-       JOIN gebruikers g ON s.student_id = g.id
+       JOIN persoon p ON s.student_id = p.id
        ORDER BY s.ingediend DESC`
     )
     res.json(rijen)

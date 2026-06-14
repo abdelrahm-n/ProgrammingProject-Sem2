@@ -3,9 +3,9 @@
 
 USE stage_monitoring;
 
-INSERT INTO gebruikers (naam, email, wachtwoord, rol) VALUES
-('Jan Jansen',   'jan.jansen@student.ehb.be',   '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'student'),
-('Piet Pieters', 'piet.pieters@docent.ehb.be',  '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'docent'),
-('Sara Smeets',  'sara.smeets@mentor.ehb.be',   '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'mentor'),
-('Tom Thomas',   'tom.thomas@commissie.ehb.be', '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'stagecommissie'),
-('An Anthonis',  'an.anthonis@admin.ehb.be',    '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', 'admin');
+INSERT INTO persoon (voornaam, achternaam, email, wachtwoord_hash, rol, actief) VALUES
+('Jan',   'Jansen',   'jan.jansen@student.ehb.be',     '$2a$10$0V0mfYPp/RvHvfcuUzmE6.QB66A.MICQMmASTNrx5o9PzZvuiUQze', 'student',        TRUE),
+('Piet',  'Pieters',  'piet.pieters@docent.ehb.be',    '$2a$10$0V0mfYPp/RvHvfcuUzmE6.QB66A.MICQMmASTNrx5o9PzZvuiUQze', 'docent',         TRUE),
+('Sara',  'Smeets',   'sara.smeets@mentor.ehb.be',     '$2a$10$0V0mfYPp/RvHvfcuUzmE6.QB66A.MICQMmASTNrx5o9PzZvuiUQze', 'stagementor',    TRUE),
+('Tom',   'Thomas',   'tom.thomas@commissie.ehb.be',   '$2a$10$0V0mfYPp/RvHvfcuUzmE6.QB66A.MICQMmASTNrx5o9PzZvuiUQze', 'stagecommissie', TRUE),
+('An',    'Anthonis', 'an.anthonis@admin.ehb.be',      '$2a$10$0V0mfYPp/RvHvfcuUzmE6.QB66A.MICQMmASTNrx5o9PzZvuiUQze', 'admin',          TRUE);

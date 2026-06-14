@@ -14,9 +14,8 @@ router.post('/login', async (req, res) => {
   }
 
   try {
-    /* Zoek de gebruiker op in de tabel */
     const [rijen] = await db.query(
-      'SELECT * FROM gebruikers WHERE email = ?',
+      'SELECT * FROM persoon WHERE email = ?',
       [email]
     )
 
@@ -24,27 +23,71 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ fout: 'Gebruiker niet gevonden' })
     }
 
-    const gebruiker = rijen[0]
+    const persoon = rijen[0]
 
-    /* Vergelijk het ingevoerde wachtwoord met de opgeslagen hash */
-    const klopt = await bcrypt.compare(wachtwoord, gebruiker.wachtwoord)
+    const klopt = await bcrypt.compare(wachtwoord, persoon.wachtwoord_hash)
 
     if (!klopt) {
       return res.status(401).json({ fout: 'Verkeerd wachtwoord' })
     }
 
-    /* Maak een JWT token aan */
     const token = jwt.sign(
-      { id: gebruiker.id, rol: gebruiker.rol },
+      { id: persoon.id, rol: persoon.rol },
       process.env.JWT_SECRET,
       { expiresIn: '8h' }
     )
 
     res.json({
       token,
-      rol: gebruiker.rol,
-      naam: gebruiker.naam
+      rol: persoon.rol,
+      naam: persoon.voornaam + ' ' + persoon.achternaam
     })
+
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ fout: 'Serverfout' })
+  }
+})
+
+/* POST /api/auth/registreren - stagementor account aanmaken */
+router.post('/registreren', async (req, res) => {
+  const { voornaam, achternaam, wachtwoord } = req.body
+
+  if (!voornaam || !achternaam || !wachtwoord) {
+    return res.status(400).json({ fout: 'Voornaam, achternaam en wachtwoord zijn verplicht' })
+  }
+
+  if (wachtwoord.length < 6) {
+    return res.status(400).json({ fout: 'Wachtwoord moet minstens 6 tekens lang zijn' })
+  }
+
+  const schoneVoornaam = voornaam.toLowerCase().replace(/[^a-z]/g, '')
+  const schoneAchternaam = achternaam.toLowerCase().replace(/[^a-z]/g, '')
+  const email = schoneVoornaam + '.' + schoneAchternaam + '@mentor.ehb.be'
+
+  try {
+    const [bestaand] = await db.query(
+      'SELECT id FROM persoon WHERE email = ?',
+      [email]
+    )
+
+    if (bestaand.length > 0) {
+      return res.status(409).json({ fout: 'Dit e-mailadres is al in gebruik: ' + email })
+    }
+
+    const hash = await bcrypt.hash(wachtwoord, 10)
+
+    const [resultaat] = await db.query(
+      'INSERT INTO persoon (voornaam, achternaam, email, wachtwoord_hash, rol, actief) VALUES (?, ?, ?, ?, ?, TRUE)',
+      [voornaam, achternaam, email, hash, 'stagementor']
+    )
+
+    await db.query(
+      'INSERT INTO stagementor (persoon_id, functie, bedrijf_id) VALUES (?, NULL, NULL)',
+      [resultaat.insertId]
+    )
+
+    res.status(201).json({ bericht: 'Account aangemaakt', email })
 
   } catch (err) {
     console.error(err)
