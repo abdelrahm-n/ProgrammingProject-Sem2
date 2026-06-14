@@ -53,31 +53,67 @@
                 </section>
 
                 <section class="dashboard-card">
+                    <h2>Status van je stageaanvraag</h2>
+
+                    <div class="stage-progress">
+
+                        <div class="stage-step active">
+                            <span></span>
+                            <p>Aanmaak</p>
+                        </div>
+
+                        <div class="progress-line"></div>
+
+                        <div class="stage-step">
+                            <span></span>
+                            <p>Ingediend</p>
+                        </div>
+
+                        <div class="progress-line"></div>
+
+                        <div class="stage-step">
+                            <span></span>
+                            <p>In behandeling</p>
+                        </div>
+
+                        <div class="progress-line"></div>
+
+                        <div class="stage-step">
+                            <span></span>
+                            <p>Goedgekeurd</p>
+                        </div>
+
+                    </div>
+                </section>
+
+                <section class="dashboard-card">
                     <h2>Studentgegevens</h2>
                     <p>Deze gegevens worden later automatisch opgehaald uit je profiel.</p>
 
                     <div class="form-grid">
                         <div class="form-group">
                             <label>Naam student</label>
-                            <input type="text" placeholder="Bijvoorbeeld: Ranya Rabib" />
+                            <input type="text" id="studentNaam" placeholder="Bijvoorbeeld: Ranya Rabib" />
                         </div>
 
                         <div class="form-group">
                             <label>Studentnummer</label>
-                            <input type="text" placeholder="Bijvoorbeeld: 123456" />
+                            <input type="text" id="studentNummer" placeholder="Studentnummer" />
                         </div>
 
                         <div class="form-group">
                             <label>Opleiding</label>
-                            <input type="text" placeholder="Toegepaste Informatica" />
+                            <input type="text" id="opleiding" placeholder="Toegepaste Informatica" />
                         </div>
 
                         <div class="form-group">
                             <label>E-mailadres</label>
-                            <input type="email" placeholder="student@ehb.be" />
+                            <input type="email" id="emailStudent" placeholder="student@ehb.be" />
                         </div>
                     </div>
                 </section>
+
+
 
                 <section class="dashboard-card">
                     <h2>Stagegegevens</h2>
@@ -85,32 +121,37 @@
                     <div class="form-grid">
                         <div class="form-group">
                             <label>Stagebedrijf</label>
-                            <input type="text" placeholder="Naam van het bedrijf" />
+                            <input type="text" id="stagebedrijf" placeholder="Naam van het bedrijf" />
                         </div>
 
                         <div class="form-group">
                             <label>Contactpersoon bedrijf</label>
-                            <input type="text" placeholder="Naam contactpersoon" />
+                            <input type="text" id="contactPersoon" placeholder="Naam contactpersoon" />
                         </div>
 
                         <div class="form-group">
                             <label>E-mail bedrijf</label>
-                            <input type="email" placeholder="contact@bedrijf.be" />
+                            <input type="email" id="emailBedrijf" placeholder="contact@bedrijf.be" />
                         </div>
 
                         <div class="form-group">
                             <label>Telefoon</label>
-                            <input type="text" placeholder="Telefoonnummer" />
+                            <input type="text" id="telefoonBedrijf" placeholder="Telefoonnummer" />
+                        </div>
+
+                        <div class="form-group">
+                            <label>Adres bedrijf</label>
+                            <input type="text" id="adresBedrijf" placeholder="Straat, nummer, postcode en gemeente" />
                         </div>
 
                         <div class="form-group">
                             <label>Startdatum</label>
-                            <input type="date" />
+                            <input type="date" id="startDatum" />
                         </div>
 
                         <div class="form-group">
                             <label>Einddatum</label>
-                            <input type="date" />
+                            <input type="date" id="eindDatum" />
                         </div>
                     </div>
                 </section>
@@ -120,14 +161,15 @@
 
                     <div class="form-group">
                         <label>Stageopdracht</label>
-                        <input type="text" placeholder="Hier beschrijf je kort wat jouw opdracht is" />
+                        <input type="text" id="stageopdracht"
+                            placeholder="Hier beschrijf je kort wat jouw opdracht is" />
                     </div>
 
 
 
                     <div class="form-group">
                         <label>Functie tijdens de stage</label>
-                        <input type="text" placeholder="Bijvoorbeeld: Junior Network Engineer" />
+                        <input type="text" id="functie" placeholder="Bijvoorbeeld: Junior Network Engineer" />
                     </div>
                 </section>
 
@@ -144,8 +186,12 @@
 
                 </section>
 
-            </main>
+
         </div>
+        </section>
+
+        </main>
+    </div>
     </div>
 
 

@@ -69,7 +69,7 @@ if (status === "aanpassing_vereist") {
     stepIngediend.classList.add("active");
     stepBehandeling.classList.add("active");
 
-    stepGoedgekeurd.classList.add("rejected");
+    stepGoedgekeurd.classList.add("warning");
     laatsteStatus.textContent = "Aanpassing vereist";
 
     startCard.style.display = "block";

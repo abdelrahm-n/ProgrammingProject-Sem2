@@ -1,19 +1,122 @@
 /* stagecommissie - accentkleur paars */
 :root {
-  --rol-accent:       #7C3AED;
+  --rol-accent: #7C3AED;
   --rol-accent-hover: #6d28d9;
   --rol-accent-licht: #F5F3FF;
 }
 
-.nav-item.actief    { background: var(--rol-accent); }
-.stat-kaart__icon   { color: var(--rol-accent); }
-.btn--primair       { background: var(--rol-accent); }
-.btn--primair:hover { background: var(--rol-accent-hover); }
-.actie-kaart:hover  { border-color: var(--rol-accent); color: var(--rol-accent); }
+.nav-item.actief {
+  background: var(--rol-accent);
+}
+
+.stat-kaart__icon {
+  color: var(--rol-accent);
+}
+
+.btn--primair {
+  background: var(--rol-accent);
+}
+
+.btn--primair:hover {
+  background: var(--rol-accent-hover);
+}
+
+.actie-kaart:hover {
+  border-color: var(--rol-accent);
+  color: var(--rol-accent);
+}
 
 input:focus,
 textarea:focus,
 select:focus {
   border-color: var(--rol-accent);
   box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
+}
+
+.btn--warning {
+  background-color: #E58A12 !important;
+  color: white !important;
+  border: none;
+}
+
+.btn--warning:hover {
+  background-color: #c9750f !important;
+}
+
+.btn--succes {
+  background-color: #2E9E49;
+  color: white;
+  border: none;
+}
+
+.btn--succes:hover {
+  background-color: #24803a;
+}
+
+.dashboard-card {
+  background: white;
+  border-radius: 8px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.actie-knoppen {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.actie-knoppen button {
+  min-width: 160px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.actie-knoppen button:hover {
+  transform: translateY(-2px);
+}
+
+h1 {
+  margin-bottom: 8px;
+}
+
+h2 {
+  margin-bottom: 16px;
+}
+
+main p {
+  line-height: 1.6;
+}
+
+.stage-aanvraag {
+  background: #fafafa;
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+
+.status-badge {
+  display: inline-block;
+  padding: 8px 14px;
+  border-radius: 6px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: white;
+}
+
+.status-ingediend {
+  background-color: #2563eb;
+}
+
+.status-aanpassing {
+  background-color: #E58A12;
+}
+
+.status-afgekeurd {
+  background-color: #990018;
+}
+
+.status-goedgekeurd {
+  background-color: #2E9E49;
 }

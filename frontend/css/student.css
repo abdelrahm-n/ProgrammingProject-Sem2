@@ -137,6 +137,26 @@ select:focus {
   font-weight: bold;
 }
 
+.btn--succes {
+  background-color: #2E9E49;
+  color: white;
+  border: none;
+}
+
+.btn--succes:hover {
+  background-color: #24803a;
+}
+
+.btn--warning {
+  background-color: #E58A12;
+  color: white;
+  border: none;
+}
+
+.btn--warning:hover {
+  background-color: #c9750f;
+}
+
 /* ==========================================
    STAGEOVEREENKOMST
 ========================================== */
@@ -217,6 +237,13 @@ select:focus {
   color: #dc3545;
   font-weight: bold;
 }
+
+
+.warning span {
+  background-color: #E58A12;
+}
+
+
 
 .student-card {
   background: white;
