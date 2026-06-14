@@ -7,3 +7,8 @@ function aanvraagAfkeuren() {
     localStorage.setItem("stageStatus", "afgekeurd");
     alert("Stageaanvraag afgekeurd.");
 }
+
+function aanvraagAanpassing() {
+  localStorage.setItem("stageStatus", "aanpassing_vereist");
+  alert("Aanpassing vereist ingesteld.");
+}

@@ -58,8 +58,29 @@ if (status === "afgekeurd") {
     statusTitel.textContent = "Stageaanvraag afgekeurd";
     statusTekst.textContent =
         "Je stageaanvraag werd afgekeurd omdat er gegevens ontbreken of niet correct zijn ingevuld. Pas je stagevoorstel aan en dien het opnieuw in.";
-        startCardTitle.textContent = "Stagevoorstel aanpassen";
-startCardText.textContent =
-    "Pas je stagevoorstel aan op basis van de feedback en dien het opnieuw in.";
-startCardButton.textContent = "Stagevoorstel aanpassen";
+    startCardTitle.textContent = "Stagevoorstel aanpassen";
+    startCardText.textContent =
+        "Pas je stagevoorstel aan op basis van de feedback en dien het opnieuw in.";
+    startCardButton.textContent = "Stagevoorstel aanpassen";
+}
+
+if (status === "aanpassing_vereist") {
+    stepAanmaak.classList.add("active");
+    stepIngediend.classList.add("active");
+    stepBehandeling.classList.add("active");
+
+    stepGoedgekeurd.classList.add("rejected");
+    laatsteStatus.textContent = "Aanpassing vereist";
+
+    startCard.style.display = "block";
+    statusCard.style.display = "block";
+
+    statusTitel.textContent = "Aanpassing vereist";
+    statusTekst.textContent =
+        "Je stagevoorstel moet aangepast worden voordat het opnieuw beoordeeld kan worden.";
+
+    startCardTitle.textContent = "Stagevoorstel aanpassen";
+    startCardText.textContent =
+        "Pas je stagevoorstel aan op basis van de feedback van de stagecommissie.";
+    startCardButton.textContent = "Stagevoorstel aanpassen";
 }
