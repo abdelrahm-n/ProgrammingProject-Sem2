@@ -172,8 +172,28 @@
     </div>
     <span id="schoolCheck" class="signature-badge pending">In afwachting</span>
   </div>
-</div>       
- <button type="button" class="btn-primary" onclick="window.location.href='stageovereenkomst-getekend.html'">
+</div>   
+<div class="signature-input-box">
+  <label for="studentHandtekening">Digitale handtekening student</label>
+  <input 
+    type="text" 
+    id="studentHandtekening" 
+    placeholder="Typ je volledige naam"
+  />
+  
+
+  <label class="checkbox-row">
+    <input type="checkbox" id="akkoordCheck" />
+    Ik bevestig dat ik deze stageovereenkomst heb gelezen en akkoord ga.
+  </label>
+</div>
+   
+ <button
+  type="button"
+  id="ondertekenBtn"
+  class="btn-primary"
+  disabled
+>
   Ondertekenen als student
 </button>
 </div>

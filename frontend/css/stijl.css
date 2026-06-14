@@ -862,3 +862,53 @@ tr:hover td {
   background: #d8f3df;
   color: #2e7d32;
 }
+
+.signature-input-box {
+  margin: 24px 0;
+}
+
+.signature-input-box label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.signature-input-box input[type="text"] {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #D8D8D8;
+  border-radius: 4px;
+  margin-bottom: 14px;
+}
+
+.checkbox-row {
+  display: flex !important;
+  gap: 10px;
+  align-items: center;
+  font-weight: normal !important;
+}
+
+.progress-step.done .progress-circle {
+  background: #d7f5dd;
+}
+
+.progress-step.active .progress-circle {
+  background: #eeeeee;
+  border: 2px solid #d7f5dd;
+}
+
+.progress-25 {
+  width: 28%;
+}
+
+.progress-50 {
+  width: 58%;
+}
+
+.progress-75 {
+  width: 83%;
+}
+
+.progress-100 {
+  width: calc(100% - 180px);
+}

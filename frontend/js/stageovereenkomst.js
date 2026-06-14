@@ -7,7 +7,6 @@ const stapContract = document.getElementById("stapContract");
 const stapActivatie = document.getElementById("stapActivatie");
 
 const bekijkBtn = document.getElementById("bekijkBtn");
-const ondertekenBtn = document.getElementById("ondertekenBtn");
 
 function toonOverzicht() {
   stapOverzicht.style.display = "block";
@@ -133,3 +132,20 @@ bekijkBtn.addEventListener("click", toonContract);
 ondertekenBtn.addEventListener("click", ondertekenAlsStudent);
 
 laadStageovereenkomst();
+
+const handtekeningInput = document.getElementById("studentHandtekening");
+const akkoordCheck = document.getElementById("akkoordCheck");
+
+function controleerOndertekening() {
+  const naamIngevuld = handtekeningInput.value.trim().length >= 2;
+  const akkoordGegeven = akkoordCheck.checked;
+
+  ondertekenBtn.disabled = !(naamIngevuld && akkoordGegeven);
+}
+
+handtekeningInput.addEventListener("input", controleerOndertekening);
+akkoordCheck.addEventListener("change", controleerOndertekening);
+
+ondertekenBtn.addEventListener("click", () => {
+  window.location.href = "stageovereenkomst-getekend.html";
+});
