@@ -5,28 +5,7 @@ import db from '../db.js'
 
 const router = express.Router()
 
-/* Zoek in welke roltabel de persoon zit en geef de rolnaam terug */
-async function bepaalRol(persoonId) {
-  const tabellen = [
-    { tabel: 'student',            rol: 'student'    },
-    { tabel: 'docent',             rol: 'docent'     },
-    { tabel: 'stagementor',        rol: 'mentor'     },
-    { tabel: 'stagecommissielid',  rol: 'commissie'  },
-    { tabel: 'administratie',      rol: 'admin'      }
-  ]
-
-  for (const entry of tabellen) {
-    const [rijen] = await db.query(
-      `SELECT persoon_id FROM ${entry.tabel} WHERE persoon_id = ?`,
-      [persoonId]
-    )
-    if (rijen.length > 0) return entry.rol
-  }
-
-  return null
-}
-
-/* POST /api/auth/login */
+/* POST /api/auth/login - gebruiker inloggen */
 router.post('/login', async (req, res) => {
   const { email, wachtwoord } = req.body
 
@@ -35,8 +14,9 @@ router.post('/login', async (req, res) => {
   }
 
   try {
+    /* Zoek de gebruiker op in de tabel */
     const [rijen] = await db.query(
-      'SELECT * FROM persoon WHERE email = ? AND actief = TRUE',
+      'SELECT * FROM gebruikers WHERE email = ?',
       [email]
     )
 
@@ -44,74 +24,27 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ fout: 'Gebruiker niet gevonden' })
     }
 
-    const persoon = rijen[0]
-    const klopt = await bcrypt.compare(wachtwoord, persoon.wachtwoord_hash)
+    const gebruiker = rijen[0]
+
+    /* Vergelijk het ingevoerde wachtwoord met de opgeslagen hash */
+    const klopt = await bcrypt.compare(wachtwoord, gebruiker.wachtwoord)
 
     if (!klopt) {
       return res.status(401).json({ fout: 'Verkeerd wachtwoord' })
     }
 
-    const rol = await bepaalRol(persoon.id)
-
-    if (!rol) {
-      return res.status(403).json({ fout: 'Geen rol toegewezen aan dit account' })
-    }
-
+    /* Maak een JWT token aan */
     const token = jwt.sign(
-      { id: persoon.id, rol },
+      { id: gebruiker.id, rol: gebruiker.rol },
       process.env.JWT_SECRET,
       { expiresIn: '8h' }
     )
 
     res.json({
       token,
-      rol,
-      naam: persoon.voornaam + ' ' + persoon.achternaam
+      rol: gebruiker.rol,
+      naam: gebruiker.naam
     })
-
-  } catch (err) {
-    console.error(err)
-    res.status(500).json({ fout: 'Serverfout' })
-  }
-})
-
-/* POST /api/auth/registreren (alleen voor stagementoren) */
-router.post('/registreren', async (req, res) => {
-  const { voornaam, achternaam, wachtwoord } = req.body
-
-  if (!voornaam || !achternaam || !wachtwoord) {
-    return res.status(400).json({ fout: 'Alle velden zijn verplicht' })
-  }
-
-  if (wachtwoord.length < 6) {
-    return res.status(400).json({ fout: 'Wachtwoord moet minstens 6 tekens lang zijn' })
-  }
-
-  /* Genereer het e-mailadres automatisch op basis van naam */
-  const schoneVoornaam = voornaam.toLowerCase().replace(/[^a-z]/g, '')
-  const schoneAchternaam = achternaam.toLowerCase().replace(/[^a-z]/g, '')
-  const email = `${schoneVoornaam}.${schoneAchternaam}@mentor.ehb.be`
-
-  try {
-    const [bestaand] = await db.query('SELECT id FROM persoon WHERE email = ?', [email])
-
-    if (bestaand.length > 0) {
-      return res.status(409).json({ fout: 'Dit e-mailadres is al in gebruik' })
-    }
-
-    const hash = await bcrypt.hash(wachtwoord, 10)
-
-    const [resultaat] = await db.query(
-      'INSERT INTO persoon (voornaam, achternaam, email, wachtwoord_hash, actief) VALUES (?, ?, ?, ?, TRUE)',
-      [voornaam, achternaam, email, hash]
-    )
-
-    await db.query(
-      'INSERT INTO stagementor (persoon_id, functie, bedrijf_id) VALUES (?, NULL, NULL)',
-      [resultaat.insertId]
-    )
-
-    res.status(201).json({ bericht: 'Account aangemaakt', email })
 
   } catch (err) {
     console.error(err)
