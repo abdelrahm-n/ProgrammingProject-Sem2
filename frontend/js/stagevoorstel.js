@@ -50,10 +50,7 @@ async function bewaarInDatabase(aanvraag) {
                 "Content-Type": "application/json",
                 "Authorization": "Bearer " + (localStorage.getItem("token") || "")
             },
-            body: JSON.stringify({
-                bedrijf: aanvraag.stagebedrijf,
-                omschrijving: aanvraag.stageopdracht
-            })
+            body: JSON.stringify(aanvraag)
         });
     } catch (fout) {
         /* Zonder server blijft de aanvraag in localStorage bewaard */
