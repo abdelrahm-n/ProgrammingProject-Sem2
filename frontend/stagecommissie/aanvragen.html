@@ -48,27 +48,33 @@
           <p>Bekijk en beoordeel de stageaanvragen van studenten.</p>
         </section>
 
-        <section class="dashboard-card">
+        <section class="dashboard-card stage-aanvraag">
           <h2>Stageaanvraag student</h2>
+          <div id="aanvraagStatus" class="status-badge"></div>
 
-          <p><strong>Student:</strong> Ranya Rabib</p>
-          <p><strong>Opleiding:</strong> Toegepaste Informatica</p>
-          <p><strong>Stagebedrijf:</strong> Voorbeeldbedrijf</p>
-          <p><strong>Functie:</strong> Junior Network Engineer</p>
+          
+          <p><strong>Student:</strong> <span id="aanvraagStudent"></span></p>
+          <p><strong>Studentnummer:</strong> <span id="aanvraagStudentNummer"></span></p>
+          <p><strong>Opleiding:</strong> <span id="aanvraagOpleiding"></span></p>
+          <p><strong>E-mail student:</strong> <span id="aanvraagEmailStudent"></span></p>
+          <p><strong>Stagebedrijf:</strong> <span id="aanvraagBedrijf"></span></p>
+          <p><strong>Adres bedrijf:</strong> <span id="aanvraagAdres"></span></p>
+          <p><strong>Contactpersoon:</strong> <span id="aanvraagContactPersoon"></span></p>
+          <p><strong>E-mail bedrijf:</strong> <span id="aanvraagEmailBedrijf"></span></p>
+          <p><strong>Telefoon:</strong> <span id="aanvraagTelefoonBedrijf"></span></p>
+          <p><strong>Startdatum:</strong> <span id="aanvraagStartDatum"></span></p>
+          <p><strong>Einddatum:</strong> <span id="aanvraagEindDatum"></span></p>
+          <p><strong>Functie:</strong> <span id="aanvraagFunctie"></span></p>
 
           <p>
             <strong>Omschrijving opdracht:</strong><br>
-            De student zal ondersteunende IT-taken uitvoeren binnen het bedrijf.
+            <span id="aanvraagOpdracht"></span>
           </p>
 
           <div class="actie-knoppen">
-            <button class="btn btn--primair" onclick="aanvraagGoedkeuren()">
-              Goedkeuren
-            </button>
-
-            <button class="btn btn--gevaar" onclick="aanvraagAfkeuren()">
-              Afkeuren
-            </button>
+            <button class="btn btn--succes" onclick="aanvraagGoedkeuren()">Goedkeuren</button>
+            <button class="btn btn--gevaar" onclick="aanvraagAfkeuren()">Afkeuren</button>
+            <button class="btn btn--warning" onclick="aanvraagAanpassing()">Aanpassing vereist</button>
           </div>
         </section>
       </main>
