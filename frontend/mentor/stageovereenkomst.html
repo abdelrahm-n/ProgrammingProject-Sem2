@@ -120,26 +120,6 @@
 </div>
 
 <script>
-  const bedrijfInput = document.getElementById("bedrijfHandtekening");
-  const bedrijfCheck = document.getElementById("bedrijfAkkoordCheck");
-  const bedrijfBtn = document.getElementById("bedrijfOndertekenBtn");
-
-  function controleerBedrijfOndertekening() {
-    const naamIngevuld = bedrijfInput.value.trim().length >= 2;
-    const akkoord = bedrijfCheck.checked;
-
-    bedrijfBtn.disabled = !(naamIngevuld && akkoord);
-  }
-
-  bedrijfInput.addEventListener("input", controleerBedrijfOndertekening);
-  bedrijfCheck.addEventListener("change", controleerBedrijfOndertekening);
-
-  bedrijfBtn.addEventListener("click", () => {
-    window.location.href = "stageovereenkomst-getekend.html";
-  });
-</script>
-
-<script>
 const params = new URLSearchParams(window.location.search);
 const student = params.get("student");
 
@@ -184,7 +164,27 @@ document.getElementById("contactpersoon").textContent = data.contactpersoon;
 document.getElementById("stageperiode").textContent = data.periode;
 document.getElementById("functie").textContent = data.functie;
 document.getElementById("stageopdracht").textContent = data.opdracht;
+
+  const bedrijfInput = document.getElementById("bedrijfHandtekening");
+  const bedrijfCheck = document.getElementById("bedrijfAkkoordCheck");
+  const bedrijfBtn = document.getElementById("bedrijfOndertekenBtn");
+
+  function controleerBedrijfOndertekening() {
+    const naamIngevuld = bedrijfInput.value.trim().length >= 2;
+    const akkoord = bedrijfCheck.checked;
+
+    bedrijfBtn.disabled = !(naamIngevuld && akkoord);
+  }
+
+  bedrijfInput.addEventListener("input", controleerBedrijfOndertekening);
+  bedrijfCheck.addEventListener("change", controleerBedrijfOndertekening);
+
+bedrijfBtn.addEventListener("click", () => {
+  window.location.href = `stageovereenkomst-getekend.html?student=${student}`;
+});
 </script>
+
+
 
 </body>
 </html>
