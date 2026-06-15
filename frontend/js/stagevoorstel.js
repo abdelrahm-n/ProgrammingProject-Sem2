@@ -21,9 +21,50 @@ function vulStudentgegevensIn() {
     emailVeld.readOnly = true;
 }
 
-vulStudentgegevensIn();
+/* Zet eerder ingevulde gegevens terug zodat ze bewaard blijven */
+function herstelOpgeslagenAanvraag() {
+    const opgeslagen = localStorage.getItem("stageAanvraag");
+    if (!opgeslagen) {
+        return;
+    }
 
-function stagevoorstelIndienen() {
+    const aanvraag = JSON.parse(opgeslagen);
+
+    document.getElementById("stagebedrijf").value = aanvraag.stagebedrijf || "";
+    document.getElementById("contactPersoon").value = aanvraag.contactPersoon || "";
+    document.getElementById("emailBedrijf").value = aanvraag.emailBedrijf || "";
+    document.getElementById("telefoonBedrijf").value = aanvraag.telefoonBedrijf || "";
+    document.getElementById("adresBedrijf").value = aanvraag.adresBedrijf || "";
+    document.getElementById("startDatum").value = aanvraag.startDatum || "";
+    document.getElementById("eindDatum").value = aanvraag.eindDatum || "";
+    document.getElementById("functie").value = aanvraag.functie || "";
+    document.getElementById("stageopdracht").value = aanvraag.stageopdracht || "";
+}
+
+/* Bewaar de stagegegevens in de database tabellen via de backend */
+async function bewaarInDatabase(aanvraag) {
+    try {
+        await fetch("http://localhost:3000/api/stages", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": "Bearer " + (localStorage.getItem("token") || "")
+            },
+            body: JSON.stringify({
+                bedrijf: aanvraag.stagebedrijf,
+                omschrijving: aanvraag.stageopdracht
+            })
+        });
+    } catch (fout) {
+        /* Zonder server blijft de aanvraag in localStorage bewaard */
+        console.log("Opslaan in database overgeslagen (geen server).");
+    }
+}
+
+vulStudentgegevensIn();
+herstelOpgeslagenAanvraag();
+
+async function stagevoorstelIndienen() {
 
     const studentNaam = document.getElementById("studentNaam").value;
     const studentNummer = document.getElementById("studentNummer").value;
@@ -77,8 +118,12 @@ function stagevoorstelIndienen() {
         stageopdracht
     };
 
+    /* Bewaar lokaal zodat het overzicht en de overeenkomst de gegevens tonen */
     localStorage.setItem("stageAanvraag", JSON.stringify(aanvraag));
     localStorage.setItem("stageStatus", "ingediend");
+
+    /* Bewaar de gegevens ook in de database tabellen */
+    await bewaarInDatabase(aanvraag);
 
     window.location.href = "dashboard.html";
 }
