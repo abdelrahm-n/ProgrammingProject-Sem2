@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Stageplatform - Mentor - Stagiairs</title>
+
+  <link rel="stylesheet" href="../css/stijl.css" />
+  <link rel="stylesheet" href="../css/student.css" />
+</head>
+
+<body>
+<div id="app">
+
+  <header class="header">
+    <div class="header-logo">
+      <span class="header-logo-text">Stageplatform</span>
+    </div>
+
+    <div class="header-actions">
+      <span class="header-rol-badge">Stagementor</span>
+      <button class="btn-terug" onclick="window.location.href='dashboard.html'">Terug</button>
+    </div>
+  </header>
+
+  <div class="app-body">
+
+    <nav class="sidebar">
+      <a href="dashboard.html" class="nav-item">Home</a>
+      <a href="stagiairs.html" class="nav-item actief">Stagiairs</a>
+      <a href="logboeken.html" class="nav-item">Logboeken</a>
+      <a href="evaluatie.html" class="nav-item">Evaluatie</a>
+      <a href="profiel.html" class="nav-item">Profiel</a>
+      <a href="../index.html" class="nav-item" style="margin-top:auto">Uitloggen</a>
+    </nav>
+
+    <main class="content-area">
+
+      <section class="page-header">
+        <h1>Mijn stagiairs</h1>
+        <p>Bekijk de studenten die gekoppeld zijn aan jouw stagebedrijf.</p>
+      </section>
+
+      <section class="student-card">
+        <h2>Stagiairs</h2>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Opleiding</th>
+              <th>Stageperiode</th>
+              <th>Actie</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr>
+              <td>Iman Obenalli</td>
+              <td>Toegepaste Informatica</td>
+              <td>10/03/2026 - 31/05/2026</td>
+              <td>
+                <a href="stagiair-detail.html" class="btn-primary">
+                     Student bekijken
+                </a>
+            </td>
+            </tr>
+
+            <tr>
+  <td>Ranya Rabib</td>
+  <td>Toegepaste Informatica</td>
+  <td>10/03/2026 - 31/05/2026</td>
+  <td>
+    <a href="stagiair-detail.html" class="btn-primary">
+      Student bekijken
+    </a>
+  </td>
+</tr>
+
+<tr>
+  <td>Ryan Machiels</td>
+  <td>Toegepaste Informatica</td>
+  <td>10/03/2026 - 31/05/2026</td>
+  <td>
+    <a href="stagiair-detail.html" class="btn-primary">
+      Student bekijken
+    </a>
+  </td>
+</tr>
+          </tbody>
+        </table>
+      </section>
+
+    </main>
+  </div>
+</div>
+</body>
+</html>
