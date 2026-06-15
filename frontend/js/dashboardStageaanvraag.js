@@ -12,6 +12,7 @@ const stepGoedgekeurd = document.getElementById("step-goedgekeurd");
 const startCardTitle = document.getElementById("start-card-title");
 const startCardText = document.getElementById("start-card-text");
 const startCardButton = document.getElementById("start-card-button");
+const overeenkomstKnop = document.getElementById("overeenkomst-knop");
 
 if (status === "ingediend") {
     stepAanmaak.classList.add("active");
@@ -41,6 +42,9 @@ if (status === "goedgekeurd") {
 
     statusTitel.textContent = "Stageaanvraag goedgekeurd";
     statusTekst.textContent = "Je stageaanvraag is goedgekeurd. Je kan nu verdergaan met de stageovereenkomst.";
+
+    /* Toon de knop naar de stageovereenkomst */
+    overeenkomstKnop.style.display = "inline-block";
 }
 
 if (status === "afgekeurd") {
