@@ -47,84 +47,61 @@
 
         <section class="dashboard-card">
           <h2>Status van je stageaanvraag</h2>
-
           <div class="stage-progress">
-            <div class="progress-line"></div>
+
+            <div class="stage-step" id="step-aanmaak">
+              <span></span>
+              <p>Aanmaak</p>
+            </div>
+
+            <div class="progress-line" id="line-aanmaak-ingediend"></div>
 
             <div class="stage-step" id="step-ingediend">
               <span></span>
               <p>Ingediend</p>
             </div>
 
-            <div class="stage-step">
-              <span></span>
-              <p>Aangekomen bij<br>administratie</p>
-            </div>
+            <div class="progress-line" id="line-ingediend-behandeling"></div>
 
-            <div class="stage-step">
+            <div class="stage-step" id="step-behandeling">
               <span></span>
               <p>In behandeling</p>
             </div>
 
-            <div class="stage-step">
-              <span></span>
-              <p>Goedgekeurd</p>
-            </div>
-          </div>
+            <div class="progress-line" id="line-behandeling-goedgekeurd"></div>
 
+            <div class="stage-step" id="step-goedgekeurd">
+              <span></span>
+              <p id="laatste-status">Goedgekeurd</p>
+            </div>
+
+          </div>
 
         </section>
 
-        <section class="dashboard-card" id="stageprocesCard">
-          <h2>Stageproces starten</h2>
-          <p>Je hebt nog geen stageaanvraag ingediend. Start met het indienen van je stagevoorstel.</p>
 
-          <a href="stagevoorstel.html" class="btn-primary">
+
+
+        <section class="dashboard-card" id="status-card" style="display:none;">
+          <h2 id="status-titel">Stageaanvraag</h2>
+          <p id="status-tekst"></p>
+        </section>
+
+        <section class="dashboard-card" id="start-stage-card">
+          <h2 id="start-card-title">Stageproces starten</h2>
+          <p id="start-card-text">
+            Je hebt nog geen stageaanvraag ingediend. Start met het indienen van je stagevoorstel.
+          </p>
+          <a href="stagevoorstel.html" class="btn btn--primair" id="start-card-button">
             Stagevoorstel indienen
           </a>
         </section>
 
-        <section class="dashboard-card" id="stageovereenkomstCard" style="display:none;">
-  <h2>Stageovereenkomst</h2>
-
-  <p>
-    Je stagevoorstel is goedgekeurd.
-    Je kan nu je stageovereenkomst bekijken en ondertekenen.
-  </p>
-
-  <a href="stageovereenkomst.html" class="btn-primary">
-    Stageovereenkomst openen
-  </a>
-</section>
-
-        <section class="dashboard-card" id="stageovereenkomstCard" style="display:none;">
-
-        <h2>Stageovereenkomst</h2>
-
-         <p id="stageovereenkomstTekst">
-         Je stageovereenkomst wordt beschikbaar zodra je stagevoorstel is goedgekeurd.
-        </p>
-
-  <a href="#" class="btn-secondary disabled-link" id="stageovereenkomstBtn">
-    Nog niet beschikbaar
-  </a>
-</section>
-
-        <section class="dashboard-grid">
       </main>
 
-      <script>
-        const status = localStorage.getItem("stageStatus");
 
-        if (status === "ingediend") {
-          document.getElementById("step-ingediend").classList.add("active");
-        }
-      </script>
-
-
-  <script src="../js/nav.js"></script>
-  <script src="../js/dashboard-stageovereenkomst.js"></script>
-
+      <script src="../js/dashboardStageaanvraag.js"></script>
+      <script src="../js/nav.js"></script>
 
 </body>
 

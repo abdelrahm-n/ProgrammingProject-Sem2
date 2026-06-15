@@ -2,6 +2,30 @@ const API_URL = "http://localhost:3000/api/stageovereenkomst";
 
 const stagevoorstelId = 1;
 
+const stapOverzicht = document.getElementById("stapOverzicht");
+const stapContract = document.getElementById("stapContract");
+const stapActivatie = document.getElementById("stapActivatie");
+
+const bekijkBtn = document.getElementById("bekijkBtn");
+
+function toonOverzicht() {
+  stapOverzicht.style.display = "block";
+  stapContract.style.display = "none";
+  stapActivatie.style.display = "none";
+}
+
+function toonContract() {
+  stapOverzicht.style.display = "none";
+  stapContract.style.display = "block";
+  stapActivatie.style.display = "none";
+}
+
+function toonActivatie() {
+  stapOverzicht.style.display = "none";
+  stapContract.style.display = "none";
+  stapActivatie.style.display = "block";
+}
+
 async function laadStageovereenkomst() {
   const melding = document.getElementById("melding");
 
@@ -49,11 +73,14 @@ async function laadStageovereenkomst() {
       data.getekend_door_bedrijf ? "Ondertekend" : "Nog niet ondertekend";
 
     document.getElementById("schoolCheck").value =
-      data.getekend_door_school ? "Ondertekend" : "Nog niet ondertekend";
+      data.getekend_door_stagecommissie ? "Ondertekend" : "Nog niet ondertekend";
 
     if (data.getekend_door_student) {
-      document.getElementById("ondertekenBtn").disabled = true;
-      document.getElementById("ondertekenBtn").textContent = "Al ondertekend";
+      ondertekenBtn.disabled = true;
+      ondertekenBtn.textContent = "Al ondertekend";
+      toonActivatie();
+    } else {
+      toonOverzicht();
     }
 
   } catch (error) {
@@ -73,12 +100,22 @@ async function ondertekenAlsStudent() {
     const data = await response.json();
 
     if (!response.ok) {
-      melding.textContent = data.message;
+      melding.textContent = data.message || "Ondertekenen is niet gelukt.";
       return;
     }
 
-    melding.textContent = data.message;
-    laadStageovereenkomst();
+    melding.textContent = "";
+
+    document.getElementById("studentCheck").textContent = "Ondertekend";
+    document.getElementById("studentCheck").classList.remove("waiting");
+    document.getElementById("studentCheck").classList.add("done");
+
+    document.getElementById("status").textContent = "Wacht op bedrijf";
+
+    ondertekenBtn.disabled = true;
+    ondertekenBtn.textContent = "Al ondertekend";
+
+    toonActivatie();
 
   } catch (error) {
     console.error(error);
@@ -91,8 +128,24 @@ function formatDatum(datum) {
   return new Date(datum).toLocaleDateString("nl-BE");
 }
 
-document
-  .getElementById("ondertekenBtn")
-  .addEventListener("click", ondertekenAlsStudent);
+bekijkBtn.addEventListener("click", toonContract);
+ondertekenBtn.addEventListener("click", ondertekenAlsStudent);
 
 laadStageovereenkomst();
+
+const handtekeningInput = document.getElementById("studentHandtekening");
+const akkoordCheck = document.getElementById("akkoordCheck");
+
+function controleerOndertekening() {
+  const naamIngevuld = handtekeningInput.value.trim().length >= 2;
+  const akkoordGegeven = akkoordCheck.checked;
+
+  ondertekenBtn.disabled = !(naamIngevuld && akkoordGegeven);
+}
+
+handtekeningInput.addEventListener("input", controleerOndertekening);
+akkoordCheck.addEventListener("change", controleerOndertekening);
+
+ondertekenBtn.addEventListener("click", () => {
+  window.location.href = "stageovereenkomst-getekend.html";
+});
