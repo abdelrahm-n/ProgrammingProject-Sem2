@@ -42,19 +42,119 @@
           Uitloggen
         </a>
       </nav>
+      
 
       <main class="content-area">
 
-        <div class="view-header">
-          <h1 class="view-titel">Mijn evaluaties</h1>
-          <p class="view-subtitel">Bekijk je evaluatiemomenten en vul je reflectie per competentie in</p>
-        </div>
+  <div class="view-header">
+    <h1 class="view-titel">Evaluatie</h1>
+    <p class="view-subtitel">
+      Bekijk je tussentijdse evaluatie, eindevaluatie en vul je zelfevaluaties in.
+    </p>
+  </div>
 
-        <div id="evaluatieInhoud">
-          <p class="tekst-muted">Laden...</p>
-        </div>
+  <section class="dashboard-card">
+    <h2>Evaluatiemomenten</h2>
 
-      </main>
+    <div class="evaluatie-overzicht">
+      <div>
+        <strong>Tussentijdse evaluatie</strong>
+        <p>30 april 2026</p>
+        <span class="status-badge status-ingediend">Beschikbaar</span>
+
+        <button id="invullenTussenBtn" class="btn btn--primair" onclick="toonZelfevaluatie('tussen')">
+          Invullen
+        </button>
+
+        <span id="ingediendTussenBadge" class="status-badge status-goedgekeurd" style="display:none;">
+          Ingediend
+        </span>
+      </div>
+
+      <div>
+        <strong>Eindevaluatie</strong>
+        <p>31 mei 2026</p>
+        <span class="status-badge status-ingediend">Beschikbaar</span>
+
+        <button id="invullenEindeBtn" class="btn btn--primair" onclick="toonZelfevaluatie('einde')">
+          Invullen
+        </button>
+
+        <span id="ingediendEindeBadge" class="status-badge status-goedgekeurd" style="display:none;">
+          Ingediend
+        </span>
+      </div>
+    </div>
+  </section>
+
+  <section class="dashboard-card" id="zelfevaluatieCard" style="display:none;">
+    <h2 id="zelfevaluatieTitel">Zelfevaluatie</h2>
+    <p class="tekst-muted">
+      Kies per competentie de score die het best bij je past en voeg een korte reflectie toe.
+    </p>
+
+    <div id="competentieLijst"></div>
+
+    <button class="btn btn--primair" onclick="zelfEvaluatieOpslaan()">
+      Indienen
+    </button>
+  </section>
+
+  <section class="dashboard-card">
+    <h2>Resultaat tussentijdse evaluatie</h2>
+
+    <table class="evaluatie-tabel">
+      <thead>
+        <tr>
+          <th>Competentie</th>
+          <th>Zelfscore student</th>
+          <th>Mentorscore</th>
+          <th>Reflectie student</th>
+          <th>Feedback mentor</th>
+        </tr>
+      </thead>
+      <tbody id="evaluatieResultaat">
+        <tr>
+          <td colspan="5">Nog geen tussentijdse evaluatiegegevens beschikbaar.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="dashboard-card">
+    <h2>Eindevaluatie</h2>
+
+    <button class="btn btn--primair" onclick="toonEindeResultaat()">
+      Bekijk jouw eindevaluatie
+    </button>
+
+    <table class="evaluatie-tabel" style="margin-top:20px;">
+      <thead>
+        <tr>
+          <th>Competentie</th>
+          <th>Zelfscore student</th>
+          <th>Mentorscore</th>
+          <th>Reflectie student</th>
+          <th>Feedback mentor</th>
+        </tr>
+      </thead>
+      <tbody id="eindeEvaluatieResultaat">
+        <tr>
+          <td colspan="5">Nog geen eindevaluatiegegevens beschikbaar.</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+</main>
+
+
+
+
+
+
+
+
     </div>
   </div>
 
