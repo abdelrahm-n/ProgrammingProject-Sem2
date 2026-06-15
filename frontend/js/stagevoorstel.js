@@ -1,3 +1,28 @@
+/* Vul de studentgegevens automatisch in vanuit de ingelogde sessie */
+function vulStudentgegevensIn() {
+    const naam = localStorage.getItem("naam") || "Test Account";
+    const email = localStorage.getItem("email") || "test.account@student.ehb.be";
+    const studentnummer = localStorage.getItem("studentnummer") || "r0123456";
+
+    const naamVeld = document.getElementById("studentNaam");
+    const nummerVeld = document.getElementById("studentNummer");
+    const opleidingVeld = document.getElementById("opleiding");
+    const emailVeld = document.getElementById("emailStudent");
+
+    naamVeld.value = naam;
+    nummerVeld.value = studentnummer;
+    opleidingVeld.value = "Toegepaste Informatica";
+    emailVeld.value = email;
+
+    /* Deze gegevens komen uit het profiel en mogen niet aangepast worden */
+    naamVeld.readOnly = true;
+    nummerVeld.readOnly = true;
+    opleidingVeld.readOnly = true;
+    emailVeld.readOnly = true;
+}
+
+vulStudentgegevensIn();
+
 function stagevoorstelIndienen() {
 
     const studentNaam = document.getElementById("studentNaam").value;
