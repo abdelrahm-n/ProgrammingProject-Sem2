@@ -10,93 +10,70 @@
 <body>
 
   <div id="app">
-    <header class="header">
-      <div class="header-logo">
-        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
-        </svg>
-        <span class="header-logo-text">Stageplatform</span>
+    <header class="header-monitoring">
+      <div class="header-left">
+        <a href="dashboard.html" class="header-nav-link">Dashboard</a>
+        <div class="header-divider"></div>
       </div>
-      <div class="header-actions">
-        <span class="header-rol-badge">Student</span>
-        <button class="btn-terug" onclick="window.location.href='logboek.html'">Terug</button>
+      <div class="header-center">
+        <h1 class="header-title">STAGE MONITORING TOOL</h1>
+      </div>
+      <div class="header-right">
+        <span>Student</span>
+        <button onclick="window.location.href='../index.html'">Profiel/Logout</button>
       </div>
     </header>
 
-    <div class="app-body">
-      <nav class="sidebar">
-        <a href="dashboard.html" class="nav-item">Dashboard</a>
-        <a href="stage-indienen.html" class="nav-item">Stage indienen</a>
-        <a href="logboek.html" class="nav-item">Logboek</a>
-        <a href="evaluatie.html" class="nav-item">Evaluatie</a>
-        <a href="../index.html" class="nav-item" id="uitlogBtn" style="margin-top:auto">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-            <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
-          </svg>
-          Uitloggen
-        </a>
+    <div class="monitoring-container">
+      <nav class="sidebar-monitoring">
+        <a href="dashboard.html" class="sidebar-item">DASHBOARD</a>
+        <a href="logboek.html" class="sidebar-item active">LOGBOEKEN</a>
+        <a href="evaluatie.html" class="sidebar-item">EVALUATIE</a>
+        <a href="#" class="sidebar-item">PROFIEL</a>
       </nav>
 
-      <main class="content-area">
-        <div class="detail-panel">
-          <div class="detail-topbar">
-            <a href="logboek.html" class="detail-back">← Terug naar logboeken</a>
-            <h1>LOGBOEK</h1>
+      <main class="monitoring-content">
+        <div class="logboek-detail">
+          <div class="logboek-header">
+            <a href="logboek.html" class="back-link">← Terug</a>
+            <h2 id="logboekTitel">Logboek week 4</h2>
           </div>
 
-          <div class="detail-card">
-            <div class="detail-row">
-              <label>Logboekgegevens</label>
-            </div>
-            <div class="detail-row">
-              <div class="detail-field">
-                <span>Datum</span>
-                <input type="text" value="24/03/2026" readonly />
-              </div>
-              <div class="detail-field">
-                <span>Week</span>
-                <input type="text" value="Week 4" readonly />
-              </div>
-            </div>
+          <div class="logboek-meta">
+            <span id="logboekDatum">12 maart 2026</span>
+            <span id="logboekWeek" class="week-tag">Week 4</span>
+            <span id="logboekStatus" class="status-tag"></span>
           </div>
 
-          <div class="detail-card">
-            <div class="detail-row">
-              <label>Uitgevoerde taken</label>
-            </div>
-            <div class="detail-task">
-              <strong>Taak 1</strong>
-              <p>Software geïnstalleerd op nieuwe toestellen</p>
-              <div class="detail-textarea" contenteditable="true">Vul per taak een apart item toe. Zo blijft duidelijk wat je op deze stagedag hebt gedaan.</div>
-            </div>
-            <div class="detail-task">
-              <strong>Taak 2</strong>
-              <p>Gebruikersaccounts aangemaakt</p>
-              <div class="detail-textarea" contenteditable="true">Welke accounts werden aangemaakt en welke rechten werden gecontroleerd?</div>
-            </div>
-            <div class="detail-task">
-              <strong>Taak 3</strong>
-              <p>Netwerkproblemen onderzocht</p>
-              <div class="detail-textarea" contenteditable="true">Welke stappen heb je genoeg om het probleem te analyseren?</div>
-            </div>
-            <button class="btn-task-add">+ Taak toevoegen</button>
+          <!-- Uitgevoerde taken -->
+          <div class="section">
+            <h3>Uitgevoerde taken</h3>
+            <div id="takenContainer" class="taken-list"></div>
+            <button id="addTaskBtn" class="btn-add-task">+ Taak toevoegen</button>
           </div>
 
-          <div class="detail-grid">
-            <div class="detail-card detail-small">
-              <label>Reflectie</label>
-              <div class="detail-textarea" contenteditable="true">Wat heb je vandaag geleerd? Wat ging goed?</div>
-            </div>
-            <div class="detail-card detail-small">
-              <label>Problemen / leerpunten</label>
-              <div class="detail-textarea" contenteditable="true">Welke moeilijkheden kwamen je tegen? Waar wil je nog in groeien?</div>
-            </div>
+          <!-- Reflectie -->
+          <div class="section">
+            <h3>Reflectie</h3>
+            <div id="reflectieField" class="text-field"></div>
           </div>
 
-          <div class="detail-actions">
-            <button class="btn-secondary">Opslaan als concept</button>
-            <button class="btn-primary">Logboek indienen</button>
+          <!-- Problemen / leerpunten -->
+          <div class="section">
+            <h3>Problemen / leerpunten</h3>
+            <div id="probiemenField" class="text-field"></div>
+          </div>
+
+          <!-- Mentorfeedback (alleen als ingediend) -->
+          <div id="feedbackSection" class="section feedback-section" style="display: none;">
+            <h3>Mentorfeedback</h3>
+            <div id="feedbackField" class="feedback-box"></div>
+          </div>
+
+          <!-- Actions -->
+          <div class="logboek-actions">
+            <button id="saveBtn" class="btn-secondary">Opslaan als concept</button>
+            <button id="submitBtn" class="btn-primary">Logboek indienen</button>
           </div>
         </div>
       </main>
@@ -104,5 +81,144 @@
   </div>
 
   <script src="../js/nav.js"></script>
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const weekParam = parseInt(urlParams.get('week'));
+    const isEigen = urlParams.get('eigen') === '1';
+
+    function getEigenLogboeken() {
+      const stored = localStorage.getItem('eigenLogboeken');
+      return stored ? JSON.parse(stored) : [];
+    }
+
+    function renderLogboek() {
+      const eigenLogboeken = getEigenLogboeken();
+      let logboek = null;
+
+      if (isEigen) {
+        logboek = eigenLogboeken.find(log => log.week === weekParam);
+      } else {
+        // Sample data
+        const sampleLogboeken = [
+          { 
+            week: 3, 
+            datum: '12/03/2026', 
+            submitted: true, 
+            statusText: 'Feedback ontvangen',
+            reflectie: 'Ik heb de toegewezen opdrachten correct uitgevoerd. Het netwerkprobleem had ik snel geanalyseerd en verbonden.',
+            problemen: 'Ik had wat moeite met de ingewikkelde netwerkconfiguratie, maar na wat onderzoek lukte het me.',
+            feedback: 'Je hebt de toegewezen taken correct uitgevoerd. Het netwerkprobleem had je snel geanalyseerd en verbonden. Probeer in het volgende logboek meer initiatief te tonen.',
+            tasks: [
+              { title: 'Software geïnstalleerd op nieuwe toestellen', description: 'Nieuwe laptops met Windows 11 voorzien van de nodige software.' },
+              { title: 'Gebruikersaccounts aangemaakt', description: 'Nieuwe gebruikersaccounts aangemaakt en rechten ingesteld.' },
+              { title: 'Netwerkproblemen onderzocht', description: 'Verbindingsproblemen op eerste verdieping opgelost.' }
+            ]
+          },
+          { 
+            week: 2, 
+            datum: '05/03/2026', 
+            submitted: true, 
+            statusText: 'Goedgekeurd',
+            reflectie: 'Goed kunnen werken met de systeembeheer taken.',
+            problemen: 'Geen grote problemen tegen gekomen.',
+            tasks: [
+              { title: 'Server onderhoud', description: 'Backup scripts gecontroleerd en geupdate.' },
+              { title: 'Database beheer', description: 'Database queries geoptimaliseerd.' }
+            ]
+          },
+          { 
+            week: 1, 
+            datum: '26/02/2026', 
+            submitted: true, 
+            statusText: 'Goedgekeurd',
+            reflectie: 'Goede kennismaking met het bedrijf en de IT-afdeling.',
+            problemen: 'Geen specifieke problemen.',
+            tasks: [
+              { title: 'Kennismaking', description: 'Rondleiding op kantoor en introductie collega\'s.' }
+            ]
+          }
+        ];
+        logboek = sampleLogboeken.find(log => log.week === weekParam);
+      }
+
+      if (!logboek) return;
+
+      // Update header
+      document.getElementById('logboekTitel').textContent = `Logboek week ${logboek.week}`;
+      
+      if (logboek.datum) {
+        const dateObj = new Date(logboek.datum);
+        const formatted = dateObj.toLocaleDateString('nl-NL', { year: 'numeric', month: 'long', day: 'numeric' });
+        document.getElementById('logboekDatum').textContent = formatted;
+      }
+
+      document.getElementById('logboekWeek').textContent = `Week ${logboek.week}`;
+
+      // Status badge
+      if (logboek.submitted && logboek.statusText) {
+        const statusSpan = document.getElementById('logboekStatus');
+        statusSpan.textContent = logboek.statusText;
+        statusSpan.className = logboek.feedback ? 'status-tag feedback-status' : 'status-tag approved-status';
+      }
+
+      // Taken
+      if (logboek.tasks) {
+        const container = document.getElementById('takenContainer');
+        container.innerHTML = '';
+        logboek.tasks.forEach((task, i) => {
+          const taskDiv = document.createElement('div');
+          taskDiv.className = 'task-item';
+          taskDiv.innerHTML = `
+            <div class="task-title">Task ${i + 1}</div>
+            <div class="task-subtitle">${task.title}</div>
+            <textarea class="task-textarea" ${logboek.submitted ? 'readonly' : ''}>${task.description}</textarea>
+          `;
+          container.appendChild(taskDiv);
+        });
+      }
+
+      // Reflectie
+      const reflectieField = document.getElementById('reflectieField');
+      reflectieField.innerHTML = `<textarea class="field-textarea" ${logboek.submitted ? 'readonly' : ''}>${logboek.reflectie || ''}</textarea>`;
+
+      // Problemen
+      const probiemenField = document.getElementById('probiemenField');
+      probiemenField.innerHTML = `<textarea class="field-textarea" ${logboek.submitted ? 'readonly' : ''}>${logboek.problemen || ''}</textarea>`;
+
+      // Feedback (alleen als ingediend)
+      if (logboek.submitted && logboek.feedback) {
+        document.getElementById('feedbackSection').style.display = 'block';
+        document.getElementById('feedbackField').textContent = logboek.feedback;
+      }
+
+      // Buttons
+      const saveBtn = document.getElementById('saveBtn');
+      const submitBtn = document.getElementById('submitBtn');
+
+      if (logboek.submitted) {
+        saveBtn.style.display = 'none';
+        submitBtn.style.display = 'none';
+      } else {
+        submitBtn.addEventListener('click', () => {
+          if (isEigen) {
+            const eigen = getEigenLogboeken();
+            const index = eigen.findIndex(l => l.week === weekParam);
+            if (index !== -1) {
+              eigen[index].submitted = true;
+              localStorage.setItem('eigenLogboeken', JSON.stringify(eigen));
+            }
+          }
+          alert('Logboek ingediend!');
+          window.location.href = 'logboek.html';
+        });
+
+        saveBtn.addEventListener('click', () => {
+          alert('Concept opgeslagen!');
+        });
+      }
+    }
+
+    renderLogboek();
+  </script>
 </body>
 </html>

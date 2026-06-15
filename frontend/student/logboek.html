@@ -88,10 +88,62 @@
     </div>
   </div>
 
+  <!-- Modal voor nieuw logboek -->
+  <div id="newLogboekModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Nieuw logboek invullen</h2>
+        <button class="modal-close" id="closeModal">&times;</button>
+      </div>
+      <form id="newLogboekForm">
+        <div class="form-group">
+          <label>Week</label>
+          <select id="weekSelect" required>
+            <option value="">Kies een week</option>
+            <option value="4">Week 4</option>
+            <option value="5">Week 5</option>
+            <option value="6">Week 6</option>
+            <option value="7">Week 7</option>
+            <option value="8">Week 8</option>
+            <option value="9">Week 9</option>
+            <option value="10">Week 10</option>
+            <option value="11">Week 11</option>
+            <option value="12">Week 12</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Datum</label>
+          <input type="date" id="datumInput" required />
+        </div>
+
+        <div class="form-group">
+          <label>Aantal items ingevuld</label>
+          <input type="number" id="itemsInput" min="1" max="10" required />
+        </div>
+
+        <div class="form-group">
+          <label>Reflectie</label>
+          <textarea id="reflectieInput" placeholder="Wat heb je vandaag geleerd?"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Problemen / leerpunten</label>
+          <textarea id="probiemenInput" placeholder="Waar wil je nog in groeien?"></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" id="cancelModal">Annuleren</button>
+          <button type="submit" class="btn-primary">Opslaan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script src="../js/nav.js"></script>
   <script>
     // Sample logboeken data
-    const logboeken = [
+    const sampleLogboeken = [
       {
         week: 4,
         logboeken: '4 / 5',
@@ -131,39 +183,106 @@
       }
     ];
 
-    // Render table rows
-    const tableBody = document.getElementById('logboekTableBody');
-    
-    logboeken.forEach(entry => {
-      const row = document.createElement('tr');
+    // Laad eigen logboeken uit localStorage
+    function getEigenLogboeken() {
+      const stored = localStorage.getItem('eigenLogboeken');
+      return stored ? JSON.parse(stored) : [];
+    }
+
+    // Sla eigen logboek op in localStorage
+    function saveEigenLogboek(logboek) {
+      const eigen = getEigenLogboeken();
+      eigen.push(logboek);
+      localStorage.setItem('eigenLogboeken', JSON.stringify(eigen));
+    }
+
+    // Render tabel met sample + eigen logboeken
+    function renderLogboeken() {
+      const tableBody = document.getElementById('logboekTableBody');
+      tableBody.innerHTML = '';
+
+      // Combineer sample en eigen logboeken
+      const allLogboeken = [...sampleLogboeken, ...getEigenLogboeken()];
       
-      const statusText = entry.submitted ? entry.statusText : '';
-      const statusClass = entry.submitted ? `status-${entry.status}` : '';
-      const feedbackText = entry.submitted ? entry.feedback : '';
-      const detailsText = entry.submitted ? entry.details : 'Verder aanvullen';
-      
-      row.innerHTML = `
-        <td><span class="week-badge">Week ${entry.week}</span></td>
-        <td>${entry.logboeken}</td>
-        <td>${entry.items}</td>
-        <td>${statusText ? `<span class="${statusClass}">${statusText}</span>` : ''}</td>
-        <td><span class="feedback-text">${feedbackText}</span></td>
-        <td><a class="details-link" href="logboek-detail.html?week=${entry.week}">${detailsText}</a></td>
-      `;
-      
-      tableBody.appendChild(row);
+      allLogboeken.forEach((entry, index) => {
+        const row = document.createElement('tr');
+        
+        const statusText = entry.submitted ? entry.statusText : 'Nog niet ingediend';
+        const statusClass = entry.submitted ? `status-${entry.status}` : 'status-nog-ingediend';
+        const feedbackText = entry.submitted ? entry.feedback : '';
+        const detailsText = entry.submitted ? entry.details : 'Verder aanvullen';
+        const isEigen = index >= sampleLogboeken.length;
+        
+        row.innerHTML = `
+          <td><span class="week-badge">Week ${entry.week}</span></td>
+          <td>${entry.logboeken || '? / 5'}</td>
+          <td>${entry.items}</td>
+          <td><span class="${statusClass}">${statusText}</span></td>
+          <td><span class="feedback-text">${feedbackText}</span></td>
+          <td><a class="details-link" href="logboek-detail.html?week=${entry.week}${isEigen ? '&eigen=1' : ''}">${detailsText}</a></td>
+        `;
+        
+        tableBody.appendChild(row);
+      });
+    }
+
+    // Modal handling
+    const modal = document.getElementById('newLogboekModal');
+    const openBtn = document.querySelector('.btn-nieuw-logboek');
+    const closeBtn = document.getElementById('closeModal');
+    const cancelBtn = document.getElementById('cancelModal');
+    const form = document.getElementById('newLogboekForm');
+
+    openBtn.addEventListener('click', () => {
+      modal.classList.remove('hidden');
     });
+
+    closeBtn.addEventListener('click', () => {
+      modal.classList.add('hidden');
+    });
+
+    cancelBtn.addEventListener('click', () => {
+      modal.classList.add('hidden');
+    });
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      
+      const week = parseInt(document.getElementById('weekSelect').value);
+      const datum = document.getElementById('datumInput').value;
+      const items = parseInt(document.getElementById('itemsInput').value);
+      const reflectie = document.getElementById('reflectieInput').value;
+      const problemen = document.getElementById('probiemenInput').value;
+
+      const newLogboek = {
+        week,
+        logboeken: '? / 5',
+        items,
+        submitted: false,
+        details: 'Verder aanvullen',
+        datum,
+        reflectie,
+        problemen,
+        isEigen: true,
+        tasks: [
+          { title: 'Taak 1', description: '' },
+          { title: 'Taak 2', description: '' },
+          { title: 'Taak 3', description: '' }
+        ]
+      };
+
+      saveEigenLogboek(newLogboek);
+      renderLogboeken();
+      modal.classList.add('hidden');
+      form.reset();
+    });
+
+    // Initial render
+    renderLogboeken();
 
     // Event listeners
     document.querySelector('.btn-nieuw-logboek').addEventListener('click', () => {
-      alert('Nieuw logboek formulier - nog in ontwikkeling');
-    });
-
-    // Bekijken links
-    document.querySelectorAll('.details-link').forEach((link, index) => {
-      link.addEventListener('click', () => {
-        alert(`Week ${logboeken[index].week} details bekijken - pagina nog in ontwikkeling`);
-      });
+      // Modal wordt al geopend door click handler hierboven
     });
   </script>
 
