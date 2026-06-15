@@ -92,34 +92,17 @@ document.getElementById('loginForm').addEventListener('submit', async function (
   }
 });
 
-/* Dev-login: direct inloggen zonder wachtwoord */
-document.getElementById('devLoginBtn').addEventListener('click', async function () {
-  const foutmelding = document.getElementById('foutmelding');
-  foutmelding.hidden = true;
+/* Dev-login: direct inloggen zonder server als testaccount voor de gekozen rol */
+document.getElementById('devLoginBtn').addEventListener('click', function () {
+  /* Bouw het testaccount-emailadres op basis van de rol */
+  const email = 'test.account' + domein;
 
-  try {
-    const antwoord = await fetch(API_URL + '/api/auth/dev-login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ rol })
-    });
+  /* Sla de sessiegegevens lokaal op zodat de rolpagina's je herkennen */
+  localStorage.setItem('token', 'dev-token');
+  localStorage.setItem('rol', rol);
+  localStorage.setItem('naam', 'Test Account');
+  localStorage.setItem('email', email);
 
-    const data = await antwoord.json();
-
-    if (!antwoord.ok) {
-      foutmelding.textContent = data.fout || 'Dev-login mislukt.';
-      foutmelding.hidden = false;
-      return;
-    }
-
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('rol', data.rol);
-    localStorage.setItem('naam', data.naam);
-
-    window.location.href = dashboards[data.rol] || 'index.html';
-
-  } catch (fout) {
-    foutmelding.textContent = 'Kan geen verbinding maken met de server.';
-    foutmelding.hidden = false;
-  }
+  /* Stuur door naar het dashboard van de gekozen rol */
+  window.location.href = dashboards[rol] || 'index.html';
 });
