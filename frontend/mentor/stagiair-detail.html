@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Stageplatform - Mentor - Stagiair detail</title>
+
+  <link rel="stylesheet" href="../css/stijl.css" />
+  <link rel="stylesheet" href="../css/student.css" />
+</head>
+
+<body>
+<div id="app">
+
+  <header class="header">
+    <div class="header-logo">
+      <span class="header-logo-text">Stageplatform</span>
+    </div>
+
+    <div class="header-actions">
+      <span class="header-rol-badge">Stagementor</span>
+      <button class="btn-terug" onclick="window.location.href='stagiairs.html'">
+        Terug
+      </button>
+    </div>
+  </header>
+
+  <div class="app-body">
+
+    <nav class="sidebar">
+      <a href="dashboard.html" class="nav-item">Home</a>
+      <a href="stagiairs.html" class="nav-item actief">Stagiairs</a>
+      <a href="logboeken.html" class="nav-item">Logboeken</a>
+      <a href="evaluatie.html" class="nav-item">Evaluatie</a>
+      <a href="profiel.html" class="nav-item">Profiel</a>
+      <a href="../index.html" class="nav-item" style="margin-top:auto">Uitloggen</a>
+    </nav>
+
+    <main class="content-area">
+
+      <section class="page-header">
+        <h1>Stagiair detail</h1>
+        <p>Bekijk de gegevens van de student en de gekoppelde stage.</p>
+      </section>
+
+      <section class="student-card">
+        <h2>Studentgegevens</h2>
+
+        <div class="contract-info">
+          <p><strong>Naam:</strong> <span id="studentNaam"></span></p>
+            <p><strong>Opleiding:</strong> <span id="opleiding"></span></p>
+            <p><strong>E-mail:</strong> <span id="email"></span></p>
+        </div>
+      </section>
+
+      <section class="student-card">
+        <h2>Stagegegevens</h2>
+
+        <div class="contract-info">
+          <p><strong>Stagebedrijf:</strong> Orange Belgium NV</p>
+          <p><strong>Contactpersoon:</strong> Steven De Vla</p>
+          <p><strong>Stageperiode:</strong> 10/03/2026 - 31/05/2026</p>
+          <p><strong>Functie:</strong> Webdeveloper stagiair</p>
+          <p><strong>Stageopdracht:</strong> Meewerken aan een interne webapplicatie.</p>
+        </div>
+      </section>
+
+      <section class="student-card">
+        <h2>Stageovereenkomst</h2>
+
+        <p>
+          De student heeft de stageovereenkomst al ondertekend.
+          Controleer de overeenkomst en onderteken namens het bedrijf.
+        </p>
+
+        <a id="stageovereenkomstLink" href="#" class="btn-primary">
+            Stageovereenkomst bekijken
+        </a>
+      </section>
+
+      <script>
+const params = new URLSearchParams(window.location.search);
+const student = params.get("student");
+
+const studenten = {
+  iman: {
+    naam: "Iman Obenali",
+    opleiding: "Toegepaste Informatica",
+    email: "iman@student.ehb.be"
+  },
+
+  ranya: {
+    naam: "Ranya Rabib",
+    opleiding: "Toegepaste Informatica",
+    email: "ranya@student.ehb.be"
+  },
+
+  ryan: {
+    naam: "Ryan Machiels",
+    opleiding: "Toegepaste Informatica",
+    email: "ryan@student.ehb.be"
+  }
+};
+
+const data = studenten[student];
+
+document.getElementById("studentNaam").textContent = data.naam;
+document.getElementById("opleiding").textContent = data.opleiding;
+document.getElementById("email").textContent = data.email;
+
+document.getElementById("stageovereenkomstLink").href =
+  `stageovereenkomst.html?student=${student}`;
+</script>
+
+    </main>
+  </div>
+</div>
+</body>
+</html>
