@@ -95,4 +95,61 @@ router.post('/registreren', async (req, res) => {
   }
 })
 
+/* Dev-login mapping: frontend rol → database rol */
+const rolMapping = {
+  student: 'student',
+  docent: 'docent',
+  mentor: 'stagementor',
+  commissie: 'stagecommissie',
+  admin: 'admin'
+}
+
+/* Inverse mapping: database rol → frontend rol */
+const rolOmgekeerd = {
+  student: 'student',
+  docent: 'docent',
+  stagementor: 'mentor',
+  stagecommissie: 'commissie',
+  admin: 'admin'
+}
+
+/* POST /api/auth/dev-login - direct inloggen zonder wachtwoord (alleen voor ontwikkeling) */
+router.post('/dev-login', async (req, res) => {
+  const { rol } = req.body
+
+  const dbRol = rolMapping[rol]
+  if (!dbRol) {
+    return res.status(400).json({ fout: 'Ongeldige rol' })
+  }
+
+  try {
+    const [rijen] = await db.query(
+      'SELECT * FROM persoon WHERE rol = ? LIMIT 1',
+      [dbRol]
+    )
+
+    if (rijen.length === 0) {
+      return res.status(404).json({ fout: 'Geen gebruiker gevonden voor deze rol. Draai eerst node seed.js' })
+    }
+
+    const persoon = rijen[0]
+
+    const token = jwt.sign(
+      { id: persoon.id, rol: persoon.rol },
+      process.env.JWT_SECRET,
+      { expiresIn: '8h' }
+    )
+
+    res.json({
+      token,
+      rol: rolOmgekeerd[persoon.rol] || persoon.rol,
+      naam: persoon.voornaam + ' ' + persoon.achternaam
+    })
+
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ fout: 'Serverfout' })
+  }
+})
+
 export default router

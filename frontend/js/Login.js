@@ -91,3 +91,35 @@ document.getElementById('loginForm').addEventListener('submit', async function (
     foutmelding.hidden = false;
   }
 });
+
+/* Dev-login: direct inloggen zonder wachtwoord */
+document.getElementById('devLoginBtn').addEventListener('click', async function () {
+  const foutmelding = document.getElementById('foutmelding');
+  foutmelding.hidden = true;
+
+  try {
+    const antwoord = await fetch(API_URL + '/api/auth/dev-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rol })
+    });
+
+    const data = await antwoord.json();
+
+    if (!antwoord.ok) {
+      foutmelding.textContent = data.fout || 'Dev-login mislukt.';
+      foutmelding.hidden = false;
+      return;
+    }
+
+    localStorage.setItem('token', data.token);
+    localStorage.setItem('rol', data.rol);
+    localStorage.setItem('naam', data.naam);
+
+    window.location.href = dashboards[data.rol] || 'index.html';
+
+  } catch (fout) {
+    foutmelding.textContent = 'Kan geen verbinding maken met de server.';
+    foutmelding.hidden = false;
+  }
+});
