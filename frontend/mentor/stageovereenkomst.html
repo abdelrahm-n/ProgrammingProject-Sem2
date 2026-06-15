@@ -74,16 +74,16 @@
 
               <hr />
 
-              <p><strong>Student:</strong> Neyla Achaoui</p>
-              <p><strong>Opleiding:</strong> Toegepaste Informatica</p>
-              <p><strong>Stagebedrijf:</strong> Orange Belgium NV</p>
-              <p><strong>Contactpersoon bedrijf:</strong> Steven De Vla</p>
+              <p><strong>Student:</strong> <span id="studentNaam"></span></p>
+                <p><strong>Opleiding:</strong> <span id="opleiding"></span></p>
+                <p><strong>Stagebedrijf:</strong> <span id="bedrijfNaam"></span></p>
+                <p><strong>Contactpersoon bedrijf:</strong> <span id="contactpersoon"></span></p>
 
               <hr />
 
-              <p><strong>Stageperiode:</strong> 10/03/2026 - 31/05/2026</p>
-              <p><strong>Functie:</strong> Webdeveloper stagiair</p>
-              <p><strong>Stageopdracht:</strong> Meewerken aan een interne webapplicatie.</p>
+              <p><strong>Stageperiode:</strong> <span id="stageperiode"></span></p>
+                <p><strong>Functie:</strong> <span id="functie"></span></p>
+                <p><strong>Stageopdracht:</strong> <span id="stageopdracht"></span></p>
             </div>
 
             <hr />
@@ -137,6 +137,53 @@
   bedrijfBtn.addEventListener("click", () => {
     window.location.href = "stageovereenkomst-getekend.html";
   });
+</script>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const student = params.get("student");
+
+const studenten = {
+  iman: {
+    naam: "Iman Obenali",
+    opleiding: "Toegepaste Informatica",
+    bedrijf: "Orange Belgium NV",
+    contactpersoon: "Steven De Vla",
+    periode: "10/03/2026 - 31/05/2026",
+    functie: "Webdeveloper stagiair",
+    opdracht: "Meewerken aan een interne webapplicatie."
+  },
+
+  ranya: {
+    naam: "Ranya Rabib",
+    opleiding: "Toegepaste Informatica",
+    bedrijf: "Orange Belgium NV",
+    contactpersoon: "Steven De Vla",
+    periode: "10/03/2026 - 31/05/2026",
+    functie: "Frontend developer stagiair",
+    opdracht: "Ondersteunen bij de ontwikkeling van de gebruikersinterface."
+  },
+
+  ryan: {
+    naam: "Ryan Machiels",
+    opleiding: "Toegepaste Informatica",
+    bedrijf: "Orange Belgium NV",
+    contactpersoon: "Steven De Vla",
+    periode: "10/03/2026 - 31/05/2026",
+    functie: "Backend developer stagiair",
+    opdracht: "Meewerken aan API-routes en databankkoppelingen."
+  }
+};
+
+const data = studenten[student] || studenten.iman;
+
+document.getElementById("studentNaam").textContent = data.naam;
+document.getElementById("opleiding").textContent = data.opleiding;
+document.getElementById("bedrijfNaam").textContent = data.bedrijf;
+document.getElementById("contactpersoon").textContent = data.contactpersoon;
+document.getElementById("stageperiode").textContent = data.periode;
+document.getElementById("functie").textContent = data.functie;
+document.getElementById("stageopdracht").textContent = data.opdracht;
 </script>
 
 </body>

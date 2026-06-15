@@ -74,8 +74,8 @@
           Controleer de overeenkomst en onderteken namens het bedrijf.
         </p>
 
-        <a href="stageovereenkomst.html" class="btn-primary">
-          Stageovereenkomst bekijken
+        <a id="stageovereenkomstLink" href="#" class="btn-primary">
+            Stageovereenkomst bekijken
         </a>
       </section>
 
@@ -108,6 +108,9 @@ const data = studenten[student];
 document.getElementById("studentNaam").textContent = data.naam;
 document.getElementById("opleiding").textContent = data.opleiding;
 document.getElementById("email").textContent = data.email;
+
+document.getElementById("stageovereenkomstLink").href =
+  `stageovereenkomst.html?student=${student}`;
 </script>
 
     </main>
