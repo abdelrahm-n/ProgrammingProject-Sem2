@@ -155,3 +155,291 @@ select:focus {
     grid-template-columns: 1fr;
   }
 }
+
+/* Student Logboeken Overzicht */
+.logboeken-header {
+  margin-bottom: 40px;
+}
+
+.logboeken-header h1 {
+  margin: 0 0 24px 0;
+  font-size: 32px;
+  font-weight: 700;
+  color: #111;
+}
+
+.progress-info {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+}
+
+.progress-item {
+  background: linear-gradient(135deg, #f8fafc 0%, #eef2f7 100%);
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.progress-label {
+  font-size: 12px;
+  color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.progress-value {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--rol-accent);
+}
+
+.logboeken-table-container {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 24px;
+}
+
+.student-logboeken-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.student-logboeken-table thead {
+  background: linear-gradient(135deg, #f8fafc 0%, #f0f4f8 100%);
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.student-logboeken-table th {
+  padding: 16px;
+  text-align: left;
+  font-size: 13px;
+  font-weight: 700;
+  color: #334155;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.student-logboeken-table tbody tr {
+  border-bottom: 1px solid #e8eef7;
+  transition: all 0.2s;
+}
+
+.student-logboeken-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.student-logboeken-table td {
+  padding: 16px;
+  font-size: 14px;
+  color: #334155;
+}
+
+.student-logboeken-table .week-badge {
+  display: inline-block;
+  padding: 6px 12px;
+  background: var(--rol-accent-licht);
+  color: var(--rol-accent);
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.student-logboeken-table .status-nog-ingediend {
+  background: #fef3c7;
+  color: #92400e;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.student-logboeken-table .status-feedback {
+  background: #fecaca;
+  color: #7f1d1d;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.student-logboeken-table .status-goedgekeurd {
+  background: #dcfce7;
+  color: #15803d;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  display: inline-block;
+}
+
+.student-logboeken-table .feedback-text {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.student-logboeken-table .details-link {
+  color: var(--rol-accent);
+  text-decoration: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.student-logboeken-table .details-link:hover {
+  color: var(--rol-accent-hover);
+  text-decoration: underline;
+}
+
+.logboeken-actions {
+  text-align: center;
+}
+
+.btn-nieuw-logboek {
+  padding: 14px 32px;
+  background: var(--rol-accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(29, 78, 216, 0.2);
+}
+
+.btn-nieuw-logboek:hover {
+  background: var(--rol-accent-hover);
+  box-shadow: 0 4px 12px rgba(29, 78, 216, 0.3);
+  transform: translateY(-2px);
+}
+
+@media (max-width: 1024px) {
+  .progress-info {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.logboeken-panel {
+  width: min(1120px, 100%);
+  margin: 24px auto 0;
+  background: #f3f4f6;
+  border-radius: 30px;
+  padding: 36px;
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.08);
+}
+
+.logboeken-header {
+  margin-bottom: 32px;
+}
+
+.logboeken-header h1 {
+  margin: 0 0 24px 0;
+  font-size: 34px;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+}
+
+.logboeken-table-container {
+  overflow: hidden;
+  border-radius: 22px;
+  margin-bottom: 28px;
+}
+
+.student-logboeken-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.student-logboeken-table thead {
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.student-logboeken-table th {
+  padding: 20px 18px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #344054;
+  text-align: left;
+  letter-spacing: 0.02em;
+}
+
+.student-logboeken-table tbody tr {
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.student-logboeken-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.student-logboeken-table td {
+  padding: 18px;
+  font-size: 14px;
+  color: #334155;
+  vertical-align: middle;
+}
+
+.student-logboeken-table td:last-child {
+  text-align: left;
+}
+
+.student-logboeken-table .details-link {
+  display: inline-flex;
+  align-items: center;
+  color: var(--rol-accent);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.student-logboeken-table .details-link:hover {
+  color: var(--rol-accent-hover);
+}
+
+.btn-nieuw-logboek {
+  padding: 18px 38px;
+  background: #6b7280;
+  color: #ffffff;
+  border: none;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.12);
+}
+
+.btn-nieuw-logboek:hover {
+  transform: translateY(-1px);
+  background: #52555f;
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.16);
+}
+
+@media (max-width: 768px) {
+  .logboeken-panel {
+    padding: 24px;
+  }
+
+  .logboeken-header h1 {
+    font-size: 28px;
+  }
+
+  .progress-info {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .student-logboeken-table th,
+  .student-logboeken-table td {
+    padding: 14px 12px;
+    font-size: 13px;
+  }
+}

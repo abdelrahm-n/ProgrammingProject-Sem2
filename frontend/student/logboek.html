@@ -39,12 +39,133 @@
       </nav>
 
       <main class="content-area">
-        <!-- inhoud komt hier -->
+        <div class="logboeken-panel">
+          <div class="logboeken-header">
+            <h1>Overzicht logboeken</h1>
+            <div class="progress-info">
+              <div class="progress-item">
+                <span class="progress-label">Huidige week</span>
+                <span class="progress-value">Week 4 / 12</span>
+              </div>
+              <div class="progress-item">
+                <span class="progress-label">Deze week ingevuld</span>
+                <span class="progress-value">4 / 5 dagen</span>
+              </div>
+              <div class="progress-item">
+                <span class="progress-label">Totaal logboeken</span>
+                <span class="progress-value">19 / 60</span>
+              </div>
+              <div class="progress-item">
+                <span class="progress-label">Laatste feedback</span>
+                <span class="progress-value">Week 3</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="logboeken-table-container">
+            <table class="student-logboeken-table">
+              <thead>
+                <tr>
+                  <th>Week</th>
+                  <th>Logboeken</th>
+                  <th>Items</th>
+                  <th>Status</th>
+                  <th>Mentorfeedback</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody id="logboekTableBody">
+                <!-- Rows worden hier ingevoegd via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+
+          <div class="logboeken-actions">
+            <button class="btn-nieuw-logboek">Nieuw logboek invullen</button>
+          </div>
+        </div>
       </main>
     </div>
   </div>
 
   <script src="../js/nav.js"></script>
+  <script>
+    // Sample logboeken data
+    const logboeken = [
+      {
+        week: 4,
+        logboeken: '4 / 5',
+        items: 6,
+        submitted: false,
+        details: 'Verder aanvullen'
+      },
+      {
+        week: 3,
+        logboeken: '5 / 5',
+        items: 8,
+        submitted: true,
+        status: 'feedback',
+        statusText: 'Feedback ontvangen',
+        feedback: 'Meer initiatief nemen',
+        details: 'Bekijken'
+      },
+      {
+        week: 2,
+        logboeken: '5 / 5',
+        items: 6,
+        submitted: true,
+        status: 'goedgekeurd',
+        statusText: 'Goedgekeurd',
+        feedback: 'Taken correct uitgevoerd',
+        details: 'Bekijken'
+      },
+      {
+        week: 1,
+        logboeken: '5 / 5',
+        items: 7,
+        submitted: true,
+        status: 'goedgekeurd',
+        statusText: 'Goedgekeurd',
+        feedback: 'Goede start',
+        details: 'Bekijken'
+      }
+    ];
+
+    // Render table rows
+    const tableBody = document.getElementById('logboekTableBody');
+    
+    logboeken.forEach(entry => {
+      const row = document.createElement('tr');
+      
+      const statusText = entry.submitted ? entry.statusText : '';
+      const statusClass = entry.submitted ? `status-${entry.status}` : '';
+      const feedbackText = entry.submitted ? entry.feedback : '';
+      const detailsText = entry.submitted ? entry.details : 'Verder aanvullen';
+      
+      row.innerHTML = `
+        <td><span class="week-badge">Week ${entry.week}</span></td>
+        <td>${entry.logboeken}</td>
+        <td>${entry.items}</td>
+        <td>${statusText ? `<span class="${statusClass}">${statusText}</span>` : ''}</td>
+        <td><span class="feedback-text">${feedbackText}</span></td>
+        <td><a class="details-link">${detailsText}</a></td>
+      `;
+      
+      tableBody.appendChild(row);
+    });
+
+    // Event listeners
+    document.querySelector('.btn-nieuw-logboek').addEventListener('click', () => {
+      alert('Nieuw logboek formulier - nog in ontwikkeling');
+    });
+
+    // Bekijken links
+    document.querySelectorAll('.details-link').forEach((link, index) => {
+      link.addEventListener('click', () => {
+        alert(`Week ${logboeken[index].week} details bekijken - pagina nog in ontwikkeling`);
+      });
+    });
+  </script>
 
 </body>
 </html>
