@@ -148,7 +148,7 @@
         <td>${entry.items}</td>
         <td>${statusText ? `<span class="${statusClass}">${statusText}</span>` : ''}</td>
         <td><span class="feedback-text">${feedbackText}</span></td>
-        <td><a class="details-link">${detailsText}</a></td>
+        <td><a class="details-link" href="logboek-detail.html?week=${entry.week}">${detailsText}</a></td>
       `;
       
       tableBody.appendChild(row);
