@@ -11,18 +11,22 @@ router.post('/', controleerToken, async (req, res) => {
   try {
     /* Maak eerst het bedrijf aan */
     const [bedrijf] = await db.query(
-      'INSERT INTO bedrijf (naam, adres, email, telefoon) VALUES (?, ?, ?, ?)',
-      [a.stagebedrijf, a.adresBedrijf, a.emailBedrijf, a.telefoonBedrijf]
+      'INSERT INTO bedrijf (naam, adres, email, telefoon, contactpersoon) VALUES (?, ?, ?, ?, ?)',
+      [a.stagebedrijf, a.adresBedrijf, a.emailBedrijf, a.telefoonBedrijf, a.contactPersoon || null]
     )
 
     /* Zoek de status "ingediend" op */
     const [status] = await db.query("SELECT id FROM stagevoorstel_status WHERE naam = 'ingediend'")
 
+    /* Zoek het actieve academiejaar op */
+    const [jaar] = await db.query("SELECT id FROM academiejaar WHERE actief = TRUE ORDER BY id DESC LIMIT 1")
+    const academiejaarId = jaar.length > 0 ? jaar[0].id : null
+
     /* Maak het stagevoorstel aan */
     const [voorstel] = await db.query(
-      `INSERT INTO stagevoorstel (student_id, bedrijf_id, omschrijving_opdracht, startdatum, einddatum, status_id)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [req.gebruiker.id, bedrijf.insertId, a.stageopdracht, a.startDatum, a.eindDatum, status[0].id]
+      `INSERT INTO stagevoorstel (student_id, bedrijf_id, academiejaar_id, omschrijving_opdracht, functie, startdatum, einddatum, status_id)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [req.gebruiker.id, bedrijf.insertId, academiejaarId, a.stageopdracht, a.functie || null, a.startDatum, a.eindDatum, status[0].id]
     )
 
     res.status(201).json({ id: voorstel.insertId, bericht: 'Stagevoorstel ingediend' })
@@ -32,13 +36,21 @@ router.post('/', controleerToken, async (req, res) => {
   }
 })
 
-/* Voorstellen van de ingelogde student */
+/* Voorstellen van de ingelogde student (geschiedenis met status en feedback) */
 router.get('/mijn', controleerToken, async (req, res) => {
   try {
     const [rijen] = await db.query(
-      `SELECT sv.*, st.naam AS status
+      `SELECT sv.*, st.naam AS status,
+              b.naam AS bedrijf, b.adres, b.email AS bedrijf_email, b.telefoon, b.contactpersoon,
+              cb.feedback AS commissie_feedback,
+              cb.beoordeeld_op
        FROM stagevoorstel sv
        JOIN stagevoorstel_status st ON sv.status_id = st.id
+       JOIN bedrijf b ON sv.bedrijf_id = b.id
+       LEFT JOIN commissie_beoordeling cb
+              ON cb.id = (SELECT id FROM commissie_beoordeling
+                          WHERE stagevoorstel_id = sv.id
+                          ORDER BY beoordeeld_op DESC LIMIT 1)
        WHERE sv.student_id = ?
        ORDER BY sv.aangemaakt_op DESC`,
       [req.gebruiker.id]
@@ -78,13 +90,18 @@ router.get('/:id', controleerToken, async (req, res) => {
       `SELECT sv.*, st.naam AS status,
               p.voornaam, p.achternaam, p.email AS student_email, s.studentnummer,
               o.naam AS opleiding,
-              b.naam AS bedrijf, b.adres, b.email AS bedrijf_email, b.telefoon
+              b.naam AS bedrijf, b.adres, b.email AS bedrijf_email, b.telefoon, b.contactpersoon,
+              cb.feedback AS commissie_feedback, cb.beoordeeld_op
        FROM stagevoorstel sv
        JOIN stagevoorstel_status st ON sv.status_id = st.id
        JOIN student s ON sv.student_id = s.persoon_id
        JOIN persoon p ON s.persoon_id = p.id
        LEFT JOIN opleiding o ON s.opleiding_id = o.id
        JOIN bedrijf b ON sv.bedrijf_id = b.id
+       LEFT JOIN commissie_beoordeling cb
+              ON cb.id = (SELECT id FROM commissie_beoordeling
+                          WHERE stagevoorstel_id = sv.id
+                          ORDER BY beoordeeld_op DESC LIMIT 1)
        WHERE sv.id = ?`,
       [req.params.id]
     )

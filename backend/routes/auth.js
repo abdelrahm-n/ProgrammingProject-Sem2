@@ -5,6 +5,19 @@ import db from '../db.js'
 
 const router = express.Router()
 
+/* Haal extra studentgegevens (studentnummer + opleiding) op voor een persoon.
+   Geeft een leeg object terug als de persoon geen student is. */
+async function haalStudentgegevens(persoonId) {
+  const [rijen] = await db.query(
+    `SELECT s.studentnummer, o.naam AS opleiding, o.id AS opleiding_id
+     FROM student s
+     LEFT JOIN opleiding o ON s.opleiding_id = o.id
+     WHERE s.persoon_id = ?`,
+    [persoonId]
+  )
+  return rijen.length > 0 ? rijen[0] : {}
+}
+
 /* POST /api/auth/login - gebruiker inloggen */
 router.post('/login', async (req, res) => {
   const { email, wachtwoord } = req.body
@@ -37,10 +50,16 @@ router.post('/login', async (req, res) => {
       { expiresIn: '8h' }
     )
 
+    const studentgegevens = await haalStudentgegevens(persoon.id)
+
     res.json({
       token,
+      id: persoon.id,
       rol: persoon.rol,
-      naam: persoon.voornaam + ' ' + persoon.achternaam
+      naam: persoon.voornaam + ' ' + persoon.achternaam,
+      email: persoon.email,
+      studentnummer: studentgegevens.studentnummer || null,
+      opleiding: studentgegevens.opleiding || null
     })
 
   } catch (err) {
@@ -140,10 +159,16 @@ router.post('/dev-login', async (req, res) => {
       { expiresIn: '8h' }
     )
 
+    const studentgegevens = await haalStudentgegevens(persoon.id)
+
     res.json({
       token,
+      id: persoon.id,
       rol: rolOmgekeerd[persoon.rol] || persoon.rol,
-      naam: persoon.voornaam + ' ' + persoon.achternaam
+      naam: persoon.voornaam + ' ' + persoon.achternaam,
+      email: persoon.email,
+      studentnummer: studentgegevens.studentnummer || null,
+      opleiding: studentgegevens.opleiding || null
     })
 
   } catch (err) {
