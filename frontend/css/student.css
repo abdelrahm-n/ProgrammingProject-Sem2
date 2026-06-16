@@ -494,3 +494,18 @@ select:focus {
   border: 1px solid #d8d8d8;
   padding: 10px;
 }
+/* Statusbadges voor de aanvraaggeschiedenis */
+.status-badge {
+  display: inline-block;
+  padding: 5px 12px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.85em;
+  color: #fff;
+}
+.status-ingediend,
+.status-in_behandeling { background-color: #2563eb; }
+.status-aanpassing,
+.status-aanpassing_vereist { background-color: #e58a12; }
+.status-afgekeurd { background-color: #990018; }
+.status-goedgekeurd { background-color: #2e9e49; }
