@@ -509,3 +509,4 @@ select:focus {
 .status-aanpassing_vereist { background-color: #e58a12; }
 .status-afgekeurd { background-color: #990018; }
 .status-goedgekeurd { background-color: #2e9e49; }
+.status-open { background-color: #64748b; }
