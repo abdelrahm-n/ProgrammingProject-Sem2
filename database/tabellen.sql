@@ -40,6 +40,7 @@ CREATE TABLE bedrijf (
     adres VARCHAR(255),
     email VARCHAR(255),
     telefoon VARCHAR(50),
+    contactpersoon VARCHAR(150),
     actief BOOLEAN DEFAULT TRUE
 );
 
@@ -124,6 +125,7 @@ CREATE TABLE stagevoorstel (
     academiejaar_id INT,
 
     omschrijving_opdracht TEXT,
+    functie VARCHAR(150),
 
     startdatum DATE,
     einddatum DATE,
