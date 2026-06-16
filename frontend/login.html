@@ -2,10 +2,70 @@
 <html lang="nl">
 <head>
   <meta charset="UTF-8" />
-  <meta http-equiv="refresh" content="0; url=index.html" />
-  <title>Doorsturen</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stageplatform - Inloggen</title>
+  <link rel="stylesheet" href="css/stijl.css" />
+  <link rel="stylesheet" href="css/login.css" />
 </head>
-<body>
-  <p><a href="index.html">Klik hier als je niet automatisch wordt doorgestuurd.</a></p>
+<body class="login-pagina">
+
+  <div class="login-wrapper">
+    <div class="login-kaart">
+
+      <a href="index.html" class="login-terug">← Andere rol kiezen</a>
+
+      <h1 id="loginTitel">Inloggen</h1>
+      <p class="login-subtitel">EhB – Stageplatform</p>
+
+      <form id="loginForm" novalidate>
+
+        <div class="form-group">
+          <label for="gebruikersnaam">Gebruikersnaam</label>
+          <div class="email-wrapper">
+            <input
+              type="text"
+              id="gebruikersnaam"
+              name="gebruikersnaam"
+              placeholder="voornaam.achternaam"
+              autocomplete="username"
+              required
+            />
+            <span class="email-domein" id="emailDomein">@student.ehb.be</span>
+          </div>
+          <small>Formaat: voornaam.achternaam<span id="domeinHint">@student.ehb.be</span></small>
+        </div>
+
+        <div class="form-group">
+          <label for="wachtwoord">Wachtwoord</label>
+          <div class="wachtwoord-wrapper">
+            <input
+              type="password"
+              id="wachtwoord"
+              name="wachtwoord"
+              placeholder="••••••••"
+              autocomplete="current-password"
+              required
+            />
+            <button type="button" id="toonWachtwoord" class="oog-knop">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <p id="foutmelding" class="melding melding--fout" hidden></p>
+
+        <button type="submit" class="btn btn--primair btn--login">Inloggen</button>
+
+        <button type="button" id="devLoginBtn" class="btn btn--secundair btn--dev-login">Dev-login (geen wachtwoord)</button>
+
+      </form>
+
+    </div>
+  </div>
+
+  <script src="js/login.js"></script>
 </body>
 </html>

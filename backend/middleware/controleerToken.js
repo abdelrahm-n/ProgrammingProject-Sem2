@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken'
 
+/* Controleer of er een geldig JWT token in de header zit */
 function controleerToken(req, res, next) {
   const authHeader = req.headers['authorization']
   const token = authHeader && authHeader.split(' ')[1]

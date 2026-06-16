@@ -1,46 +1,11 @@
-USE stage_monitoring; 
-SHOW TABLES; 
+/* Testdata voor het stageplatform - demo gebruikers met wachtwoord: demo123 */
+/* De hash hieronder is bcrypt van 'demo123' */
 
 USE stage_monitoring;
 
-INSERT INTO opleiding (naam, afkorting, actief)
-VALUES ('Toegepaste Informatica', 'TI', TRUE);
-
-INSERT INTO academiejaar (naam, startdatum, einddatum, actief)
-VALUES ('2025-2026', '2025-09-01', '2026-06-30', TRUE);
-
-INSERT INTO stagevoorstel_status (naam, beschrijving)
-VALUES 
-('ingediend', 'Stagevoorstel is ingediend'),
-('goedgekeurd', 'Stagevoorstel is goedgekeurd'),
-('afgekeurd', 'Stagevoorstel is afgekeurd'),
-('aanpassing_vereist', 'Stagevoorstel moet aangepast worden');
-
-INSERT INTO beslissing (naam, beschrijving)
-VALUES 
-('goedgekeurd', 'De aanvraag is goedgekeurd'),
-('afgekeurd', 'De aanvraag is afgekeurd'),
-('aanpassing_vereist', 'Er zijn aanpassingen nodig');
-
-INSERT INTO overeenkomst_status (naam, beschrijving)
-VALUES 
-('wacht_op_handtekeningen', 'Niet iedereen heeft ondertekend'),
-('volledig_getekend', 'Alle partijen hebben ondertekend'),
-('gevalideerd', 'Overeenkomst is gevalideerd door administratie');
-
-INSERT INTO logboek_status (naam, beschrijving)
-VALUES 
-('concept', 'Logboek is nog niet ingediend'),
-('ingediend', 'Logboek is ingediend'),
-('nagekeken', 'Logboek is nagekeken');
-
-INSERT INTO evaluatie_type (naam, beschrijving)
-VALUES 
-('tussentijds', 'Tussentijdse evaluatie'),
-('finaal', 'Finale evaluatie');
-
-
-
-SELECT * FROM opleiding;
-SELECT * FROM academiejaar;
-SELECT * FROM stagevoorstel_status;
+INSERT INTO persoon (voornaam, achternaam, email, wachtwoord_hash, rol, actief) VALUES
+('Jan',   'Jansen',   'jan.jansen@student.ehb.be',     '$2a$10$0V0mfYPp/RvHvfcuUzmE6.QB66A.MICQMmASTNrx5o9PzZvuiUQze', 'student',        TRUE),
+('Piet',  'Pieters',  'piet.pieters@docent.ehb.be',    '$2a$10$0V0mfYPp/RvHvfcuUzmE6.QB66A.MICQMmASTNrx5o9PzZvuiUQze', 'docent',         TRUE),
+('Sara',  'Smeets',   'sara.smeets@mentor.ehb.be',     '$2a$10$0V0mfYPp/RvHvfcuUzmE6.QB66A.MICQMmASTNrx5o9PzZvuiUQze', 'stagementor',    TRUE),
+('Tom',   'Thomas',   'tom.thomas@commissie.ehb.be',   '$2a$10$0V0mfYPp/RvHvfcuUzmE6.QB66A.MICQMmASTNrx5o9PzZvuiUQze', 'stagecommissie', TRUE),
+('An',    'Anthonis', 'an.anthonis@admin.ehb.be',      '$2a$10$0V0mfYPp/RvHvfcuUzmE6.QB66A.MICQMmASTNrx5o9PzZvuiUQze', 'admin',          TRUE);
