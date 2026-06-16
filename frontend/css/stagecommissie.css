@@ -120,3 +120,70 @@ main p {
 .status-goedgekeurd {
   background-color: #2E9E49;
 }
+/* Statusvarianten die overeenkomen met de databasenamen */
+.status-in_behandeling { background-color: #2563eb; }
+.status-aanpassing_vereist { background-color: #E58A12; }
+
+/* Lijst van aanvragen */
+.aanvraag-lijst-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 14px 18px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: background 0.15s, box-shadow 0.15s;
+}
+.aanvraag-lijst-item:hover {
+  background: #f8fafc;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+.aanvraag-lijst-item .status-badge { margin-bottom: 0; }
+
+.aanvraag-tabel td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #eef2f7;
+  vertical-align: top;
+}
+.aanvraag-tabel td:first-child {
+  font-weight: 600;
+  width: 220px;
+  color: #334155;
+}
+
+/* Feedback popup */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.modal-venster {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  width: 90%;
+  max-width: 520px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.25);
+}
+.modal-venster textarea {
+  width: 100%;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 10px;
+  font-family: inherit;
+  font-size: 1em;
+  resize: vertical;
+}
+.modal-knoppen {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 16px;
+}
