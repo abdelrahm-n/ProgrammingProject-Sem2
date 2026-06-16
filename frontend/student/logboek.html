@@ -44,11 +44,54 @@
       </nav>
 
       <main class="content-area">
-        <!-- inhoud komt hier -->
+
+        <section class="dashboard-welcome">
+          <h1>Logboek</h1>
+          <p id="logboek-intro">Houd hier dagelijks bij waar je aan gewerkt hebt tijdens je stage.</p>
+        </section>
+
+        <!-- Melding als er nog geen actieve stage is -->
+        <section class="dashboard-card" id="geen-stage-card" style="display:none;">
+          <h2>Nog geen actieve stage</h2>
+          <p>Je kan pas een logboek bijhouden zodra je stage actief is.</p>
+        </section>
+
+        <!-- Formulier om een dagitem toe te voegen -->
+        <section class="dashboard-card" id="toevoeg-card" style="display:none;">
+          <h2>Nieuwe logboekdag toevoegen</h2>
+          <div class="form-grid">
+            <div class="form-group">
+              <label>Datum</label>
+              <input type="date" id="logDatum" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Uitgevoerde taken</label>
+            <textarea id="logTaken" rows="2" placeholder="Wat heb je vandaag gedaan?"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Reflectie</label>
+            <textarea id="logReflectie" rows="2" placeholder="Wat heb je geleerd of ervaren?"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Problemen en leerpunten</label>
+            <textarea id="logProblemen" rows="2" placeholder="Welke problemen kwam je tegen?"></textarea>
+          </div>
+          <button type="button" class="btn btn--primair" id="toevoegBtn">Logboekdag toevoegen</button>
+          <p id="logFout" style="color:#990018;margin-top:10px;display:none;"></p>
+        </section>
+
+        <!-- Overzicht van de weken en dagen -->
+        <section class="dashboard-card" id="overzicht-card" style="display:none;">
+          <h2>Overzicht per week</h2>
+          <div id="logboek-weken"></div>
+        </section>
+
       </main>
     </div>
   </div>
 
+  <script src="../js/logboek.js"></script>
   <script src="../js/nav.js"></script>
 
 </body>
