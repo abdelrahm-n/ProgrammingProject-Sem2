@@ -1,11 +1,14 @@
 const API = "http://localhost:3000/api"
-const STUDENT_ID = 1 // voorlopig hardcoded
+/* Het id van de ingelogde student, zodat enkel de eigen gegevens geladen worden */
+const STUDENT_ID = localStorage.getItem("id")
 
 document.addEventListener("DOMContentLoaded", function () {
   laadDashboardStatus()
 })
 
 async function laadDashboardStatus() {
+  if (!STUDENT_ID) return
+
   try {
     const res = await fetch(`${API}/stageovereenkomst/voorstel/${STUDENT_ID}`)
     const data = await res.json()

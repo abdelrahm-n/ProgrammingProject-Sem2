@@ -112,6 +112,7 @@ router.get("/student/:persoonId", async (req, res) => {
 
         sv.id AS stagevoorstel_id,
         sv.omschrijving_opdracht,
+        sv.functie,
         sv.startdatum,
         sv.einddatum,
         sv.status_id AS voorstel_status_id,
@@ -131,6 +132,7 @@ router.get("/student/:persoonId", async (req, res) => {
         b.email AS email_bedrijf,
         b.telefoon AS telefoon_bedrijf,
         b.adres AS adres_bedrijf,
+        b.contactpersoon AS contactpersoon_bedrijf,
 
         sm.persoon_id AS mentor_persoon_id,
         mentor_p.voornaam AS mentor_voornaam,

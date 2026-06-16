@@ -44,6 +44,18 @@ document.getElementById('toonWachtwoord').addEventListener('click', function () 
   veld.type = veld.type === 'password' ? 'text' : 'password';
 });
 
+/* Bewaar de sessiegegevens uit het server-antwoord in localStorage.
+   Het id en studentnummer zijn nodig om enkel de eigen gegevens op te halen. */
+function bewaarSessie(data) {
+  localStorage.setItem('token', data.token);
+  localStorage.setItem('rol', data.rol);
+  localStorage.setItem('naam', data.naam);
+  localStorage.setItem('id', data.id != null ? data.id : '');
+  localStorage.setItem('email', data.email || '');
+  localStorage.setItem('studentnummer', data.studentnummer || '');
+  localStorage.setItem('opleiding', data.opleiding || '');
+}
+
 /* Verwerk het loginformulier */
 document.getElementById('loginForm').addEventListener('submit', async function (e) {
   e.preventDefault();
@@ -79,9 +91,7 @@ document.getElementById('loginForm').addEventListener('submit', async function (
     }
 
     /* Sla de sessiegegevens op in localStorage */
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('rol', data.rol);
-    localStorage.setItem('naam', data.naam);
+    bewaarSessie(data);
 
     /* Stuur door naar het juiste dashboard */
     window.location.href = dashboards[data.rol] || 'index.html';
@@ -92,17 +102,32 @@ document.getElementById('loginForm').addEventListener('submit', async function (
   }
 });
 
-/* Dev-login: direct inloggen zonder server als testaccount voor de gekozen rol */
-document.getElementById('devLoginBtn').addEventListener('click', function () {
-  /* Bouw het testaccount-emailadres op basis van de rol */
-  const email = 'test.account' + domein;
+/* Dev-login: snel inloggen als de eerste demo-gebruiker van de gekozen rol.
+   Loopt via de server zodat je een echt token krijgt en met de database werkt. */
+document.getElementById('devLoginBtn').addEventListener('click', async function () {
+  const foutmelding = document.getElementById('foutmelding');
+  foutmelding.hidden = true;
 
-  /* Sla de sessiegegevens lokaal op zodat de rolpagina's je herkennen */
-  localStorage.setItem('token', 'dev-token');
-  localStorage.setItem('rol', rol);
-  localStorage.setItem('naam', 'Test Account');
-  localStorage.setItem('email', email);
+  try {
+    const antwoord = await fetch(API_URL + '/api/auth/dev-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ rol })
+    });
 
-  /* Stuur door naar het dashboard van de gekozen rol */
-  window.location.href = dashboards[rol] || 'index.html';
+    const data = await antwoord.json();
+
+    if (!antwoord.ok) {
+      foutmelding.textContent = data.fout || 'Dev-login mislukt. Draai eerst node seed.js.';
+      foutmelding.hidden = false;
+      return;
+    }
+
+    bewaarSessie(data);
+    window.location.href = dashboards[data.rol] || 'index.html';
+
+  } catch (fout) {
+    foutmelding.textContent = 'Kan geen verbinding maken met de server.';
+    foutmelding.hidden = false;
+  }
 });
