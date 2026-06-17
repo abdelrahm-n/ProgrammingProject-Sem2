@@ -10,31 +10,29 @@
 <body>
 
   <div id="app">
-    <header class="header-monitoring">
-      <div class="header-left">
-        <a href="dashboard.html" class="header-nav-link">Dashboard</a>
-        <div class="header-divider"></div>
+    <header class="header">
+      <div class="header-logo">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+        </svg>
+        <span class="header-logo-text">Stageplatform</span>
       </div>
-      <div class="header-center">
-        <h1 class="header-title">STAGE MONITORING TOOL</h1>
-      </div>
-      <div class="header-right">
-        <div class="header-user">
-          <span class="user-role">stagementor</span>
-          <button onclick="window.location.href='../index.html'">Profiel/Logout</button>
-        </div>
+      <div class="header-actions">
+        <span class="header-rol-badge">Stagementor</span>
+        <button class="btn-terug" onclick="window.location.href='../index.html'">Terug</button>
       </div>
     </header>
 
-    <div class="monitoring-container">
-      <nav class="sidebar-monitoring">
-        <a href="dashboard.html" class="sidebar-item">DASHBOARD</a>
-        <a href="mijn-studenten.html" class="sidebar-item">MIJN STUDENTEN</a>
-        <a href="logboeken.html" class="sidebar-item active">LOGBOEKEN</a>
-        <a href="evaluatie.html" class="sidebar-item">EVALUATIE</a>
+    <div class="app-body">
+      <nav class="sidebar">
+        <a href="dashboard.html" class="nav-item">Dashboard</a>
+        <a href="stagiairs.html" class="nav-item">Stagiairs</a>
+        <a href="logboeken.html" class="nav-item actief">Logboeken</a>
+        <a href="evaluatie.html" class="nav-item">Evaluatie</a>
+        <a href="../index.html" class="nav-item" id="uitlogBtn" style="margin-top:auto">Uitloggen</a>
       </nav>
 
-      <main class="monitoring-content">
+      <main class="content-area">
         <div class="logboek-student-card">
           <div class="page-header">
             <h2>LOGBOEK STUDENT</h2>
