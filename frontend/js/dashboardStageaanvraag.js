@@ -1,232 +1,145 @@
-const API_URL = 'http://localhost:3000';
-const token = localStorage.getItem('token');
+const API_URL = "http://localhost:3000";
 
-if (!token) {
-  window.location.href = '../index.html';
+const laatsteStatus = document.getElementById("laatste-status");
+const startCard = document.getElementById("start-stage-card");
+const statusCard = document.getElementById("status-card");
+const statusTitel = document.getElementById("status-titel");
+const statusTekst = document.getElementById("status-tekst");
+
+const stepAanmaak = document.getElementById("step-aanmaak");
+const stepIngediend = document.getElementById("step-ingediend");
+const stepBehandeling = document.getElementById("step-behandeling");
+const stepGoedgekeurd = document.getElementById("step-goedgekeurd");
+const startCardTitle = document.getElementById("start-card-title");
+const startCardText = document.getElementById("start-card-text");
+const startCardButton = document.getElementById("start-card-button");
+const overeenkomstKnop = document.getElementById("overeenkomst-knop");
+
+const geschiedenisCard = document.getElementById("geschiedenis-card");
+const geschiedenisLijst = document.getElementById("geschiedenis-lijst");
+
+/* Toon een datum als dd-mm-jjjj (of een streepje) */
+function toonDatum(waarde) {
+    if (!waarde) return "-";
+    return new Date(waarde).toLocaleDateString("nl-BE");
 }
 
-const laatsteStatus = document.getElementById('laatste-status');
-const startCard = document.getElementById('start-stage-card');
-const statusCard = document.getElementById('status-card');
-const statusTitel = document.getElementById('status-titel');
-const statusTekst = document.getElementById('status-tekst');
-const stepAanmaak = document.getElementById('step-aanmaak');
-const stepIngediend = document.getElementById('step-ingediend');
-const stepBehandeling = document.getElementById('step-behandeling');
-const stepGoedgekeurd = document.getElementById('step-goedgekeurd');
-const startCardTitle = document.getElementById('start-card-title');
-const startCardText = document.getElementById('start-card-text');
-const startCardButton = document.getElementById('start-card-button');
-const overeenkomstKnop = document.getElementById('overeenkomst-knop');
+/* Nette label per status */
+const statusLabels = {
+    ingediend: "Ingediend",
+    in_behandeling: "In behandeling",
+    goedgekeurd: "Goedgekeurd",
+    afgekeurd: "Afgekeurd",
+    aanpassing_vereist: "Aanpassing vereist"
+};
 
-const actiefDashboard = document.getElementById('actief-dashboard');
-const procesDashboard = document.getElementById('proces-dashboard');
+/* Vul de voortgangsbalk en de statuskaart op basis van de laatste aanvraag */
+function toonStatus(voorstel) {
+    const status = voorstel.status;
 
-function toonProcesDashboard() {
-  procesDashboard.style.display = 'block';
-  actiefDashboard.style.display = 'none';
-}
+    stepAanmaak.classList.add("active");
+    stepIngediend.classList.add("active");
+    startCard.style.display = "none";
+    statusCard.style.display = "block";
 
-function toonActiefDashboardWeergave() {
-  procesDashboard.style.display = 'none';
-  actiefDashboard.style.display = 'block';
-}
-
-function activeerStappen(stappen) {
-  stappen.forEach(function (s) { s.classList.add('active'); });
-}
-
-function toonVoorstelStatus(status, feedback) {
-  toonProcesDashboard();
-  stepAanmaak.classList.add('active');
-
-  if (status === 'ingediend') {
-    activeerStappen([stepIngediend]);
-    startCard.style.display = 'none';
-    statusCard.style.display = 'block';
-    statusTitel.textContent = 'Stageaanvraag ingediend';
-    statusTekst.textContent = 'Je stageaanvraag is ingediend en wordt momenteel verwerkt.';
-    overeenkomstKnop.style.display = 'none';
-  } else if (status === 'goedgekeurd') {
-    activeerStappen([stepIngediend, stepBehandeling, stepGoedgekeurd]);
-    laatsteStatus.textContent = 'Goedgekeurd';
-    startCard.style.display = 'none';
-    statusCard.style.display = 'block';
-    statusTitel.textContent = 'Stageaanvraag goedgekeurd';
-    statusTekst.textContent = 'Je stageaanvraag is goedgekeurd. Je kan nu de stageovereenkomst ondertekenen.';
-    overeenkomstKnop.style.display = 'inline-block';
-    overeenkomstKnop.textContent = 'Stageovereenkomst indienen';
-  } else if (status === 'afgekeurd') {
-    activeerStappen([stepIngediend, stepBehandeling]);
-    stepGoedgekeurd.classList.add('rejected');
-    laatsteStatus.textContent = 'Afgekeurd';
-    startCard.style.display = 'block';
-    statusCard.style.display = 'block';
-    statusTitel.textContent = 'Stageaanvraag afgekeurd';
-    var tekst = 'Je stageaanvraag werd afgekeurd.';
-    if (feedback) tekst += ' Feedback: ' + feedback;
-    statusTekst.textContent = tekst;
-    startCardTitle.textContent = 'Stagevoorstel aanpassen';
-    startCardText.textContent = 'Pas je stagevoorstel aan op basis van de feedback en dien het opnieuw in.';
-    startCardButton.textContent = 'Stagevoorstel aanpassen';
-    overeenkomstKnop.style.display = 'none';
-  } else if (status === 'aanpassing_vereist') {
-    activeerStappen([stepIngediend, stepBehandeling]);
-    stepGoedgekeurd.classList.add('warning');
-    laatsteStatus.textContent = 'Aanpassing vereist';
-    startCard.style.display = 'block';
-    statusCard.style.display = 'block';
-    statusTitel.textContent = 'Aanpassing vereist';
-    var tekst2 = 'Je stagevoorstel moet aangepast worden.';
-    if (feedback) tekst2 += ' Feedback: ' + feedback;
-    statusTekst.textContent = tekst2;
-    startCardTitle.textContent = 'Stagevoorstel aanpassen';
-    startCardText.textContent = 'Pas je stagevoorstel aan op basis van de feedback van de stagecommissie.';
-    startCardButton.textContent = 'Stagevoorstel aanpassen';
-    overeenkomstKnop.style.display = 'none';
-  }
-}
-
-function toonOvereenkomstStatus(data) {
-  stepAanmaak.classList.add('active');
-  activeerStappen([stepIngediend, stepBehandeling, stepGoedgekeurd]);
-  laatsteStatus.textContent = 'Goedgekeurd';
-  startCard.style.display = 'none';
-  overeenkomstKnop.style.display = 'none';
-
-  if (data.status === 'actief') {
-    laadActiefDashboard();
-  } else if (data.status === 'wacht_startdatum') {
-    toonProcesDashboard();
-    statusCard.style.display = 'block';
-    statusTitel.textContent = 'Alle handtekeningen ontvangen';
-    statusTekst.textContent = data.bericht;
-  } else if (data.status === 'wacht_handtekeningen') {
-    toonProcesDashboard();
-    statusCard.style.display = 'block';
-    statusTitel.textContent = 'Stageovereenkomst in behandeling';
-    statusTekst.textContent = data.bericht;
-    overeenkomstKnop.style.display = 'inline-block';
-    overeenkomstKnop.textContent = 'Stageovereenkomst indienen';
-  } else {
-    toonProcesDashboard();
-    statusCard.style.display = 'block';
-    statusTitel.textContent = 'Status onbekend';
-    statusTekst.textContent = data.bericht || 'Controleer je dashboard voor de huidige status.';
-  }
-}
-
-function toonActiefDashboard(data) {
-  toonActiefDashboardWeergave();
-
-  document.getElementById('welkom-tekst').textContent = 'Welkom';
-
-  document.getElementById('info-bedrijf').textContent = data.bedrijf.naam;
-  document.getElementById('info-data').textContent = data.bedrijf.adres || '';
-  document.getElementById('info-mentor').textContent = data.mentor
-    ? data.mentor.voornaam + ' ' + data.mentor.achternaam + (data.mentor.functie ? ' (' + data.mentor.functie + ')' : '')
-    : 'Nog niet toegewezen';
-  document.getElementById('info-docent').textContent = data.docent
-    ? data.docent.voornaam + ' ' + data.docent.achternaam
-    : 'Nog niet toegewezen';
-
-  var vw = data.voortgang;
-  document.getElementById('info-week').textContent = 'Week ' + vw.huidig_week + ' / ' + vw.totaal_weken;
-  var pct = vw.totaal_weken > 0 ? Math.round((vw.huidig_week / vw.totaal_weken) * 100) : 0;
-  document.getElementById('info-progress-balk').style.width = pct + '%';
-
-  var lb = data.logboeken;
-  var maxDagenPerWeek = 5;
-  var wekenInStage = vw.totaal_weken || 1;
-  var maxTotaalDagen = wekenInStage * maxDagenPerWeek;
-  document.getElementById('log-vandaag').textContent = '0';
-  document.getElementById('log-week').textContent = '0 / ' + maxDagenPerWeek;
-  document.getElementById('log-totaal').textContent = lb.totaal_dagen + ' / ' + maxTotaalDagen;
-
-  var evalBody = document.getElementById('eval-tabel-body');
-  evalBody.innerHTML = '';
-  if (data.evaluaties && data.evaluaties.length > 0) {
-    data.evaluaties.forEach(function (e) {
-      var tr = document.createElement('tr');
-      var tdType = document.createElement('td');
-      tdType.textContent = e.type;
-      var tdDatum = document.createElement('td');
-      tdDatum.textContent = e.datum ? new Date(e.datum).toLocaleDateString('nl-BE') : 'Nog niet gepland';
-      tr.appendChild(tdType);
-      tr.appendChild(tdDatum);
-      evalBody.appendChild(tr);
-    });
-  } else {
-    var tr = document.createElement('tr');
-    var td = document.createElement('td');
-    td.colSpan = 2;
-    td.textContent = 'Nog geen evaluaties gepland';
-    tr.appendChild(td);
-    evalBody.appendChild(tr);
-  }
-}
-
-async function laadActiefDashboard() {
-  try {
-    var resp = await fetch(API_URL + '/api/stages/mijn/actief', {
-      headers: { 'Authorization': 'Bearer ' + token }
-    });
-
-    if (resp.ok) {
-      var data = await resp.json();
-      toonActiefDashboard(data);
-    } else {
-      toonProcesDashboard();
-      statusCard.style.display = 'block';
-      statusTitel.textContent = 'Stage is geactiveerd';
-      statusTekst.textContent = 'Je stage is geactiveerd maar de details konden niet geladen worden.';
-      overeenkomstKnop.style.display = 'none';
+    if (status === "ingediend" || status === "in_behandeling") {
+        if (status === "in_behandeling") stepBehandeling.classList.add("active");
+        statusTitel.textContent = "Stageaanvraag " + statusLabels[status].toLowerCase();
+        statusTekst.textContent =
+            "Je stageaanvraag is ingediend en wordt momenteel verwerkt. Je ontvangt een melding zodra er een beslissing is genomen.";
+    } else if (status === "goedgekeurd") {
+        stepBehandeling.classList.add("active");
+        stepGoedgekeurd.classList.add("active");
+        laatsteStatus.textContent = "Goedgekeurd";
+        statusTitel.textContent = "Stageaanvraag goedgekeurd";
+        statusTekst.textContent = "Je stageaanvraag is goedgekeurd. Je kan nu verdergaan met de stageovereenkomst.";
+        overeenkomstKnop.style.display = "inline-block";
+    } else if (status === "afgekeurd") {
+        stepBehandeling.classList.add("active");
+        stepGoedgekeurd.classList.add("rejected");
+        laatsteStatus.textContent = "Afgekeurd";
+        statusTitel.textContent = "Stageaanvraag afgekeurd";
+        statusTekst.textContent =
+            "Je stageaanvraag werd afgekeurd. " +
+            (voorstel.commissie_feedback ? "Feedback: " + voorstel.commissie_feedback : "Pas je stagevoorstel aan en dien het opnieuw in.");
+        startCard.style.display = "block";
+        startCardTitle.textContent = "Stagevoorstel opnieuw indienen";
+        startCardText.textContent = "Pas je stagevoorstel aan op basis van de feedback en dien het opnieuw in.";
+        startCardButton.textContent = "Stagevoorstel indienen";
+    } else if (status === "aanpassing_vereist") {
+        stepBehandeling.classList.add("active");
+        stepGoedgekeurd.classList.add("warning");
+        laatsteStatus.textContent = "Aanpassing vereist";
+        statusTitel.textContent = "Aanpassing vereist";
+        statusTekst.textContent =
+            "Je stagevoorstel moet aangepast worden. " +
+            (voorstel.commissie_feedback ? "Feedback: " + voorstel.commissie_feedback : "Bekijk de feedback van de stagecommissie.");
+        startCard.style.display = "block";
+        startCardTitle.textContent = "Stagevoorstel aanpassen";
+        startCardText.textContent = "Pas je stagevoorstel aan op basis van de feedback van de stagecommissie.";
+        startCardButton.textContent = "Stagevoorstel aanpassen";
     }
-  } catch (e) {
-    toonProcesDashboard();
-    statusCard.style.display = 'block';
-    statusTitel.textContent = 'Stage is geactiveerd';
-    statusTekst.textContent = 'Je stage is geactiveerd maar de details konden niet geladen worden.';
-    overeenkomstKnop.style.display = 'none';
-  }
 }
 
-async function init() {
-  try {
-    var resp = await fetch(API_URL + '/api/stages/mijn', {
-      headers: { 'Authorization': 'Bearer ' + token }
+/* Toon de volledige geschiedenis van ingediende aanvragen */
+function toonGeschiedenis(voorstellen) {
+    if (voorstellen.length === 0) return;
+
+    geschiedenisCard.style.display = "block";
+    geschiedenisLijst.innerHTML = "";
+
+    voorstellen.forEach(v => {
+        const status = v.status;
+        const label = statusLabels[status] || status;
+
+        const blok = document.createElement("div");
+        blok.className = "aanvraag-rij";
+        blok.style.cssText = "border:1px solid #e2e8f0;border-radius:8px;padding:12px 16px;margin-bottom:12px;";
+
+        let feedbackHtml = "";
+        if (v.commissie_feedback && (status === "afgekeurd" || status === "aanpassing_vereist")) {
+            feedbackHtml =
+                '<p style="margin:8px 0 0;color:#b45309;"><strong>Feedback commissie:</strong> ' +
+                v.commissie_feedback + "</p>";
+        }
+
+        blok.innerHTML =
+            '<div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">' +
+                "<strong>" + (v.bedrijf || "Onbekend bedrijf") + "</strong>" +
+                '<span class="status-badge status-' + status + '">' + label + "</span>" +
+            "</div>" +
+            '<p style="margin:6px 0 0;color:#475569;">' + (v.functie || "") + "</p>" +
+            '<p style="margin:4px 0 0;color:#64748b;font-size:0.9em;">' +
+                "Ingediend op " + toonDatum(v.aangemaakt_op) +
+                " &middot; " + toonDatum(v.startdatum) + " t.e.m. " + toonDatum(v.einddatum) +
+            "</p>" +
+            feedbackHtml;
+
+        geschiedenisLijst.appendChild(blok);
     });
-
-    if (resp.status === 401) { window.location.href = '../index.html'; return; }
-
-    var data = await resp.json();
-
-    if (!data || data.length === 0) {
-      toonProcesDashboard();
-      startCard.style.display = 'block';
-      statusCard.style.display = 'none';
-      return;
-    }
-
-    var laatste = data[0];
-
-    if (laatste.status === 'goedgekeurd') {
-      var respAct = await fetch(API_URL + '/api/stageovereenkomst/mijn/activateer', {
-        headers: { 'Authorization': 'Bearer ' + token }
-      });
-      if (respAct.ok) {
-        var actData = await respAct.json();
-        toonOvereenkomstStatus(actData);
-        return;
-      }
-    }
-
-    toonVoorstelStatus(laatste.status, laatste.feedback);
-  } catch (e) {
-    toonProcesDashboard();
-    startCard.style.display = 'block';
-    statusCard.style.display = 'none';
-  }
 }
 
-init();
+/* Haal de aanvragen van de ingelogde student op (alleen de eigen aanvragen) */
+async function laadAanvragen() {
+    try {
+        const antwoord = await fetch(API_URL + "/api/stages/mijn", {
+            headers: { "Authorization": "Bearer " + (localStorage.getItem("token") || "") }
+        });
+
+        if (!antwoord.ok) return;
+
+        const voorstellen = await antwoord.json();
+
+        if (voorstellen.length === 0) {
+            /* Geen aanvragen: toon enkel de startkaart */
+            return;
+        }
+
+        toonStatus(voorstellen[0]);
+        toonGeschiedenis(voorstellen);
+    } catch (fout) {
+        console.error("Kan aanvragen niet laden:", fout);
+    }
+}
+
+laadAanvragen();

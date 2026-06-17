@@ -4,6 +4,53 @@ import controleerToken from '../middleware/controleerToken.js'
 
 const router = express.Router()
 
+/* Hulpfunctie: controleer of de gebruiker een van de toegestane rollen heeft */
+function controleerRol(req, res, volgende, toegestaneRollen) {
+  if (!toegestaneRollen.includes(req.gebruiker.rol)) {
+    res.status(403).json({ fout: 'Geen toegang voor deze rol' })
+    return false
+  }
+  return true
+}
+
+/* Haal een stagevoorstel op en controleer of de gebruiker het mag zien.
+   Studenten mogen alleen hun eigen voorstel bekijken. */
+async function haalVoorstelOpMetToegang(req, res, voorstelId) {
+  const [rijen] = await db.query(
+    `SELECT sv.*, st.naam AS status,
+            p.voornaam, p.achternaam, p.email AS student_email, s.studentnummer,
+            o.naam AS opleiding,
+            b.naam AS bedrijf, b.adres, b.email AS bedrijf_email, b.telefoon, b.contactpersoon,
+            cb.feedback AS commissie_feedback, cb.beoordeeld_op
+     FROM stagevoorstel sv
+     JOIN stagevoorstel_status st ON sv.status_id = st.id
+     JOIN student s ON sv.student_id = s.persoon_id
+     JOIN persoon p ON s.persoon_id = p.id
+     LEFT JOIN opleiding o ON s.opleiding_id = o.id
+     JOIN bedrijf b ON sv.bedrijf_id = b.id
+     LEFT JOIN commissie_beoordeling cb
+            ON cb.id = (SELECT id FROM commissie_beoordeling
+                        WHERE stagevoorstel_id = sv.id
+                        ORDER BY beoordeeld_op DESC LIMIT 1)
+     WHERE sv.id = ?`,
+    [voorstelId]
+  )
+
+  if (rijen.length === 0) {
+    res.status(404).json({ fout: 'Voorstel niet gevonden' })
+    return null
+  }
+
+  const voorstel = rijen[0]
+
+  if (req.gebruiker.rol === 'student' && voorstel.student_id !== req.gebruiker.id) {
+    res.status(403).json({ fout: 'Je mag alleen je eigen stagevoorstel bekijken' })
+    return null
+  }
+
+  return voorstel
+}
+
 /* Student dient een stagevoorstel in */
 router.post('/', controleerToken, async (req, res) => {
   const a = req.body
@@ -50,10 +97,14 @@ router.post('/', controleerToken, async (req, res) => {
   }
 })
 
-/* Voorstellen van de ingelogde student */
+/* Haal alle voorstellen van de ingelogde student op (geschiedenis) */
 router.get('/mijn', controleerToken, async (req, res) => {
   try {
     const [rijen] = await db.query(
+      `SELECT sv.*, st.naam AS status,
+              b.naam AS bedrijf, b.adres, b.email AS bedrijf_email, b.telefoon, b.contactpersoon,
+              cb.feedback AS commissie_feedback,
+              cb.beoordeeld_op
       `SELECT sv.*, st.naam AS status,
               b.naam AS bedrijf, b.adres, b.email AS bedrijf_email, b.telefoon,
               cb.feedback
@@ -77,8 +128,31 @@ router.get('/mijn', controleerToken, async (req, res) => {
   }
 })
 
-/* Alle voorstellen voor de stagecommissie */
+/* Statistieken voor de stagecommissie: aantallen per status */
+router.get('/statistieken', controleerToken, async (req, res) => {
+  if (!controleerRol(req, res, null, ['stagecommissie'])) return
+
+  try {
+    const [aantallen] = await db.query(
+      `SELECT st.naam AS status, COUNT(*) AS aantal
+       FROM stagevoorstel sv
+       JOIN stagevoorstel_status st ON sv.status_id = st.id
+       GROUP BY st.naam`
+    )
+
+    const [totaal] = await db.query('SELECT COUNT(*) AS aantal FROM stagevoorstel')
+
+    res.json({ aantallen, totaal: totaal[0].aantal })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ fout: 'Serverfout' })
+  }
+})
+
+/* Alle voorstellen (alleen stagecommissie) */
 router.get('/', controleerToken, async (req, res) => {
+  if (!controleerRol(req, res, null, ['stagecommissie'])) return
+
   try {
     const [rijen] = await db.query(
       `SELECT sv.*, st.naam AS status,
@@ -252,6 +326,9 @@ router.get('/mijn/actief', controleerToken, async (req, res) => {
 /* Eén voorstel met alle details */
 router.get('/:id', controleerToken, async (req, res) => {
   try {
+    const voorstel = await haalVoorstelOpMetToegang(req, res, req.params.id)
+    if (!voorstel) return
+    res.json(voorstel)
     const [rijen] = await db.query(
       `SELECT sv.*, st.naam AS status,
               p.voornaam, p.achternaam, p.email AS student_email, s.studentnummer,
@@ -283,7 +360,7 @@ router.get('/:id', controleerToken, async (req, res) => {
   }
 })
 
-/* Stagecommissie beoordeelt een voorstel */
+/* Stagecommissie beoordeelt een voorstel (alleen stagecommissie) */
 router.post('/:id/beoordeling', controleerToken, async (req, res) => {
   const { beslissing, feedback } = req.body
 

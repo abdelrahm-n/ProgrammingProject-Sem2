@@ -39,7 +39,19 @@ document.getElementById('toonWachtwoord').addEventListener('click', function () 
   veld.type = veld.type === 'password' ? 'text' : 'password';
 });
 
-/* Normaal inloggen */
+/* Bewaar de sessiegegevens uit het server-antwoord in localStorage.
+   Het id en studentnummer zijn nodig om enkel de eigen gegevens op te halen. */
+function bewaarSessie(data) {
+  localStorage.setItem('token', data.token);
+  localStorage.setItem('rol', data.rol);
+  localStorage.setItem('naam', data.naam);
+  localStorage.setItem('id', data.id != null ? data.id : '');
+  localStorage.setItem('email', data.email || '');
+  localStorage.setItem('studentnummer', data.studentnummer || '');
+  localStorage.setItem('opleiding', data.opleiding || '');
+}
+
+/* Verwerk het loginformulier */
 document.getElementById('loginForm').addEventListener('submit', async function (e) {
   e.preventDefault();
 
@@ -71,9 +83,8 @@ document.getElementById('loginForm').addEventListener('submit', async function (
       return;
     }
 
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('rol', data.rol);
-    localStorage.setItem('naam', data.naam);
+    /* Sla de sessiegegevens op in localStorage */
+    bewaarSessie(data);
 
     /* Map database rol terug naar frontend rol voor redirect */
     const rolOmgekeerd = {
@@ -89,8 +100,10 @@ document.getElementById('loginForm').addEventListener('submit', async function (
   }
 });
 
-/* Dev-login: direct inloggen via backend */
+/* Dev-login: snel inloggen als de eerste demo-gebruiker van de gekozen rol.
+   Loopt via de server zodat je een echt token krijgt en met de database werkt. */
 document.getElementById('devLoginBtn').addEventListener('click', async function () {
+  const foutmelding = document.getElementById('foutmelding');
   foutmelding.hidden = true;
 
   try {
@@ -103,16 +116,14 @@ document.getElementById('devLoginBtn').addEventListener('click', async function 
     const data = await antwoord.json();
 
     if (!antwoord.ok) {
-      foutmelding.textContent = data.fout || 'Dev-login mislukt.';
+      foutmelding.textContent = data.fout || 'Dev-login mislukt. Draai eerst node seed.js.';
       foutmelding.hidden = false;
       return;
     }
 
-    localStorage.setItem('token', data.token);
-    localStorage.setItem('rol', data.rol);
-    localStorage.setItem('naam', data.naam);
-
+    bewaarSessie(data);
     window.location.href = dashboards[data.rol] || 'index.html';
+
   } catch (fout) {
     foutmelding.textContent = 'Kan geen verbinding maken met de server.';
     foutmelding.hidden = false;
