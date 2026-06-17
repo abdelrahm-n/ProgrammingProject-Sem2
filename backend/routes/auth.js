@@ -2,8 +2,85 @@ import express from 'express'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import db from '../db.js'
+import controleerToken from '../middleware/controleerToken.js'
 
 const router = express.Router()
+
+/* GET /api/auth/me - huidige ingelogde gebruiker ophalen */
+router.get('/me', controleerToken, async (req, res) => {
+  try {
+    const [rijen] = await db.query(
+      'SELECT id, voornaam, achternaam, email, rol FROM persoon WHERE id = ?',
+      [req.gebruiker.id]
+    )
+
+    if (rijen.length === 0) {
+      return res.status(404).json({ fout: 'Gebruiker niet gevonden' })
+    }
+
+    const gebruiker = rijen[0]
+
+    /* Haal extra info op afhankelijk van rol */
+    if (gebruiker.rol === 'student') {
+      const [student] = await db.query(
+        'SELECT studentnummer, opleiding_id FROM student WHERE persoon_id = ?',
+        [gebruiker.id]
+      )
+      if (student.length > 0) {
+        gebruiker.studentnummer = student[0].studentnummer
+        const [opleiding] = await db.query(
+          'SELECT naam FROM opleiding WHERE id = ?',
+          [student[0].opleiding_id]
+        )
+        gebruiker.opleiding = opleiding.length > 0 ? opleiding[0].naam : null
+      }
+    }
+
+    if (gebruiker.rol === 'stagementor') {
+      const [mentor] = await db.query(
+        'SELECT functie, bedrijf_id FROM stagementor WHERE persoon_id = ?',
+        [gebruiker.id]
+      )
+      if (mentor.length > 0) {
+        gebruiker.functie = mentor[0].functie
+        if (mentor[0].bedrijf_id) {
+          const [bedrijf] = await db.query(
+            'SELECT naam, adres, email, telefoon FROM bedrijf WHERE id = ?',
+            [mentor[0].bedrijf_id]
+          )
+          if (bedrijf.length > 0) {
+            gebruiker.bedrijf = bedrijf[0]
+          }
+        }
+      }
+    }
+
+    if (gebruiker.rol === 'stagecommissie') {
+      const [commissie] = await db.query(
+        'SELECT commissie_rol FROM stagecommissielid WHERE persoon_id = ?',
+        [gebruiker.id]
+      )
+      if (commissie.length > 0) {
+        gebruiker.commissie_rol = commissie[0].commissie_rol
+      }
+    }
+
+    if (gebruiker.rol === 'docent') {
+      const [docent] = await db.query(
+        'SELECT vakgroep FROM docent WHERE persoon_id = ?',
+        [gebruiker.id]
+      )
+      if (docent.length > 0) {
+        gebruiker.vakgroep = docent[0].vakgroep
+      }
+    }
+
+    res.json(gebruiker)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ fout: 'Serverfout' })
+  }
+})
 
 /* POST /api/auth/login - gebruiker inloggen */
 router.post('/login', async (req, res) => {
