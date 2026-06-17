@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stageplatform - Stagementor - Logboek Detail</title>
+  <link rel="stylesheet" href="../css/stijl.css" />
+  <link rel="stylesheet" href="../css/mentor.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="header-monitoring">
+      <div class="header-left">
+        <a href="dashboard.html" class="header-nav-link">Dashboard</a>
+        <div class="header-divider"></div>
+      </div>
+      <div class="header-center">
+        <h1 class="header-title">STAGE MONITORING TOOL</h1>
+      </div>
+      <div class="header-right">
+        <div class="header-user">
+          <span class="user-role">stagementor</span>
+          <button onclick="window.location.href='../index.html'">Profiel/Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="monitoring-container">
+      <nav class="sidebar-monitoring">
+        <a href="dashboard.html" class="sidebar-item">DASHBOARD</a>
+        <a href="mijn-studenten.html" class="sidebar-item">MIJN STUDENTEN</a>
+        <a href="logboeken.html" class="sidebar-item active">LOGBOEKEN</a>
+        <a href="evaluatie.html" class="sidebar-item">EVALUATIE</a>
+      </nav>
+
+      <main class="monitoring-content">
+        <div class="logboek-student-card">
+          <div class="page-header">
+            <h2>LOGBOEK STUDENT</h2>
+          </div>
+
+          <div class="student-summary">
+            <div class="student-summary-name-block">
+              <div class="student-name" id="studentName">Ryan Machiels</div>
+              <div class="student-year">1ste jaar</div>
+            </div>
+            <div class="student-study">Toegepaste Informatica</div>
+          </div>
+
+          <div class="week-status-list" id="weekStatusList">
+            <div class="week-status-item status-approved">logboek week 1 - <span class="status-text">goedgekeurd</span></div>
+            <div class="week-status-item status-approved">logboek week 2 - <span class="status-text">goedgekeurd</span></div>
+            <div class="week-status-item status-action"><a href="logboek-week.html?student=ryan&week=3" class="status-link">logboek week 3 - <span class="status-text">actie vereist</span></a></div>
+            <div class="week-status-item status-unavailable">logboek week 4 - <span class="status-text">nog niet beschikbaar</span></div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../js/nav.js"></script>
+  <script>
+    (function(){
+      const params = new URLSearchParams(window.location.search);
+      const student = params.get('student') || 'ryan';
+
+      const namen = {
+        ryan: 'Ryan Machiels',
+        abdelrahman: 'Abdelrahman',
+        iman: 'Iman Obenali',
+        ranya: 'Ranya Rabib'
+      };
+
+      const nameEl = document.getElementById('studentName');
+      if (nameEl && namen[student]) {
+        nameEl.textContent = namen[student];
+      }
+
+      // Zorg dat de weeklinks de juiste student meegeven
+      document.querySelectorAll('#weekStatusList .status-link').forEach(link => {
+        const url = new URL(link.getAttribute('href'), window.location.href);
+        url.searchParams.set('student', student);
+        link.setAttribute('href', url.pathname.split('/').pop() + url.search);
+      });
+    })();
+  </script>
+</body>
+</html>

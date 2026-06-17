@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stageplatform - Stagementor - Logboek Week</title>
+  <link rel="stylesheet" href="../css/stijl.css" />
+  <link rel="stylesheet" href="../css/mentor.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="header-monitoring">
+      <div class="header-left">
+        <a href="dashboard.html" class="header-nav-link">Dashboard</a>
+        <div class="header-divider"></div>
+      </div>
+      <div class="header-center">
+        <h1 class="header-title">STAGE MONITORING TOOL</h1>
+      </div>
+      <div class="header-right">
+        <div class="header-user">
+          <span class="user-role">stagementor</span>
+          <button onclick="window.location.href='../index.html'">Profiel/Logout</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="monitoring-container">
+      <nav class="sidebar-monitoring">
+        <a href="dashboard.html" class="sidebar-item">DASHBOARD</a>
+        <a href="mijn-studenten.html" class="sidebar-item">MIJN STUDENTEN</a>
+        <a href="logboeken.html" class="sidebar-item active">LOGBOEKEN</a>
+        <a href="evaluatie.html" class="sidebar-item">EVALUATIE</a>
+      </nav>
+
+      <main class="monitoring-content">
+        <div class="logboek-detail-main">
+          <section class="logboek-days">
+            <div class="detail-heading-row">
+              <h2>LOGBOEK STUDENT</h2>
+              <div class="student-meta-row">
+                <span class="student-name">Ryan Machiels</span>
+                <span class="student-study">Toegepaste Informatica</span>
+                <span class="student-year">1ste jaar</span>
+              </div>
+            </div>
+
+            <div class="day-grid">
+              <article class="day-card">
+                <div class="day-title">Maandag</div>
+                <p class="day-text"><strong>Beschrijving uitgevoerde taken</strong><br> (ingevuld door student)</p>
+                <p class="day-text"><strong>Reflectie</strong><br> (ingevuld door student)</p>
+                <p class="day-text"><strong>Problemen of leerpunten</strong><br> (ingevuld door student)</p>
+              </article>
+
+              <article class="day-card">
+                <div class="day-title">Dinsdag</div>
+                <p class="day-text"><strong>Beschrijving uitgevoerde taken</strong><br> (ingevuld door student)</p>
+                <p class="day-text"><strong>Reflectie</strong><br> (ingevuld door student)</p>
+                <p class="day-text"><strong>Problemen of leerpunten</strong><br> (ingevuld door student)</p>
+              </article>
+
+              <article class="day-card">
+                <div class="day-title">Woensdag</div>
+                <p class="day-text"><strong>Beschrijving uitgevoerde taken</strong><br> (ingevuld door student)</p>
+                <p class="day-text"><strong>Reflectie</strong><br> (ingevuld door student)</p>
+                <p class="day-text"><strong>Problemen of leerpunten</strong><br> (ingevuld door student)</p>
+              </article>
+
+              <article class="day-card">
+                <div class="day-title">Donderdag</div>
+                <p class="day-text"><strong>Beschrijving uitgevoerde taken</strong><br> (ingevuld door student)</p>
+                <p class="day-text"><strong>Reflectie</strong><br> (ingevuld door student)</p>
+                <p class="day-text"><strong>Problemen of leerpunten</strong><br> (ingevuld door student)</p>
+              </article>
+
+              <article class="day-card day-card-full">
+                <div class="day-title">Vrijdag</div>
+                <p class="day-text"><strong>Beschrijving uitgevoerde taken</strong><br> (ingevuld door student)</p>
+                <p class="day-text"><strong>Reflectie</strong><br> (ingevuld door student)</p>
+                <p class="day-text"><strong>Problemen of leerpunten</strong><br> (ingevuld door student)</p>
+              </article>
+            </div>
+          </section>
+
+          <aside class="logboek-sidebar">
+            <div class="decision-panel detail-right-panel">
+              <div class="decision-status-row">
+                <label class="decision-status decision-approve">
+                  <span>Goedgekeurd</span>
+                  <input type="radio" name="mentorDecision" id="approveRadio" value="approved">
+                </label>
+              </div>
+              <div class="decision-status-row">
+                <label class="decision-status decision-decline">
+                  <span>Afgekeurd</span>
+                  <input type="radio" name="mentorDecision" id="declineRadio" value="declined">
+                </label>
+              </div>
+
+              <div class="feedback-box">
+                <label class="feedback-label">Feedback stagementor:</label>
+                <textarea id="mentorFeedback" class="mentor-feedback"></textarea>
+              </div>
+
+              <button id="submitDecision" class="btn-submit">indienen</button>
+            </div>
+          </aside>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../js/nav.js"></script>
+  <script>
+    (function(){
+      const params = new URLSearchParams(window.location.search);
+      const student = params.get('student') || 'student';
+      const week = params.get('week') || '0';
+
+      // Mentor decision state
+      const approveRadio = document.getElementById('approveRadio');
+      const declineRadio = document.getElementById('declineRadio');
+      const feedbackEl = document.getElementById('mentorFeedback');
+      const submitBtn = document.getElementById('submitDecision');
+
+      const key = `mentor_decision_${student}_${week}`;
+      const saved = localStorage.getItem(key);
+      if (saved) {
+        try {
+          const obj = JSON.parse(saved);
+          if (obj.status === 'approved') approveRadio.checked = true;
+          if (obj.status === 'declined') declineRadio.checked = true;
+          feedbackEl.value = obj.feedback || '';
+        } catch(e) { /* ignore */ }
+      }
+
+      submitBtn.addEventListener('click', () => {
+        const status = approveRadio.checked ? 'approved' : (declineRadio.checked ? 'declined' : 'none');
+        const payload = { status, feedback: feedbackEl.value };
+        localStorage.setItem(key, JSON.stringify(payload));
+        window.location.href = `logboek-detail.html?student=${encodeURIComponent(student)}`;
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -842,16 +842,152 @@ select:focus {
   overflow-y: auto;
 }
 
-.logboek-detail {
+.logboek-detail,
+.logboek-detail-page {
   background: white;
   padding: 32px;
   border-radius: 4px;
   max-width: 900px;
+  width: 100%;
   margin: 0 auto;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
 }
 
-.logboek-header {
+.logboek-detail-page {
+  padding: 40px;
+}
+
+.detail-topbar {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 22px;
+}
+
+.detail-topbar h2 {
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+}
+
+.detail-meta-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 30px;
+}
+
+.meta-pill,
+.status-pill {
+  display: inline-flex;
+  padding: 8px 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1f2937;
+  background: #f3f4f6;
+}
+
+.status-pill {
+  background: #dbf0ff;
+  color: #1d4ed8;
+}
+
+.detail-block {
+  background: #f3f4f6;
+  border-radius: 16px;
+  padding: 24px;
   margin-bottom: 24px;
+}
+
+.detail-block h3 {
+  margin: 0 0 18px 0;
+  font-size: 16px;
+}
+
+.detail-textarea {
+  width: 100%;
+  min-height: 140px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  background: white;
+  color: #111827;
+  font-size: 14px;
+  resize: vertical;
+}
+
+.task-block {
+  background: white;
+  border-radius: 12px;
+  padding: 18px;
+  border: 1px solid #e5e7eb;
+  margin-bottom: 16px;
+}
+
+.task-header {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #334155;
+}
+
+.task-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: #111827;
+}
+
+.task-input {
+  width: 100%;
+  min-height: 90px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  background: white;
+  font-size: 14px;
+  color: #111827;
+  resize: vertical;
+}
+
+.task-input[readonly],
+.detail-textarea[readonly] {
+  background: #f8fafc;
+  color: #475569;
+}
+
+.feedback-panel {
+  background: #fef2f2;
+  border-left: 4px solid #ef4444;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.feedback-title {
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #991b1b;
+}
+
+.feedback-text {
+  font-size: 14px;
+  color: #7f1d1d;
+  line-height: 1.7;
+}
+
+.detail-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 14px;
+}
+
+.detail-actions .btn-secondary,
+.detail-actions .btn-primary {
+  padding: 12px 26px;
+  border-radius: 999px;
 }
 
 .back-link {

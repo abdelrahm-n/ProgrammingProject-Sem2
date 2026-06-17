@@ -33,47 +33,43 @@
       </nav>
 
       <main class="monitoring-content">
-        <div class="logboek-detail">
-          <div class="logboek-header">
-            <a href="logboek.html" class="back-link">← Terug</a>
-            <h2 id="logboekTitel">Logboek week 4</h2>
-          </div>
+        <div class="logboek-detail-page">
+          <div class="detail-card detail-page-card">
+            <div class="detail-topbar">
+              <a href="logboek.html" class="back-link">← Terug</a>
+              <h2 id="logboekTitel">Logboek week 4</h2>
+            </div>
 
-          <div class="logboek-meta">
-            <span id="logboekDatum">12 maart 2026</span>
-            <span id="logboekWeek" class="week-tag">Week 4</span>
-            <span id="logboekStatus" class="status-tag"></span>
-          </div>
+            <div class="detail-meta-row">
+              <span class="meta-pill" id="logboekDatum">12 maart 2026</span>
+              <span class="meta-pill" id="logboekWeek">Week 4</span>
+              <span class="meta-pill status-pill" id="logboekStatus"></span>
+            </div>
 
-          <!-- Uitgevoerde taken -->
-          <div class="section">
-            <h3>Uitgevoerde taken</h3>
-            <div id="takenContainer" class="taken-list"></div>
-            <button id="addTaskBtn" class="btn-add-task">+ Taak toevoegen</button>
-          </div>
+            <div class="detail-block">
+              <h3>Uitgevoerde taken</h3>
+              <div id="takenContainer" class="detail-tasks"></div>
+            </div>
 
-          <!-- Reflectie -->
-          <div class="section">
-            <h3>Reflectie</h3>
-            <div id="reflectieField" class="text-field"></div>
-          </div>
+            <div class="detail-block">
+              <h3>Reflectie</h3>
+              <textarea id="reflectieField" class="detail-textarea"></textarea>
+            </div>
 
-          <!-- Problemen / leerpunten -->
-          <div class="section">
-            <h3>Problemen / leerpunten</h3>
-            <div id="probiemenField" class="text-field"></div>
-          </div>
+            <div class="detail-block">
+              <h3>Problemen / leerpunten</h3>
+              <textarea id="problemenField" class="detail-textarea"></textarea>
+            </div>
 
-          <!-- Mentorfeedback (alleen als ingediend) -->
-          <div id="feedbackSection" class="section feedback-section" style="display: none;">
-            <h3>Mentorfeedback</h3>
-            <div id="feedbackField" class="feedback-box"></div>
-          </div>
+            <div id="feedbackSection" class="feedback-panel" style="display: none;">
+              <div class="feedback-title">Mentorfeedback</div>
+              <div id="feedbackField" class="feedback-text"></div>
+            </div>
 
-          <!-- Actions -->
-          <div class="logboek-actions">
-            <button id="saveBtn" class="btn-secondary">Opslaan als concept</button>
-            <button id="submitBtn" class="btn-primary">Logboek indienen</button>
+            <div class="detail-actions">
+              <button id="saveBtn" class="btn-secondary">Opslaan als concept</button>
+              <button id="submitBtn" class="btn-primary">Logboek indienen</button>
+            </div>
           </div>
         </div>
       </main>
@@ -167,11 +163,11 @@
         container.innerHTML = '';
         logboek.tasks.forEach((task, i) => {
           const taskDiv = document.createElement('div');
-          taskDiv.className = 'task-item';
+          taskDiv.className = 'task-block';
           taskDiv.innerHTML = `
-            <div class="task-title">Task ${i + 1}</div>
-            <div class="task-subtitle">${task.title}</div>
-            <textarea class="task-textarea" ${logboek.submitted ? 'readonly' : ''}>${task.description}</textarea>
+            <div class="task-header">Taak ${i + 1}</div>
+            <div class="task-title">${task.title}</div>
+            <textarea class="task-input" ${logboek.submitted ? 'readonly' : ''}>${task.description}</textarea>
           `;
           container.appendChild(taskDiv);
         });
@@ -179,11 +175,13 @@
 
       // Reflectie
       const reflectieField = document.getElementById('reflectieField');
-      reflectieField.innerHTML = `<textarea class="field-textarea" ${logboek.submitted ? 'readonly' : ''}>${logboek.reflectie || ''}</textarea>`;
+      reflectieField.value = logboek.reflectie || '';
+      reflectieField.readOnly = logboek.submitted;
 
       // Problemen
-      const probiemenField = document.getElementById('probiemenField');
-      probiemenField.innerHTML = `<textarea class="field-textarea" ${logboek.submitted ? 'readonly' : ''}>${logboek.problemen || ''}</textarea>`;
+      const problemenField = document.getElementById('problemenField');
+      problemenField.value = logboek.problemen || '';
+      problemenField.readOnly = logboek.submitted;
 
       // Feedback (alleen als ingediend)
       if (logboek.submitted && logboek.feedback) {

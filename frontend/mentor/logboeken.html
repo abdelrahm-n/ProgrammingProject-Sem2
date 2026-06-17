@@ -35,47 +35,47 @@
       </nav>
 
       <main class="monitoring-content">
-        <div class="logboek-table-card">
+        <div class="logboek-student-card">
           <div class="page-header">
-            <h2>LGBOEK STUDENT</h2>
+            <h2>LOGBOEK STUDENT</h2>
           </div>
 
-          <table class="mentor-logboeken-table">
-            <thead>
-              <tr>
-                <th>Naam</th>
-                <th>Richting</th>
-                <th>Status</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Ryan Machiels</td>
-                <td>Toegepaste Informatica</td>
-                <td><span class="status-tag status-action">Actie vereist</span></td>
-                <td><a href="../student/logboek-detail.html" class="details-link">Bekijken</a></td>
-              </tr>
-              <tr>
-                <td>Abdelrahman</td>
-                <td>Toegepaste Informatica</td>
-                <td><span class="status-tag status-approved">Goedgekeurd</span></td>
-                <td><a href="../student/logboek-detail.html" class="details-link">Bekijken</a></td>
-              </tr>
-              <tr>
-                <td>Iman Obenali</td>
-                <td>Toegepaste Informatica</td>
-                <td><span class="status-tag status-approved">Goedgekeurd</span></td>
-                <td><a href="../student/logboek-detail.html" class="details-link">Bekijken</a></td>
-              </tr>
-              <tr>
-                <td>Ranya Rabib</td>
-                <td>Toegepaste Informatica</td>
-                <td><span class="status-tag status-approved">Goedgekeurd</span></td>
-                <td><a href="../student/logboek-detail.html" class="details-link">Bekijken</a></td>
-              </tr>
-            </tbody>
-          </table>
+          <div class="mentor-logboeken-list">
+            <div class="row-headings">
+              <span>Naam</span>
+              <span>Richting</span>
+              <span>Status</span>
+              <span></span>
+            </div>
+
+            <a href="logboek-detail.html?student=ryan" class="row-item status-action clickable-row">
+              <span>Ryan Machiels</span>
+              <span>Toegepaste Informatica</span>
+              <span class="status-text">Actie vereist</span>
+              <span class="details-link">Bekijken</span>
+            </a>
+
+            <a href="logboek-detail.html?student=abdelrahman" class="row-item status-approved clickable-row">
+              <span>Abdelrahman</span>
+              <span>Toegepaste Informatica</span>
+              <span class="status-text">Goedgekeurd</span>
+              <span class="details-link">Bekijken</span>
+            </a>
+
+            <a href="logboek-detail.html?student=iman" class="row-item status-approved clickable-row">
+              <span>Iman Obenali</span>
+              <span>Toegepaste Informatica</span>
+              <span class="status-text">Goedgekeurd</span>
+              <span class="details-link">Bekijken</span>
+            </a>
+
+            <a href="logboek-detail.html?student=ranya" class="row-item status-approved clickable-row">
+              <span>Ranya Rabib</span>
+              <span>Toegepaste Informatica</span>
+              <span class="status-text">Goedgekeurd</span>
+              <span class="details-link">Bekijken</span>
+            </a>
+          </div>
         </div>
       </main>
     </div>
