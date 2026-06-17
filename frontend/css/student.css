@@ -510,3 +510,20 @@ select:focus {
 .status-afgekeurd { background-color: #990018; }
 .status-goedgekeurd { background-color: #2e9e49; }
 .status-open { background-color: #64748b; }
+
+/* Formulier validatie: foutmeldingen bij verplichte velden */
+
+.fout {
+  border-color: #dc3545 !important;
+}
+
+.fout:focus {
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.15) !important;
+}
+
+.fout-melding {
+  color: #dc3545;
+  font-size: 0.85em;
+  margin-top: 4px;
+  display: block;
+}

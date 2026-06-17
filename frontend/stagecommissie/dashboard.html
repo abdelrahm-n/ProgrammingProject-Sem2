@@ -38,12 +38,32 @@
       </nav>
 
       <main class="content-area">
-        <!-- inhoud komt hier -->
+
+        <section class="dashboard-welcome">
+          <h1>Stagecommissie Dashboard</h1>
+          <p>Overzicht van alle stageaanvragen en hun status.</p>
+        </section>
+
+        <!-- Statistieken: aantallen per status -->
+        <div class="stat-kaarten" id="stat-kaarten">
+          <!-- Wordt gevuld door JavaScript -->
+        </div>
+
+        <!-- Recente aanvragen -->
+        <section class="dashboard-card">
+          <h2>Recente aanvragen</h2>
+          <p>De laatste ingediende stageaanvragen.</p>
+          <div id="recente-lijst">
+            <!-- Wordt gevuld door JavaScript -->
+          </div>
+        </section>
+
       </main>
     </div>
   </div>
 
   <script src="../js/nav.js"></script>
+  <script src="../js/stagecommissieDashboard.js"></script>
 
 </body>
 </html>
