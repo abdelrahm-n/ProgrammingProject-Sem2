@@ -1,0 +1,36 @@
+/* STATUS - Signature status, progress bars */
+
+.signature-status { margin: 28px 0; }
+
+.signature-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-3);
+  margin-bottom: 14px;
+  background: var(--color-bg-page);
+}
+
+.signature-row p { margin: 6px 0 0; color: var(--color-text-secondary); font-size: 14px; }
+.active-signature { border-color: var(--color-primary); background: var(--rol-accent-licht); }
+
+.signature-input-box { margin: 24px 0; }
+.signature-input-box label { display: block; font-weight: 600; margin-bottom: 8px; }
+.signature-input-box input[type="text"] {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 14px;
+}
+
+.checkbox-row { display: flex !important; gap: 10px; align-items: center; font-weight: normal !important; }
+
+.progress-step.done .progress-circle { background: #d7f5dd; }
+.progress-step.active .progress-circle { background: #eeeeee; border: 2px solid #d7f5dd; }
+.progress-25 { width: 28%; }
+.progress-50 { width: 58%; }
+.progress-75 { width: 83%; }
+.progress-100 { width: calc(100% - 180px); }

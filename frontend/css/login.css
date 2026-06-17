@@ -126,6 +126,19 @@
   margin-top: var(--sp-1);
 }
 
+/* Dev-login knop */
+.btn--dev-login {
+  width: 100%;
+  justify-content: center;
+  margin-top: var(--sp-1);
+  font-size: 13px;
+  opacity: 0.8;
+}
+
+.btn--dev-login:hover {
+  opacity: 1;
+}
+
 /* Registreer link onder het formulier */
 .mentor-register {
   text-align: center;

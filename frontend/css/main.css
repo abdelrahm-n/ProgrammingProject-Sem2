@@ -1,0 +1,196 @@
+/* MAIN - Rol-keuze pagina, kaarten, formulieren, tabellen, grids */
+
+.rol-keuze-pagina {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.rol-keuze-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-5) var(--sp-3);
+  gap: var(--sp-5);
+}
+
+.rol-keuze-intro { text-align: center; }
+.rol-keuze-intro h1 { font-size: 28px; color: var(--color-text); margin-bottom: var(--sp-2); }
+.rol-keuze-intro p { color: var(--color-text-secondary); font-size: 15px; }
+
+.rol-keuze-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--sp-3);
+  width: 100%;
+  max-width: 1100px;
+}
+
+.rol-kaart {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-5) var(--sp-4) var(--sp-4);
+  background: var(--color-bg-card);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-align: center;
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+  overflow: hidden;
+}
+
+.rol-kaart::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 4px;
+  background: var(--kaart-kleur, var(--color-primary));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.2s ease;
+}
+
+.rol-kaart:hover::before { transform: scaleX(1); }
+.rol-kaart:hover {
+  border-color: var(--kaart-kleur, var(--color-primary));
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.10);
+}
+
+.rol-kaart__icon { color: var(--kaart-kleur, var(--color-primary)); margin-bottom: var(--sp-1); }
+.rol-kaart__label { font-size: 17px; font-weight: bold; color: var(--color-text); }
+.rol-kaart__desc { font-size: 13px; color: var(--color-text-muted); line-height: 1.4; }
+.rol-kaart__pijl { margin-top: var(--sp-2); color: var(--color-text-muted); transition: color 0.15s ease, transform 0.15s ease; }
+.rol-kaart:hover .rol-kaart__pijl { color: var(--kaart-kleur, var(--color-primary)); transform: translateX(4px); }
+
+.rol-kaart--student { --kaart-kleur: #1D4ED8; }
+.rol-kaart--docent { --kaart-kleur: #059669; }
+.rol-kaart--stagecommissie { --kaart-kleur: #7C3AED; }
+.rol-kaart--mentor { --kaart-kleur: #D97706; }
+.rol-kaart--admin { --kaart-kleur: #8B0015; }
+
+.actie-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--sp-3);
+}
+
+.actie-kaart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-4);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  text-decoration: none;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: bold;
+  text-align: center;
+  transition: border-color 0.15s, color 0.15s, transform 0.15s;
+}
+
+.actie-kaart:hover {
+  border-color: var(--rol-accent, var(--color-primary));
+  color: var(--rol-accent, var(--color-primary));
+  transform: translateY(-2px);
+}
+
+.kaart {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.kaart-titel {
+  font-size: 15px;
+  font-weight: bold;
+  color: var(--color-text);
+  padding: var(--sp-4);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.kaart-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-3) var(--sp-4);
+  border-bottom: 1px solid var(--color-border-light);
+  flex-wrap: wrap;
+}
+
+.formulier-kaart { padding: var(--sp-4); }
+.formulier-kaart .kaart-titel { padding: 0 0 var(--sp-3); border-bottom: none; }
+
+.tabel-wrapper { overflow-x: auto; }
+.tabel-tekst { max-width: 280px; }
+.tabel-link { color: var(--rol-accent, var(--color-primary)); text-decoration: none; font-size: 13px; margin-right: var(--sp-2); }
+.tabel-link:hover { text-decoration: underline; }
+
+.formulier { display: flex; flex-direction: column; gap: var(--sp-3); }
+.form-group { display: flex; flex-direction: column; gap: 5px; }
+.form-group label { font-size: 13px; font-weight: bold; color: var(--color-text); }
+.form-group input,
+.form-group textarea,
+.form-group select {
+  padding: 10px 13px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  color: var(--color-text);
+  background: var(--color-bg-card);
+  width: 100%;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--rol-accent, var(--color-primary));
+  box-shadow: 0 0 0 3px rgba(139, 0, 21, 0.10);
+}
+
+.score-select { width: 100px; }
+.feedback-input { width: 100%; min-width: 200px; resize: vertical; }
+.form-rij { display: grid; gap: var(--sp-3); }
+.form-rij--2 { grid-template-columns: 1fr 1fr; }
+.form-rij--3 { grid-template-columns: 1fr 1fr 1fr; }
+.form-acties { display: flex; gap: var(--sp-2); flex-wrap: wrap; margin-top: var(--sp-1); }
+
+.zoek-input {
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  width: 240px;
+  transition: border-color 0.15s;
+}
+
+.zoek-input:focus { outline: none; border-color: var(--rol-accent, var(--color-primary)); }
+
+.filter-tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+.filter-tab {
+  padding: 6px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-card);
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s, border-color 0.12s;
+  margin: 0;
+}
+
+.filter-tab:hover { background: var(--color-bg-page); }
+.filter-tab.actief { background: var(--rol-accent, var(--color-primary)); border-color: var(--rol-accent, var(--color-primary)); color: var(--color-white); }

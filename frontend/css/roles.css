@@ -1,0 +1,37 @@
+/* ROLES - Gedeelde rol-overschrijvingen */
+
+/* Sidebar actief = ALTIJD rood (merkkleur) */
+.nav-item.actief {
+  background: var(--color-primary);
+  color: var(--color-white);
+  border-left-color: transparent;
+}
+
+.nav-item.actief svg {
+  stroke: var(--color-white);
+}
+
+/* Knoppen en iconen = rol-accentkleur */
+.stat-kaart__icon {
+  color: var(--rol-accent, var(--color-primary));
+}
+
+.btn--primair {
+  background: var(--rol-accent, var(--color-primary));
+}
+
+.btn--primair:hover {
+  background: var(--rol-accent-hover, var(--color-primary-hover));
+}
+
+.actie-kaart:hover {
+  border-color: var(--rol-accent, var(--color-primary));
+  color: var(--rol-accent, var(--color-primary));
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(139, 0, 21, 0.12);
+}

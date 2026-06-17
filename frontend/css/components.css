@@ -1,0 +1,435 @@
+/* COMPONENTS - Gedeelde componenten voor alle rollen */
+
+/* === Dashboard cards === */
+.dashboard-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-4);
+}
+
+.dashboard-card h2 {
+  margin-top: 0;
+  margin-bottom: var(--sp-3);
+}
+
+/* === Student card (detail pagina's) === */
+.student-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-4);
+  margin-bottom: var(--sp-4);
+}
+
+.student-card h2 {
+  margin-bottom: var(--sp-3);
+}
+
+.student-card p {
+  margin-bottom: var(--sp-3);
+}
+
+/* === Page header === */
+.page-header {
+  margin-bottom: var(--sp-3);
+}
+
+/* === Status badges (universeel) === */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.badge--ingediend { background: #FFF3CD; color: #856404; }
+.badge--goedgekeurd { background: #D6F5E0; color: #1A6633; }
+.badge--afgekeurd { background: #FDDDE0; color: #990018; }
+.badge--actief { background: #CFE2FF; color: #084298; }
+.badge--afgerond { background: #E2E3E5; color: #41464B; }
+.badge--waarschuwing { background: #FFF3CD; color: #856404; }
+
+/* === Actie knoppen row === */
+.actie-knoppen {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.actie-knoppen button,
+.actie-knoppen a {
+  min-width: 160px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.actie-knoppen button:hover,
+.actie-knoppen a:hover {
+  transform: translateY(-2px);
+}
+
+/* === Stage aanvraag card === */
+.stage-aanvraag {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-4);
+}
+
+/* === Status badge (inline, gekleurd) === */
+.status-badge {
+  display: inline-block;
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  color: white;
+  margin-bottom: var(--sp-3);
+}
+
+.status-ingediend { background-color: #2563eb; }
+.status-goedgekeurd { background-color: var(--color-success); }
+.status-afgekeurd { background-color: var(--color-error); }
+.status-aanpassing { background-color: var(--color-warning); }
+
+/* === Status box (na ondertekenen) === */
+.status-box {
+  display: inline-block;
+  background: var(--color-success);
+  color: white;
+  padding: 10px 16px;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+  margin: var(--sp-3) 0 var(--sp-4);
+}
+
+/* === Formulier labels en velden === */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: var(--sp-2);
+}
+
+.form-group label {
+  font-size: 13px;
+  font-weight: bold;
+  color: var(--color-text);
+}
+
+.form-group span {
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+/* === Handtekeningen grid === */
+.handtekeningen-rij {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* === Stat grid (dashboard overzicht) === */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--sp-3);
+}
+
+.stat-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--sp-3);
+  text-align: center;
+}
+
+.stat-getal {
+  font-size: 28px;
+  font-weight: bold;
+  color: var(--color-text);
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  margin-top: 4px;
+}
+
+/* === Text muted === */
+.text-muted {
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+/* === Legacy button classes (btn-primary, btn-secondary) === */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  background: var(--rol-accent, var(--color-primary));
+  color: var(--color-white);
+  transition: background 0.15s;
+}
+
+.btn-primary:hover {
+  background: var(--rol-accent-hover, var(--color-primary-hover));
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  border: 1px solid var(--color-border);
+  text-decoration: none;
+  background: var(--color-bg-card);
+  color: var(--color-text);
+  transition: background 0.15s;
+}
+
+.btn-secondary:hover {
+  background: var(--color-bg-page);
+}
+
+/* === Signature status (overeenkomst detail) === */
+.signature-status {
+  margin: var(--sp-4) 0;
+}
+
+.status-grid {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: var(--sp-3) 0;
+}
+
+/* === Signature row (overeenkomst) === */
+.signature-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-3);
+  margin-bottom: 14px;
+  background: var(--color-bg-page);
+}
+
+.signature-row p {
+  margin: 6px 0 0;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}
+
+.active-signature {
+  border-color: var(--color-primary);
+  background: var(--rol-accent-licht, #FFF0F1);
+}
+
+/* === Signature badges (Getekend/Wachtend) === */
+.signature-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.signature-badge.done {
+  background: #d8f3df;
+  color: #2e7d32;
+}
+
+.signature-badge.waiting {
+  background: #ffe8e8;
+  color: var(--color-error);
+}
+
+.signature-badge.pending {
+  background: #f1f1f1;
+  color: var(--color-text-muted);
+}
+
+/* === Signature overview (getekend pagina) === */
+.signature-overview {
+  margin: var(--sp-4) 0;
+}
+
+.signature-overview p {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-3);
+  margin-bottom: 12px;
+  background: var(--color-bg-page);
+}
+
+.status-ok {
+  color: var(--color-success);
+  font-weight: 700;
+}
+
+/* === Signature input box === */
+.signature-input-box {
+  margin: 24px 0;
+}
+
+.signature-input-box label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.signature-input-box input[type="text"] {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  margin-bottom: 14px;
+}
+
+.checkbox-row {
+  display: flex !important;
+  gap: 10px;
+  align-items: center;
+  font-weight: normal !important;
+}
+
+/* === Contract / overeenkomst === */
+.contract-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.contract-document {
+  background: var(--color-bg-card);
+  padding: var(--sp-5);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  max-width: 900px;
+  width: 100%;
+}
+
+.contract-title {
+  text-align: center;
+  margin-bottom: 30px;
+  color: var(--color-primary);
+}
+
+.contract-info {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.contract-info p {
+  margin: 0;
+  font-size: 15px;
+}
+
+.contract-text {
+  margin: 25px 0;
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+}
+
+/* === Contract signing block === */
+.contract-signing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.signature-block {
+  padding: var(--sp-4);
+}
+
+.signature-line {
+  width: 250px;
+  height: 1px;
+  background: var(--color-border);
+  margin: 0 auto var(--sp-2);
+}
+
+.signature-name {
+  font-weight: 600;
+  margin: 0;
+}
+
+.signature-role {
+  color: var(--color-text-muted);
+  font-size: 13px;
+  margin: 4px 0 0;
+}
+
+/* === Success message (na ondertekenen) === */
+.success-message {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: var(--sp-5);
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+/* === Meldingen === */
+.melding {
+  font-size: 13px;
+  margin-top: var(--sp-2);
+  min-height: 18px;
+}
+
+.melding--succes { color: var(--color-success); }
+.melding--fout { color: var(--color-error); }
+
+/* === Overzichtsrij (form groups in een rij) === */
+.overzicht-rij {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-2);
+}
+
+.overzicht-rij .form-group {
+  margin-bottom: 0;
+}
+
+/* === Responsive === */
+@media (max-width: 640px) {
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .overzicht-rij { grid-template-columns: 1fr; }
+  .actie-knoppen { flex-direction: column; }
+  .actie-knoppen button,
+  .actie-knoppen a { min-width: auto; width: 100%; }
+  .handtekeningen-rij { flex-direction: column; align-items: flex-start; }
+  .signature-row { flex-direction: column; gap: 8px; }
+}

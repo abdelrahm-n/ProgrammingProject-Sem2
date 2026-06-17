@@ -1,0 +1,25 @@
+/* BUTTONS - Alle button varianten */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--sp-1);
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  border: 1px solid transparent;
+  text-decoration: none;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.btn--primair { background: var(--rol-accent, var(--color-primary)); color: var(--color-white); }
+.btn--primair:hover { background: var(--rol-accent-hover, var(--color-primary-hover)); }
+.btn--secundair { background: var(--color-bg-card); border-color: var(--color-border); color: var(--color-text); }
+.btn--secundair:hover { background: var(--color-bg-page); }
+.btn--gevaar { background: var(--color-error); color: var(--color-white); border-color: var(--color-error); }
+.btn--gevaar:hover { background: #7a0014; }
+.btn--sm { padding: 7px 14px; font-size: 13px; }
+.btn--xs { padding: 4px 10px; font-size: 12px; margin-right: 4px; }
