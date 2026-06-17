@@ -7,7 +7,7 @@
   <title>Stageplatform - Mentor - Stagiairs</title>
 
   <link rel="stylesheet" href="../css/stijl.css" />
-  <link rel="stylesheet" href="../css/student.css" />
+  <link rel="stylesheet" href="../css/mentor.css" />
 </head>
 
 <body>
@@ -27,71 +27,103 @@
   <div class="app-body">
 
     <nav class="sidebar">
-      <a href="dashboard.html" class="nav-item">Home</a>
+      <a href="dashboard.html" class="nav-item">Dashboard</a>
       <a href="stagiairs.html" class="nav-item actief">Stagiairs</a>
       <a href="logboeken.html" class="nav-item">Logboeken</a>
       <a href="evaluatie.html" class="nav-item">Evaluatie</a>
       <a href="profiel.html" class="nav-item">Profiel</a>
-      <a href="../index.html" class="nav-item" style="margin-top:auto">Uitloggen</a>
+      <a href="../index.html" class="nav-item" id="uitlogBtn" style="margin-top:auto">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+          <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+        </svg>
+        Uitloggen
+      </a>
     </nav>
 
     <main class="content-area">
 
       <section class="page-header">
         <h1>Mijn stagiairs</h1>
-        <p>Bekijk de studenten die gekoppeld zijn aan jouw stagebedrijf.</p>
+        <p>Overzicht van alle studenten die aan jou gekoppeld zijn.</p>
       </section>
 
       <section class="student-card">
-        <h2>Stagiairs</h2>
+        <h2>Alle stagiairs</h2>
 
-        <table>
-          <thead>
-            <tr>
-              <th>Student</th>
-              <th>Opleiding</th>
-              <th>Stageperiode</th>
-              <th>Actie</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <tr>
-              <td>Iman Obenalli</td>
-              <td>Toegepaste Informatica</td>
-              <td>10/03/2026 - 31/05/2026</td>
-              <td>
-                <a href="stagiair-detail.html?student=iman" class="btn-primary">
-                 Student bekijken
-                </a>            
-            </td>
-            </tr>
-
-            <tr>
-  <td>Ranya Rabib</td>
-  <td>Toegepaste Informatica</td>
-  <td>10/03/2026 - 31/05/2026</td>
-  <td>
-    <a href="stagiair-detail.html?student=ranya" class="btn-primary">
-    Student bekijken
-    </a>  </td>
-</tr>
-
-<tr>
-  <td>Ryan Machiels</td>
-  <td>Toegepaste Informatica</td>
-  <td>10/03/2026 - 31/05/2026</td>
-  <td>
-    <a href="stagiair-detail.html?student=ryan" class="btn-primary">
-     Student bekijken
-    </a>  </td>
-</tr>
-          </tbody>
-        </table>
+        <div id="stagiairsLijst">
+          <p>Even laden...</p>
+        </div>
       </section>
 
     </main>
   </div>
 </div>
+
+<script>
+const API_URL = 'http://localhost:3000';
+const token = localStorage.getItem('token');
+
+if (!token) {
+  window.location.href = '../index.html';
+}
+
+async function laadStagiairs() {
+  try {
+    const resp = await fetch(API_URL + '/api/mentor/alle-stagiairs', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+
+    if (resp.status === 401) {
+      window.location.href = '../index.html';
+      return;
+    }
+
+    const data = await resp.json();
+    const container = document.getElementById('stagiairsLijst');
+
+    if (!data || data.length === 0) {
+      container.innerHTML = '<p>Je hebt nog geen stagiairs.</p>';
+      return;
+    }
+
+    let html = '<table><thead><tr>';
+    html += '<th>Student</th><th>Bedrijf</th><th>Periode</th><th>Overeenkomst</th><th>Actie</th>';
+    html += '</tr></thead><tbody>';
+
+    data.forEach(function(o) {
+      var naam = o.student_voornaam + ' ' + o.student_achternaam;
+      var periode = '';
+      if (o.startdatum && o.einddatum) {
+        periode = new Date(o.startdatum).toLocaleDateString('nl-BE') + ' - ' + new Date(o.einddatum).toLocaleDateString('nl-BE');
+      }
+
+      var osBadge = '';
+      if (o.overeenkomst_status === 'wacht_op_handtekeningen') osBadge = '<span class="badge badge--ingediend">Wachtend</span>';
+      else if (o.overeenkomst_status === 'volledig_getekend') osBadge = '<span class="badge badge--goedgekeurd">Getekend</span>';
+      else if (o.overeenkomst_status === 'gevalideerd') osBadge = '<span class="badge badge--actief">Gevalideerd</span>';
+      else osBadge = '<span class="badge">' + o.overeenkomst_status + '</span>';
+
+      var actieLink = '<a href="stagiair-detail.html?id=' + o.overeenkomst_id + '" class="btn btn--primair btn--sm">Bekijk</a>';
+
+      html += '<tr>';
+      html += '<td><strong>' + naam + '</strong><br><small>' + (o.studentnummer || '') + '</small></td>';
+      html += '<td>' + (o.bedrijf_naam || '-') + '</td>';
+      html += '<td>' + periode + '</td>';
+      html += '<td>' + osBadge + '</td>';
+      html += '<td>' + actieLink + '</td>';
+      html += '</tr>';
+    });
+
+    html += '</tbody></table>';
+    container.innerHTML = html;
+  } catch (err) {
+    document.getElementById('stagiairsLijst').innerHTML = '<p>Fout bij laden.</p>';
+  }
+}
+
+laadStagiairs();
+</script>
+<script src="../js/nav.js"></script>
 </body>
 </html>

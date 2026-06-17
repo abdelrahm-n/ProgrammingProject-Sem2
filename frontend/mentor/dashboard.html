@@ -25,9 +25,11 @@
 
     <div class="app-body">
       <nav class="sidebar">
-        <a href="dashboard.html" class="nav-item">Dashboard</a>
+        <a href="dashboard.html" class="nav-item actief">Dashboard</a>
+        <a href="stagiairs.html" class="nav-item">Stagiairs</a>
         <a href="logboeken.html" class="nav-item">Logboeken</a>
         <a href="evaluatie.html" class="nav-item">Evaluatie</a>
+        <a href="profiel.html" class="nav-item">Profiel</a>
         <a href="../index.html" class="nav-item" id="uitlogBtn" style="margin-top:auto">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
@@ -38,11 +40,102 @@
       </nav>
 
       <main class="content-area">
-        <!-- inhoud komt hier -->
+
+        <section class="page-header">
+          <h1>Dashboard</h1>
+          <p>Welkom terug! Hier zie je een overzicht van je studenten.</p>
+        </section>
+
+        <section class="student-card" id="wachtSectie" style="display:none;">
+          <h2>Wacht op jouw handtekening</h2>
+          <p>Deze studenten hebben de overeenkomst al ondertekend. Jij moet nu namens het bedrijf ondertekenen.</p>
+          <div id="wachtLijst"></div>
+        </section>
+
+        <section class="student-card">
+          <h2>Mijn stagiairs</h2>
+          <div id="stagiairsLijst">
+            <p>Even laden...</p>
+          </div>
+        </section>
+
       </main>
     </div>
   </div>
 
+  <script>
+const API_URL = 'http://localhost:3000';
+const token = localStorage.getItem('token');
+
+if (!token) {
+  window.location.href = '../index.html';
+}
+
+async function laadDashboard() {
+  try {
+    // Haal overeenkomsten op die wachten op mentor handtekening
+    const respOvereenkomsten = await fetch(API_URL + '/api/mentor/overeenkomsten', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+
+    if (respOvereenkomsten.status === 401) {
+      window.location.href = '../index.html';
+      return;
+    }
+
+    const overeenkomsten = await respOvereenkomsten.json();
+    const wachtSectie = document.getElementById('wachtSectie');
+    const wachtLijst = document.getElementById('wachtLijst');
+
+    if (overeenkomsten && overeenkomsten.length > 0) {
+      wachtSectie.style.display = 'block';
+      let html = '<table><thead><tr><th>Student</th><th>Bedrijf</th><th>Periode</th><th>Actie</th></tr></thead><tbody>';
+      overeenkomsten.forEach(function(o) {
+        var naam = o.student_voornaam + ' ' + o.student_achternaam;
+        var periode = new Date(o.startdatum).toLocaleDateString('nl-BE') + ' - ' + new Date(o.einddatum).toLocaleDateString('nl-BE');
+        html += '<tr>';
+        html += '<td>' + naam + '</td>';
+        html += '<td>' + (o.bedrijf_naam || '-') + '</td>';
+        html += '<td>' + periode + '</td>';
+        html += '<td><a href="stageovereenkomst.html?id=' + o.overeenkomst_id + '" class="btn-primary">Ondertekenen</a></td>';
+        html += '</tr>';
+      });
+      html += '</tbody></table>';
+      wachtLijst.innerHTML = html;
+    }
+
+    // Haal actieve stagiairs op
+    const respStagiairs = await fetch(API_URL + '/api/mentor/mijn-stagiairs', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const stagiairs = await respStagiairs.json();
+    const stagiairsLijst = document.getElementById('stagiairsLijst');
+
+    if (!stagiairs || stagiairs.length === 0) {
+      stagiairsLijst.innerHTML = '<p>Je hebt nog geen actieve stagiairs.</p>';
+      return;
+    }
+
+    let html2 = '<table><thead><tr><th>Student</th><th>Opleiding</th><th>Stageperiode</th></tr></thead><tbody>';
+    stagiairs.forEach(function(s) {
+      var naam = s.voornaam + ' ' + s.achternaam;
+      var periode = new Date(s.startdatum).toLocaleDateString('nl-BE') + ' - ' + new Date(s.einddatum).toLocaleDateString('nl-BE');
+      html2 += '<tr>';
+      html2 += '<td>' + naam + '</td>';
+      html2 += '<td>' + (s.opleiding || '-') + '</td>';
+      html2 += '<td>' + periode + '</td>';
+      html2 += '</tr>';
+    });
+    html2 += '</tbody></table>';
+    stagiairsLijst.innerHTML = html2;
+
+  } catch (err) {
+    console.error('Fout bij laden dashboard:', err);
+  }
+}
+
+laadDashboard();
+  </script>
   <script src="../js/nav.js"></script>
 
 </body>

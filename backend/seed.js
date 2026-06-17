@@ -15,6 +15,21 @@ const gebruikers = [
 async function maakDemoGebruikers() {
   const hash = await bcrypt.hash(DEMO_WACHTWOORD, 10)
 
+  /* Maak standaard opleiding aan als deze nog niet bestaat */
+  const [opleidingBestaat] = await db.query(
+    "SELECT id FROM opleiding WHERE naam = 'Toegepaste Informatica'"
+  )
+  let opleidingId
+  if (opleidingBestaat.length === 0) {
+    const [opleiding] = await db.query(
+      "INSERT INTO opleiding (naam, afkorting, actief) VALUES ('Toegepaste Informatica', 'TI', TRUE)"
+    )
+    opleidingId = opleiding.insertId
+    console.log('Opleiding aangemaakt: Toegepaste Informatica (id: ' + opleidingId + ')')
+  } else {
+    opleidingId = opleidingBestaat[0].id
+  }
+
   for (const g of gebruikers) {
     const [bestaand] = await db.query(
       'SELECT id FROM persoon WHERE email = ?',
@@ -35,28 +50,33 @@ async function maakDemoGebruikers() {
 
     if (g.rol === 'student') {
       await db.query(
-        'INSERT INTO student (persoon_id, studentnummer, opleiding_id) VALUES (?, NULL, NULL)',
-        [persoonId]
+        'INSERT INTO student (persoon_id, studentnummer, opleiding_id) VALUES (?, ?, ?)',
+        [persoonId, '1000001', opleidingId]
       )
     } else if (g.rol === 'docent') {
       await db.query(
-        'INSERT INTO docent (persoon_id, vakgroep) VALUES (?, NULL)',
-        [persoonId]
+        'INSERT INTO docent (persoon_id, vakgroep) VALUES (?, ?)',
+        [persoonId, 'Informatica']
       )
     } else if (g.rol === 'stagementor') {
+      /* Maak eerst een bedrijf aan */
+      const [bedrijf] = await db.query(
+        "INSERT INTO bedrijf (naam, adres, email, telefoon, actief) VALUES (?, ?, ?, ?, TRUE)",
+        ['Demo BV', 'Demostraat 1, 1000 Brussel', 'info@demo.be', '02/123.45.67']
+      )
       await db.query(
-        'INSERT INTO stagementor (persoon_id, functie, bedrijf_id) VALUES (?, NULL, NULL)',
-        [persoonId]
+        'INSERT INTO stagementor (persoon_id, functie, bedrijf_id) VALUES (?, ?, ?)',
+        [persoonId, 'Project Manager', bedrijf.insertId]
       )
     } else if (g.rol === 'stagecommissie') {
       await db.query(
-        'INSERT INTO stagecommissielid (persoon_id, commissie_rol) VALUES (?, NULL)',
-        [persoonId]
+        'INSERT INTO stagecommissielid (persoon_id, commissie_rol) VALUES (?, ?)',
+        [persoonId, 'Voorzitter']
       )
     } else if (g.rol === 'admin') {
       await db.query(
-        'INSERT INTO administratie (persoon_id, dienst) VALUES (?, NULL)',
-        [persoonId]
+        'INSERT INTO administratie (persoon_id, dienst) VALUES (?, ?)',
+        [persoonId, 'Studentenadministratie']
       )
     }
 
