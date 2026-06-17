@@ -199,7 +199,7 @@ CREATE TABLE stageovereenkomst (
         REFERENCES overeenkomst_status(id),
 
     FOREIGN KEY (gevalideerd_door_id)
-        REFERENCES administratie(persoon_id)
+        REFERENCES persoon(id)
 );
 
 -- DOCUMENTEN
