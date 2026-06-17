@@ -100,23 +100,23 @@ INSERT INTO bedrijf (id, naam, adres, email, telefoon, contactpersoon, actief) V
 
 INSERT INTO persoon (id, voornaam, achternaam, email, wachtwoord_hash, rol, actief) VALUES
 /* studenten */
-(1,  'Jan',      'Jansen',     'jan.jansen@student.ehb.be',     '$2a$10$GU7/piipSgY2nf3KQVBSpO2mo9WzSMG77zB.Hw2nSTlv73QAgdvly', 'student',        TRUE),
-(2,  'Emma',     'Peeters',    'emma.peeters@student.ehb.be',   '$2a$10$GU7/piipSgY2nf3KQVBSpO2mo9WzSMG77zB.Hw2nSTlv73QAgdvly', 'student',        TRUE),
-(3,  'Youssef',  'El Amrani',  'youssef.elamrani@student.ehb.be','$2a$10$GU7/piipSgY2nf3KQVBSpO2mo9WzSMG77zB.Hw2nSTlv73QAgdvly','student',        TRUE),
-(4,  'Lotte',    'Vermeulen',  'lotte.vermeulen@student.ehb.be','$2a$10$GU7/piipSgY2nf3KQVBSpO2mo9WzSMG77zB.Hw2nSTlv73QAgdvly', 'student',        TRUE),
-(5,  'Mohammed', 'Bakkali',    'mohammed.bakkali@student.ehb.be','$2a$10$GU7/piipSgY2nf3KQVBSpO2mo9WzSMG77zB.Hw2nSTlv73QAgdvly','student',        TRUE),
+(1,  'Jan',      'Jansen',     'jan.jansen@student.ehb.be',     '$2a$10$NDGB.Js7QO7ZTuPS3ST0m.qjte9gFCTcP5JMFezws2DymqMvKPf2K', 'student',        TRUE),
+(2,  'Emma',     'Peeters',    'emma.peeters@student.ehb.be',   '$2a$10$dEphHs/H/KMaeVywC1rc6eZjNK6d3GQ6/.Dv.xSFoyjNiC4O6gGyO', 'student',        TRUE),
+(3,  'Youssef',  'El Amrani',  'youssef.elamrani@student.ehb.be','$2a$10$pwNAh2iHTVJ6TIqVclQ8aONmeKV8ka9OM8apmh9nh3HAjW8AsyqaG','student',        TRUE),
+(4,  'Lotte',    'Vermeulen',  'lotte.vermeulen@student.ehb.be','$2a$10$acpx4/HaK1PKEM8c.lxxZusrfVpF4cUp3kULqMx146Nu2JM8nXvum','student',        TRUE),
+(5,  'Mohammed', 'Bakkali',    'mohammed.bakkali@student.ehb.be','$2a$10$acd7.9SW1Am.ulKfbaPgnuAr9Qui46Mv9TwkgOpJM6hbclHvqf6Fa','student',        TRUE),
 /* docenten */
-(6,  'Piet',     'Pieters',    'piet.pieters@docent.ehb.be',    '$2a$10$GU7/piipSgY2nf3KQVBSpO2mo9WzSMG77zB.Hw2nSTlv73QAgdvly', 'docent',         TRUE),
-(7,  'Karen',    'De Wit',     'karen.dewit@docent.ehb.be',     '$2a$10$GU7/piipSgY2nf3KQVBSpO2mo9WzSMG77zB.Hw2nSTlv73QAgdvly', 'docent',         TRUE),
+(6,  'Piet',     'Pieters',    'piet.pieters@docent.ehb.be',    '$2a$10$U8XSSVOrXytkmOM5RTzH2OW04zyEKRhiuX/Me4etPIIB9oxxTfBTu', 'docent',         TRUE),
+(7,  'Karen',    'De Wit',     'karen.dewit@docent.ehb.be',     '$2a$10$/U3fwy.xjOUJamSMa40LCOEgoSqaWPupxUt7aVPXlzhSf0UHdSqV2', 'docent',         TRUE),
 /* stagementoren */
-(8,  'Sara',     'Smeets',     'sara.smeets@mentor.ehb.be',     '$2a$10$GU7/piipSgY2nf3KQVBSpO2mo9WzSMG77zB.Hw2nSTlv73QAgdvly', 'stagementor',    TRUE),
-(9,  'David',    'Janssens',   'david.janssens@mentor.ehb.be',  '$2a$10$GU7/piipSgY2nf3KQVBSpO2mo9WzSMG77zB.Hw2nSTlv73QAgdvly', 'stagementor',    TRUE),
-(10, 'Fatima',   'Ouali',      'fatima.ouali@mentor.ehb.be',    '$2a$10$GU7/piipSgY2nf3KQVBSpO2mo9WzSMG77zB.Hw2nSTlv73QAgdvly', 'stagementor',    TRUE),
+(8,  'Sara',     'Smeets',     'sara.smeets@mentor.ehb.be',     '$2a$10$9O6lVLoK2trmiIDuOkt6v.2OIU6XoueQQ/En5kwdmG8NpklAHCPx.', 'stagementor',    TRUE),
+(9,  'David',    'Janssens',   'david.janssens@mentor.ehb.be',  '$2a$10$IoLqmhA.QaX0PGvoays/.uXFl.utISq7XekzcB2/Q8rNZkaT3.kVu', 'stagementor',    TRUE),
+(10, 'Fatima',   'Ouali',      'fatima.ouali@mentor.ehb.be',    '$2a$10$uHtSFRB9E0gHwYf76FLf3uXYC4RYZwhkf7mWxRCevfW99QXEIYy8S', 'stagementor',    TRUE),
 /* stagecommissie */
-(11, 'Tom',      'Thomas',     'tom.thomas@commissie.ehb.be',   '$2a$10$GU7/piipSgY2nf3KQVBSpO2mo9WzSMG77zB.Hw2nSTlv73QAgdvly', 'stagecommissie', TRUE),
-(12, 'Nadia',    'Cools',      'nadia.cools@commissie.ehb.be',  '$2a$10$GU7/piipSgY2nf3KQVBSpO2mo9WzSMG77zB.Hw2nSTlv73QAgdvly', 'stagecommissie', TRUE),
+(11, 'Tom',      'Thomas',     'tom.thomas@commissie.ehb.be',   '$2a$10$JBrHZbHo2r9t8iOMP13Ble0WGM75NbGo1M1YQaN/4KFAGcO3hxmrO', 'stagecommissie', TRUE),
+(12, 'Nadia',    'Cools',      'nadia.cools@commissie.ehb.be',  '$2a$10$dsaUChQ56x1IPE0.k7HSJengT.PTf8xLKUPE48qypwTDK3wZpBiFG', 'stagecommissie', TRUE),
 /* administratie */
-(13, 'An',       'Anthonis',   'an.anthonis@admin.ehb.be',      '$2a$10$GU7/piipSgY2nf3KQVBSpO2mo9WzSMG77zB.Hw2nSTlv73QAgdvly', 'admin',          TRUE);
+(13, 'An',       'Anthonis',   'an.anthonis@admin.ehb.be',      '$2a$10$6cQ6cGdDxbjinVzcb0.yfuXIQe0UB1p2a7z9yg1eDAiOENuGenu2O', 'admin',          TRUE);
 
 /* ---------- ROLKOPPELINGEN ---------- */
 

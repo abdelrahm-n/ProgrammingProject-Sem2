@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Stageplatform - Admin - Dashboard</title>
+  <title>Stageplatform - Admin - Studenten</title>
   <link rel="stylesheet" href="../css/stijl.css" />
   <link rel="stylesheet" href="../css/admin.css" />
 </head>
@@ -25,8 +25,8 @@
 
     <div class="app-body">
       <nav class="sidebar">
-        <a href="dashboard.html" class="nav-item actief">Dashboard</a>
-        <a href="studenten.html" class="nav-item">Student</a>
+        <a href="dashboard.html" class="nav-item">Dashboard</a>
+        <a href="studenten.html" class="nav-item actief">Student</a>
         <a href="docenten.html" class="nav-item">Docent</a>
         <a href="bedrijven.html" class="nav-item">Bedrijven</a>
         <a href="stages.html" class="nav-item">Stage</a>
@@ -42,22 +42,14 @@
       <main class="content-area">
 
         <section class="dashboard-welcome">
-          <h1>Dashboard</h1>
+          <h1>Studenten</h1>
         </section>
 
-        <!-- Recente updates -->
         <section class="dashboard-card">
-          <h2>Recente updates</h2>
-          <div id="recente-updates"></div>
+          <h2>Studentendossiers</h2>
+          <div id="studenten-lijst"></div>
         </section>
 
-        <!-- Overzicht stages -->
-        <section class="dashboard-card">
-          <h2>Overzicht stages</h2>
-          <div id="overzicht-stages"></div>
-        </section>
-
-        <!-- Statistieken -->
         <div class="stat-kaarten" id="stat-kaarten"></div>
 
       </main>
@@ -65,7 +57,7 @@
   </div>
 
   <script src="../js/nav.js"></script>
-  <script src="../js/adminDashboard.js"></script>
+  <script src="../js/adminStudenten.js"></script>
 
 </body>
 </html>
