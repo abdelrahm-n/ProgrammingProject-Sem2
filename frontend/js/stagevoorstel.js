@@ -1,102 +1,148 @@
-const API = "http://localhost:3000";
+const API_URL = "http://localhost:3000";
 
-/* Vul de studentgegevens automatisch in via de backend */
-async function vulStudentgegevensIn() {
-    const token = localStorage.getItem("token");
-    if (!token) return;
+/* Vul de studentgegevens automatisch in vanuit de ingelogde sessie.
+   De velden zijn readonly zodat de student ze niet kan aanpassen. */
+function vulStudentgegevensIn() {
+  const naam = localStorage.getItem("naam") || "";
+  const email = localStorage.getItem("email") || "";
+  const studentnummer = localStorage.getItem("studentnummer") || "";
+  const opleiding = localStorage.getItem("opleiding") || "";
 
-    try {
-        const resp = await fetch(`${API}/api/auth/me`, {
-            headers: { "Authorization": `Bearer ${token}` }
-        });
-        if (!resp.ok) return;
+  document.getElementById("studentNaam").value = naam;
+  document.getElementById("studentNummer").value = studentnummer;
+  document.getElementById("opleiding").value = opleiding;
+  document.getElementById("emailStudent").value = email;
 
-        const gebruiker = await resp.json();
-
-        document.getElementById("studentNaam").value =
-            (gebruiker.voornaam || "") + " " + (gebruiker.achternaam || "");
-        document.getElementById("studentNummer").value = gebruiker.studentnummer || "";
-        document.getElementById("opleiding").value = gebruiker.opleiding || "";
-        document.getElementById("emailStudent").value = gebruiker.email || "";
-
-        /* Gegevens uit profiel mogen niet aangepast worden */
-        document.getElementById("studentNaam").readOnly = true;
-        document.getElementById("studentNummer").readOnly = true;
-        document.getElementById("opleiding").readOnly = true;
-        document.getElementById("emailStudent").readOnly = true;
-    } catch (err) {
-        console.error("Fout bij ophalen profiel:", err);
-    }
-}
-
-async function stagevoorstelIndienen() {
-    const studentNaam = document.getElementById("studentNaam").value;
-    const studentNummer = document.getElementById("studentNummer").value;
-    const opleiding = document.getElementById("opleiding").value;
-    const emailStudent = document.getElementById("emailStudent").value;
-
-    const stagebedrijf = document.getElementById("stagebedrijf").value;
-    const contactPersoon = document.getElementById("contactPersoon").value;
-    const emailBedrijf = document.getElementById("emailBedrijf").value;
-    const telefoonBedrijf = document.getElementById("telefoonBedrijf").value;
-    const adresBedrijf = document.getElementById("adresBedrijf").value;
-
-    const startDatum = document.getElementById("startDatum").value;
-    const eindDatum = document.getElementById("eindDatum").value;
-
-    const functie = document.getElementById("functie").value;
-    const stageopdracht = document.getElementById("stageopdracht").value;
-
-    if (
-        !stagebedrijf || !startDatum ||
-        !eindDatum || !stageopdracht
-    ) {
-        alert("Vul alle verplichte velden in: bedrijf, startdatum, einddatum en stageopdracht zijn verplicht.");
-        return;
-    }
-
-    const token = localStorage.getItem("token");
-    if (!token) {
-        alert("Je bent niet ingelogd.");
-        return;
-    }
-
-    try {
-        const resp = await fetch(`${API}/api/stages`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                stagebedrijf,
-                contactPersoon,
-                emailBedrijf,
-                telefoonBedrijf,
-                adresBedrijf,
-                startDatum,
-                eindDatum,
-                functie,
-                stageopdracht
-            })
-        });
-
-        const data = await resp.json();
-
-        if (!resp.ok) {
-            alert(data.fout || "Er is iets misgegaan bij het indienen.");
-            return;
-        }
-
-        /* Sla het voorstel ID op voor andere pagina's */
-        localStorage.setItem("stageVoorstelId", data.id);
-        localStorage.setItem("stageStatus", "ingediend");
-
-        window.location.href = "dashboard.html";
-    } catch (err) {
-        console.error("Fout bij indienen:", err);
-        alert("Kan geen verbinding maken met de server.");
-    }
+  document.getElementById("studentNaam").readOnly = true;
+  document.getElementById("studentNummer").readOnly = true;
+  document.getElementById("opleiding").readOnly = true;
+  document.getElementById("emailStudent").readOnly = true;
 }
 
 vulStudentgegevensIn();
+
+/* Lijst van alle verplichte velden met hun foutmeldingen */
+const verplichteVelden = [
+  { id: "stagebedrijf", fout: "Vul de naam van het bedrijf in" },
+  { id: "contactPersoon", fout: "Vul de contactpersoon in" },
+  { id: "emailBedrijf", fout: "Vul een geldig e-mailadres in" },
+  { id: "telefoonBedrijf", fout: "Vul het telefoonnummer in" },
+  { id: "adresBedrijf", fout: "Vul het adres in" },
+  { id: "startDatum", fout: "Kies een startdatum" },
+  { id: "eindDatum", fout: "Kies een einddatum" },
+  { id: "functie", fout: "Vul de functie in" },
+  { id: "stageopdracht", fout: "Beschrijf de stageopdracht" }
+];
+
+/* Toon een foutmelding onder een veld */
+function toonFout(inputElement, bericht) {
+  inputElement.classList.add("fout");
+
+  const bestaandeFout = inputElement.parentElement.querySelector(".fout-melding");
+  if (bestaandeFout) bestaandeFout.remove();
+
+  const foutElement = document.createElement("span");
+  foutElement.className = "fout-melding";
+  foutElement.textContent = bericht;
+  inputElement.parentElement.appendChild(foutElement);
+}
+
+/* Verwijder de foutmelding van een veld */
+function wisFout(inputElement) {
+  inputElement.classList.remove("fout");
+  const foutElement = inputElement.parentElement.querySelector(".fout-melding");
+  if (foutElement) foutElement.remove();
+}
+
+/* Verwijder alle foutmeldingen */
+function wisAlleFouten() {
+  document.querySelectorAll(".fout").forEach(el => el.classList.remove("fout"));
+  document.querySelectorAll(".fout-melding").forEach(el => el.remove());
+}
+
+/* Controleer of een e-mailadres geldig is */
+function isGeldigEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+/* Valideer alle velden en geef terug of alles geldig is */
+function valideerAlleVelden() {
+  let geldig = true;
+
+  wisAlleFouten();
+
+  for (const veld of verplichteVelden) {
+    const input = document.getElementById(veld.id);
+    const waarde = input.value.trim();
+
+    if (!waarde) {
+      geldig = false;
+      toonFout(input, veld.fout);
+    } else if (veld.id === "emailBedrijf" && !isGeldigEmail(waarde)) {
+      geldig = false;
+      toonFout(input, "Vul een geldig e-mailadres in (bijv. naam@bedrijf.be)");
+    }
+  }
+
+  const startDatum = document.getElementById("startDatum").value;
+  const eindDatum = document.getElementById("eindDatum").value;
+
+  if (startDatum && eindDatum) {
+    if (new Date(eindDatum) <= new Date(startDatum)) {
+      geldig = false;
+      toonFout(document.getElementById("eindDatum"), "Einddatum moet na de startdatum liggen");
+    }
+  }
+
+  return geldig;
+}
+
+/* Live validatie: verwijder foutmeldingen zodra een veld wordt ingevuld */
+for (const veld of verplichteVelden) {
+  const input = document.getElementById(veld.id);
+  input.addEventListener("input", function () {
+    if (this.value.trim()) {
+      wisFout(this);
+    }
+  });
+}
+
+/* Stagevoorstel indienen */
+async function stagevoorstelIndienen() {
+  if (!valideerAlleVelden()) {
+    return;
+  }
+
+  const aanvraag = {
+    stagebedrijf: document.getElementById("stagebedrijf").value.trim(),
+    contactPersoon: document.getElementById("contactPersoon").value.trim(),
+    emailBedrijf: document.getElementById("emailBedrijf").value.trim(),
+    telefoonBedrijf: document.getElementById("telefoonBedrijf").value.trim(),
+    adresBedrijf: document.getElementById("adresBedrijf").value.trim(),
+    startDatum: document.getElementById("startDatum").value,
+    eindDatum: document.getElementById("eindDatum").value,
+    functie: document.getElementById("functie").value.trim(),
+    stageopdracht: document.getElementById("stageopdracht").value.trim()
+  };
+
+  try {
+    const antwoord = await fetch(API_URL + "/api/stages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + (localStorage.getItem("token") || "")
+      },
+      body: JSON.stringify(aanvraag)
+    });
+
+    if (!antwoord.ok) {
+      const fout = await antwoord.json().catch(() => ({}));
+      alert(fout.fout || "Indienen mislukt. Probeer opnieuw.");
+      return;
+    }
+
+    window.location.href = "dashboard.html";
+  } catch (fout) {
+    alert("Kan geen verbinding maken met de server.");
+  }
+}
