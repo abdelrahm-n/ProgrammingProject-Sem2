@@ -8,21 +8,39 @@ const router = express.Router()
 router.post('/', controleerToken, async (req, res) => {
   const a = req.body
 
+  if (!a.stagebedrijf || !a.startDatum || !a.eindDatum || !a.stageopdracht) {
+    return res.status(400).json({ fout: 'Bedrijf, data en opdracht zijn verplicht' })
+  }
+
   try {
-    /* Maak eerst het bedrijf aan */
     const [bedrijf] = await db.query(
       'INSERT INTO bedrijf (naam, adres, email, telefoon) VALUES (?, ?, ?, ?)',
-      [a.stagebedrijf, a.adresBedrijf, a.emailBedrijf, a.telefoonBedrijf]
+      [a.stagebedrijf, a.adresBedrijf || null, a.emailBedrijf || null, a.telefoonBedrijf || null]
     )
 
-    /* Zoek de status "ingediend" op */
     const [status] = await db.query("SELECT id FROM stagevoorstel_status WHERE naam = 'ingediend'")
 
-    /* Maak het stagevoorstel aan */
+    if (status.length === 0) {
+      return res.status(500).json({ fout: 'Status ingediend niet gevonden' })
+    }
+
+    const [academiejaar] = await db.query(
+      'SELECT id FROM academiejaar WHERE CURDATE() BETWEEN startdatum AND einddatum LIMIT 1'
+    )
+
     const [voorstel] = await db.query(
-      `INSERT INTO stagevoorstel (student_id, bedrijf_id, omschrijving_opdracht, startdatum, einddatum, status_id)
-       VALUES (?, ?, ?, ?, ?, ?)`,
-      [req.gebruiker.id, bedrijf.insertId, a.stageopdracht, a.startDatum, a.eindDatum, status[0].id]
+      `INSERT INTO stagevoorstel (student_id, bedrijf_id, mentor_id, academiejaar_id, omschrijving_opdracht, startdatum, einddatum, status_id)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        req.gebruiker.id,
+        bedrijf.insertId,
+        a.mentor_id || null,
+        academiejaar.length > 0 ? academiejaar[0].id : null,
+        a.stageopdracht,
+        a.startDatum,
+        a.eindDatum,
+        status[0].id
+      ]
     )
 
     res.status(201).json({ id: voorstel.insertId, bericht: 'Stagevoorstel ingediend' })
@@ -36,9 +54,18 @@ router.post('/', controleerToken, async (req, res) => {
 router.get('/mijn', controleerToken, async (req, res) => {
   try {
     const [rijen] = await db.query(
-      `SELECT sv.*, st.naam AS status
+      `SELECT sv.*, st.naam AS status,
+              b.naam AS bedrijf, b.adres, b.email AS bedrijf_email, b.telefoon,
+              cb.feedback
        FROM stagevoorstel sv
        JOIN stagevoorstel_status st ON sv.status_id = st.id
+       JOIN bedrijf b ON sv.bedrijf_id = b.id
+       LEFT JOIN commissie_beoordeling cb ON cb.stagevoorstel_id = sv.id
+         AND cb.id = (
+           SELECT cb2.id FROM commissie_beoordeling cb2
+           WHERE cb2.stagevoorstel_id = sv.id
+           ORDER BY cb2.beoordeeld_op DESC LIMIT 1
+         )
        WHERE sv.student_id = ?
        ORDER BY sv.aangemaakt_op DESC`,
       [req.gebruiker.id]
@@ -55,16 +82,167 @@ router.get('/', controleerToken, async (req, res) => {
   try {
     const [rijen] = await db.query(
       `SELECT sv.*, st.naam AS status,
-              p.voornaam, p.achternaam, s.studentnummer,
-              b.naam AS bedrijf
+              p.voornaam, p.achternaam, p.email AS student_email, s.studentnummer,
+              o.naam AS opleiding,
+              b.naam AS bedrijf, b.adres, b.email AS bedrijf_email, b.telefoon,
+              sm.functie AS mentor_functie,
+              mp.voornaam AS mentor_voornaam, mp.achternaam AS mentor_achternaam,
+              aj.naam AS academiejaar
        FROM stagevoorstel sv
        JOIN stagevoorstel_status st ON sv.status_id = st.id
        JOIN student s ON sv.student_id = s.persoon_id
        JOIN persoon p ON s.persoon_id = p.id
+       LEFT JOIN opleiding o ON s.opleiding_id = o.id
        JOIN bedrijf b ON sv.bedrijf_id = b.id
+       LEFT JOIN stagementor sm ON sv.mentor_id = sm.persoon_id
+       LEFT JOIN persoon mp ON sm.persoon_id = mp.id
+       LEFT JOIN academiejaar aj ON sv.academiejaar_id = aj.id
        ORDER BY sv.aangemaakt_op DESC`
     )
     res.json(rijen)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ fout: 'Serverfout' })
+  }
+})
+
+/* Commissie overzicht */
+router.get('/overzicht', controleerToken, async (req, res) => {
+  try {
+    const [rijen] = await db.query(
+      `SELECT sv.id AS stagevoorstel_id, sv.omschrijving_opdracht, sv.startdatum, sv.einddatum, sv.aangemaakt_op,
+              svs.naam AS voorstel_status,
+              p.voornaam AS student_voornaam, p.achternaam AS student_achternaam, p.email AS student_email,
+              st.studentnummer,
+              o.naam AS opleiding,
+              b.naam AS bedrijf_naam,
+              so.id AS overeenkomst_id,
+              so.getekend_door_student, so.getekend_door_bedrijf, so.getekend_door_school,
+              os.naam AS overeenkomst_status
+       FROM stagevoorstel sv
+       JOIN stagevoorstel_status svs ON sv.status_id = svs.id
+       JOIN student st ON sv.student_id = st.persoon_id
+       JOIN persoon p ON st.persoon_id = p.id
+       LEFT JOIN opleiding o ON st.opleiding_id = o.id
+       JOIN bedrijf b ON sv.bedrijf_id = b.id
+       LEFT JOIN stageovereenkomst so ON sv.id = so.stagevoorstel_id
+       LEFT JOIN overeenkomst_status os ON so.status_id = os.id
+       ORDER BY sv.aangemaakt_op DESC`
+    )
+    res.json(rijen)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ fout: 'Serverfout' })
+  }
+})
+
+/* Haal de actieve stage op voor de ingelogde student (dashboard) - MOET voor /:id komen */
+router.get('/mijn/actief', controleerToken, async (req, res) => {
+  try {
+    const [stages] = await db.query(
+      `SELECT stg.id AS stage_id, stg.startdatum, stg.einddatum, stg.actief,
+              b.naam AS bedrijf_naam, b.adres AS bedrijf_adres, b.email AS bedrijf_email, b.telefoon AS bedrijf_telefoon,
+              mp.voornaam AS mentor_voornaam, mp.achternaam AS mentor_achternaam, sm.functie AS mentor_functie,
+              dp.voornaam AS docent_voornaam, dp.achternaam AS docent_achternaam,
+              so.getekend_door_student, so.getekend_door_bedrijf, so.getekend_door_school,
+              so.gevalideerd_op,
+              os.naam AS overeenkomst_status
+       FROM stage stg
+       JOIN stageovereenkomst so ON stg.stageovereenkomst_id = so.id
+       JOIN overeenkomst_status os ON so.status_id = os.id
+       JOIN bedrijf b ON stg.bedrijf_id = b.id
+       LEFT JOIN stagementor sm ON stg.mentor_id = sm.persoon_id
+       LEFT JOIN persoon mp ON sm.persoon_id = mp.id
+       LEFT JOIN docent d ON stg.docent_id = d.persoon_id
+       LEFT JOIN persoon dp ON d.persoon_id = dp.id
+       WHERE stg.student_id = ? AND stg.actief = TRUE
+       ORDER BY stg.aangemaakt_op DESC
+       LIMIT 1`,
+      [req.gebruiker.id]
+    )
+
+    if (stages.length === 0) {
+      return res.status(404).json({ fout: 'Geen actieve stage gevonden' })
+    }
+
+    const stage = stages[0]
+
+    const vandaag = new Date()
+    const startdatum = new Date(stage.startdatum)
+    const einddatum = new Date(stage.einddatum)
+    const totaalDagen = (einddatum - startdatum) / (1000 * 60 * 60 * 24)
+    const totaalWeken = Math.ceil(totaalDagen / 7)
+    const verlopenDagen = Math.max(0, (vandaag - startdatum) / (1000 * 60 * 60 * 24))
+    const huidigWeek = Math.min(Math.ceil(verlopenDagen / 7), totaalWeken)
+
+    const [logboekStats] = await db.query(
+      `SELECT COUNT(DISTINCT lw.id) AS totaal_weken,
+              SUM(CASE WHEN ls.naam = 'ingevuld' THEN 1 ELSE 0 END) AS ingevulde_weken
+       FROM logboek_week lw
+       JOIN logboek_status ls ON lw.status_id = ls.id
+       WHERE lw.stage_id = ?`,
+      [stage.stage_id]
+    )
+
+    const [dagItems] = await db.query(
+      `SELECT COUNT(ldi.id) AS totaal_dagen
+       FROM logboek_dag_item ldi
+       JOIN logboek_week lw ON ldi.logboek_week_id = lw.id
+       WHERE lw.stage_id = ?`,
+      [stage.stage_id]
+    )
+
+    const [evaluaties] = await db.query(
+      `SELECT et.naam AS type_naam, em.datum
+       FROM evaluatie_moment em
+       JOIN evaluatie_type et ON em.type_id = et.id
+       WHERE em.stage_id = ?
+       ORDER BY em.datum`,
+      [stage.stage_id]
+    )
+
+    res.json({
+      stage: {
+        id: stage.stage_id,
+        startdatum: stage.startdatum,
+        einddatum: stage.einddatum,
+        actief: stage.actief
+      },
+      bedrijf: {
+        naam: stage.bedrijf_naam,
+        adres: stage.bedrijf_adres,
+        email: stage.bedrijf_email,
+        telefoon: stage.bedrijf_telefoon
+      },
+      mentor: stage.mentor_voornaam ? {
+        voornaam: stage.mentor_voornaam,
+        achternaam: stage.mentor_achternaam,
+        functie: stage.mentor_functie
+      } : null,
+      docent: stage.docent_voornaam ? {
+        voornaam: stage.docent_voornaam,
+        achternaam: stage.docent_achternaam
+      } : null,
+      voortgang: {
+        huidig_week: huidigWeek,
+        totaal_weken: totaalWeken
+      },
+      logboeken: {
+        ingevulde_weken: logboekStats[0]?.ingevulde_weken || 0,
+        totaal_dagen: dagItems[0]?.totaal_dagen || 0
+      },
+      evaluaties: evaluaties.map(e => ({
+        type: e.type_naam,
+        datum: e.datum
+      })),
+      overeenkomst: {
+        getekend_door_student: stage.getekend_door_student,
+        getekend_door_bedrijf: stage.getekend_door_bedrijf,
+        getekend_door_school: stage.getekend_door_school,
+        gevalideerd_op: stage.gevalideerd_op,
+        status: stage.overeenkomst_status
+      }
+    })
   } catch (err) {
     console.error(err)
     res.status(500).json({ fout: 'Serverfout' })
@@ -78,13 +256,18 @@ router.get('/:id', controleerToken, async (req, res) => {
       `SELECT sv.*, st.naam AS status,
               p.voornaam, p.achternaam, p.email AS student_email, s.studentnummer,
               o.naam AS opleiding,
-              b.naam AS bedrijf, b.adres, b.email AS bedrijf_email, b.telefoon
+              b.naam AS bedrijf, b.adres, b.email AS bedrijf_email, b.telefoon,
+              mp.voornaam AS mentor_voornaam, mp.achternaam AS mentor_achternaam, sm.functie AS mentor_functie,
+              aj.naam AS academiejaar
        FROM stagevoorstel sv
        JOIN stagevoorstel_status st ON sv.status_id = st.id
        JOIN student s ON sv.student_id = s.persoon_id
        JOIN persoon p ON s.persoon_id = p.id
        LEFT JOIN opleiding o ON s.opleiding_id = o.id
        JOIN bedrijf b ON sv.bedrijf_id = b.id
+       LEFT JOIN stagementor sm ON sv.mentor_id = sm.persoon_id
+       LEFT JOIN persoon mp ON sm.persoon_id = mp.id
+       LEFT JOIN academiejaar aj ON sv.academiejaar_id = aj.id
        WHERE sv.id = ?`,
       [req.params.id]
     )
@@ -102,11 +285,17 @@ router.get('/:id', controleerToken, async (req, res) => {
 
 /* Stagecommissie beoordeelt een voorstel */
 router.post('/:id/beoordeling', controleerToken, async (req, res) => {
-  /* beslissing = goedgekeurd, afgekeurd of aanpassing_vereist */
   const { beslissing, feedback } = req.body
 
+  if (!beslissing) {
+    return res.status(400).json({ fout: 'Beslissing is verplicht' })
+  }
+
+  if ((beslissing === 'afgekeurd' || beslissing === 'aanpassing_vereist') && (!feedback || feedback.trim() === '')) {
+    return res.status(400).json({ fout: 'Feedback is verplicht bij afkeuren of aanpassing' })
+  }
+
   try {
-    /* De beslissing en de nieuwe status hebben dezelfde naam */
     const [b] = await db.query('SELECT id FROM beslissing WHERE naam = ?', [beslissing])
     const [st] = await db.query('SELECT id FROM stagevoorstel_status WHERE naam = ?', [beslissing])
 
@@ -114,26 +303,60 @@ router.post('/:id/beoordeling', controleerToken, async (req, res) => {
       return res.status(400).json({ fout: 'Ongeldige beslissing' })
     }
 
-    /* Bewaar de beoordeling van de commissie */
     await db.query(
       `INSERT INTO commissie_beoordeling (stagevoorstel_id, commissielid_id, beslissing_id, feedback, beoordeeld_op)
        VALUES (?, ?, ?, ?, NOW())`,
       [req.params.id, req.gebruiker.id, b[0].id, feedback || null]
     )
 
-    /* Pas de status van het voorstel aan */
-    await db.query('UPDATE stagevoorstel SET status_id = ? WHERE id = ?', [st[0].id, req.params.id])
+    await db.query('UPDATE stagevoorstel SET status_id = ?, aangepast_op = NOW() WHERE id = ?', [st[0].id, req.params.id])
 
-    /* Bij goedkeuring meteen een lege overeenkomst aanmaken */
     if (beslissing === 'goedgekeurd') {
       const [os] = await db.query("SELECT id FROM overeenkomst_status WHERE naam = 'wacht_op_handtekeningen'")
-      await db.query(
-        'INSERT INTO stageovereenkomst (stagevoorstel_id, status_id) VALUES (?, ?)',
-        [req.params.id, os[0].id]
-      )
+      if (os.length > 0) {
+        await db.query(
+          'INSERT INTO stageovereenkomst (stagevoorstel_id, status_id) VALUES (?, ?)',
+          [req.params.id, os[0].id]
+        )
+      }
     }
 
     res.json({ bericht: 'Beoordeling opgeslagen' })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ fout: 'Serverfout' })
+  }
+})
+
+/* Haal alle docenten op (voor toewijzing) */
+router.get('/docenten/list', controleerToken, async (req, res) => {
+  try {
+    const [rijen] = await db.query(
+      `SELECT p.id, p.voornaam, p.achternaam, p.email, d.vakgroep
+       FROM persoon p
+       JOIN docent d ON p.id = d.persoon_id
+       WHERE p.actief = TRUE
+       ORDER BY p.achternaam`
+    )
+    res.json(rijen)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ fout: 'Serverfout' })
+  }
+})
+
+/* Haal alle mentoren op (voor toewijzing) */
+router.get('/mentoren/list', controleerToken, async (req, res) => {
+  try {
+    const [rijen] = await db.query(
+      `SELECT p.id, p.voornaam, p.achternaam, p.email, sm.functie, b.naam AS bedrijf_naam
+       FROM persoon p
+       JOIN stagementor sm ON p.id = sm.persoon_id
+       LEFT JOIN bedrijf b ON sm.bedrijf_id = b.id
+       WHERE p.actief = TRUE
+       ORDER BY p.achternaam`
+    )
+    res.json(rijen)
   } catch (err) {
     console.error(err)
     res.status(500).json({ fout: 'Serverfout' })
