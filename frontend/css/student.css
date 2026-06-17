@@ -1,85 +1,42 @@
-/* student */
+/* student - accentkleur rood (merkkleur) + student-specifieke stijlen */
 :root {
   --rol-accent: #8B0015;
   --rol-accent-hover: #750012;
-  --rol-accent-licht: #F7F7F7;
+  --rol-accent-licht: #FFF0F1;
 }
 
-.nav-item.actief {
-  background: var(--rol-accent);
-}
-
-.stat-kaart__icon {
-  color: var(--rol-accent);
-}
-
-.btn--primair {
-  background: var(--rol-accent);
-}
-
-.btn--primair:hover {
-  background: var(--rol-accent-hover);
-}
-
-.actie-kaart:hover {
-  border-color: var(--rol-accent);
-  color: var(--rol-accent);
-}
-
-input:focus,
-textarea:focus,
-select:focus {
-  border-color: var(--rol-accent);
-  box-shadow: 0 0 0 3px rgba(139, 0, 21, 0.12);
-}
-
-
-/*CSS dashboard*/
-
-.content-area {
-  background: #F7F7F7;
-  padding: 32px;
-}
-
+/* === Dashboard === */
 .dashboard-welcome {
-  margin-bottom: 32px;
+  margin-bottom: var(--sp-4);
 }
 
 .dashboard-welcome h1 {
   font-size: 32px;
-  margin-bottom: 8px;
-  color: #1E1E1E;
+  margin-bottom: var(--sp-2);
+  color: var(--color-text);
 }
 
 .dashboard-welcome p {
-  color: #555555;
+  color: var(--color-text-secondary);
 }
 
-.dashboard-card {
-  background: #FFFFFF;
-  border: 1px solid #D8D8D8;
-  border-radius: 4px;
-  padding: 24px;
-  margin-bottom: 24px;
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--sp-4);
 }
 
-.dashboard-card h2 {
-  margin-top: 0;
-  margin-bottom: 12px;
-}
-
+/* === Stage progress === */
 .stage-progress {
   position: relative;
   display: flex;
   justify-content: space-between;
   align-items: center;
-
-  background: #FFFFFF;
-  border: 1px solid #E4E4E4;
-  border-radius: 4px;
-
-  padding: 32px 32px 18px 32px;
-  margin-top: 16px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-sm);
+  padding: var(--sp-4);
+  margin-top: var(--sp-3);
 }
 
 .stage-step {
@@ -93,10 +50,9 @@ select:focus {
   display: block;
   width: 48px;
   height: 48px;
-  margin: 0 auto 16px auto;
-
+  margin: 0 auto var(--sp-3);
   border-radius: 50%;
-  background: #E9E9E9;
+  background: var(--color-border);
 }
 
 .stage-step.active span {
@@ -105,162 +61,28 @@ select:focus {
 
 .stage-step p {
   margin: 0;
-  color: #999999;
+  color: var(--color-text-muted);
   font-size: 15px;
   line-height: 1.3;
 }
 
-
-.btn-primary {
-  display: inline-block;
-  background: var(--rol-accent);
-  color: white;
-  padding: 12px 20px;
-  border-radius: 4px;
-  text-decoration: none;
-  font-weight: bold;
-}
-
-.btn-primary:hover {
-  background: var(--rol-accent-hover);
-}
-
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-}
-
-.btn-secondary {
-  color: var(--rol-accent);
-  text-decoration: none;
-  font-weight: bold;
-}
-
-.btn--succes {
-  background-color: #2E9E49;
-  color: white;
-  border: none;
-}
-
-.btn--succes:hover {
-  background-color: #24803a;
-}
-
-.btn--warning {
-  background-color: #E58A12;
-  color: white;
-  border: none;
-}
-
-.btn--warning:hover {
-  background-color: #c9750f;
-}
-
-/* ==========================================
-   STAGEOVEREENKOMST
-========================================== */
-
-.contract-wrapper {
-  display: flex;
-  justify-content: center;
-}
-
-.contract-document {
-  background: white;
-  padding: 32px;
-  border-radius: 8px;
-  border: 1px solid #D8D8D8;
-  max-width: 900px;
-  width: 100%;
-}
-
-.contract-title {
-  text-align: center;
-  margin-bottom: 30px;
-  color: #8B0015;
-}
-
-.contract-info {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.contract-info p {
-  margin: 0;
-  font-size: 15px;
-}
-
-.contract-text {
-  margin: 25px 0;
-  line-height: 1.7;
-  color: #555;
-}
-
-.signature-field {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 18px;
-}
-
-.signature-field label {
-  margin-bottom: 6px;
-  font-weight: 600;
-}
-
-.signature-field input {
-  padding: 10px;
-  border: 1px solid #D8D8D8;
-  border-radius: 4px;
-  font-size: 14px;
-}
-
-.signature-field input:disabled {
-  background: #f5f5f5;
-  color: #777;
-}
-
-#melding {
-  margin-bottom: 20px;
-  font-weight: 600;
-  color: #990018;
-}
-
-
-
 .stage-step.rejected span {
-  background-color: #dc3545;
+  background-color: var(--color-error);
 }
 
 .stage-step.rejected p {
-  color: #dc3545;
+  color: var(--color-error);
   font-weight: bold;
 }
 
-
-.warning span {
-  background-color: #E58A12;
-}
-
-
-
-.student-card {
-  background: white;
-  border: 1px solid #dddddd;
-  border-radius: 8px;
-  padding: 28px;
-  margin-bottom: 35px;
-  width: 100%;
-  max-width: none;
-}
-
+/* === Progress box === */
 .progress-box {
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  padding: 35px 45px 25px;
-  background: white;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  padding: var(--sp-4);
+  background: var(--color-bg-card);
   width: 100%;
+  margin-top: var(--sp-3);
 }
 
 .progress-container {
@@ -269,7 +91,6 @@ select:focus {
   justify-content: space-between;
   align-items: flex-start;
   width: 100%;
-  margin: 0 auto;
   max-width: 1100px;
   margin: 0 auto;
 }
@@ -278,8 +99,8 @@ select:focus {
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: #eeeeee;
-  margin-bottom: 14px;
+  background: var(--color-border);
+  margin-bottom: var(--sp-3);
 }
 
 .progress-track {
@@ -288,7 +109,7 @@ select:focus {
   left: 90px;
   right: 90px;
   height: 3px;
-  background-color: #eeeeee;
+  background-color: var(--color-border);
   z-index: 1;
 }
 
@@ -312,88 +133,31 @@ select:focus {
   text-align: center;
 }
 
-.progress-step.done .progress-circle {
-  background: #d7f5dd;
-}
-
 .progress-step span {
+  margin-top: var(--sp-2);
   font-size: 13px;
-  color: #8b8fa3;
+  color: var(--color-text-muted);
   line-height: 18px;
-}
-
-
-.student-card h2 {
-  margin-bottom: 22px;
-}
-
-.progress-box {
-  margin-top: 18px;
-}
-
-.progress-step span {
-  margin-top: 10px;
 }
 
 .progress-step.done .progress-circle {
   background: #d8f3df;
 }
 
-.student-card p {
-  margin-bottom: 25px;
-}
-
-.status-box {
-  display: inline-block;
-  background: #fff2b8;
-  color: #8B0015;
-  padding: 10px 16px;
-  border-radius: 6px;
-  font-weight: 600;
-  margin: 16px 0 24px;
-}
-
-.signature-overview {
-  margin: 20px 0 28px;
-}
-
-.signature-overview p {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border: 1px solid #dddddd;
-  border-radius: 6px;
-  padding: 16px;
-  margin-bottom: 12px;
-  background: #fafafa;
-}
-
-.status-ok {
-  color: #2e7d32;
-  font-weight: 700;
-}
-
-.status-wait {
-  color: #f59e0b;
-  font-weight: 700;
-}
-
-
-/*evaluatie*/
-
+/* === Evaluatie === */
 .evaluatie-overzicht {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 18px;
+  gap: var(--sp-3);
 }
 
-.evaluatie-overzicht>div,
+.evaluatie-overzicht > div,
 .competentie-card {
-  background: #f7f7f7;
-  border: 1px solid #d8d8d8;
-  border-radius: 6px;
-  padding: 18px;
-  margin-bottom: 16px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-3);
+  margin-bottom: var(--sp-3);
 }
 
 .competentie-card h3 {
@@ -403,7 +167,7 @@ select:focus {
 .competentie-card select,
 .competentie-card textarea {
   width: 100%;
-  margin: 8px 0 14px 0;
+  margin: var(--sp-1) 0 var(--sp-2);
 }
 
 .competentie-card textarea {
@@ -413,40 +177,32 @@ select:focus {
 .evaluatie-tabel {
   width: 100%;
   border-collapse: collapse;
-  margin-top: 16px;
+  margin-top: var(--sp-3);
 }
 
 .evaluatie-tabel th,
 .evaluatie-tabel td {
-  border: 1px solid #d8d8d8;
-  padding: 12px;
+  border: 1px solid var(--color-border);
+  padding: var(--sp-2);
   text-align: left;
   vertical-align: top;
 }
 
 .evaluatie-tabel th {
-  background: #f3f3f3;
+  background: var(--color-bg-table-head);
 }
 
 .zelfevaluatie-wrapper {
-  background: #d8d8d8;
-  padding: 24px;
-  border-radius: 4px;
-}
-
-.competentie-card {
-  background: white;
-  border: 1px solid #d8d8d8;
-  border-radius: 3px;
-  padding: 14px;
-  margin-bottom: 16px;
+  background: var(--color-border);
+  padding: var(--sp-4);
+  border-radius: var(--radius-sm);
 }
 
 .competentie-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 8px;
+  margin-bottom: var(--sp-2);
 }
 
 .competentie-header h3 {
@@ -456,20 +212,20 @@ select:focus {
 
 .gewicht {
   font-size: 12px;
-  color: #555;
+  color: var(--color-text-secondary);
 }
 
 .score-keuzes {
   display: grid;
   grid-template-columns: repeat(3, 1fr) 80px;
-  gap: 8px;
-  margin-bottom: 10px;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-2);
 }
 
 .score-optie {
-  border: 1px solid #d8d8d8;
-  background: #f7f7f7;
-  padding: 10px;
+  border: 1px solid var(--color-border);
+  background: var(--color-bg-page);
+  padding: var(--sp-2);
   font-size: 12px;
   cursor: pointer;
 }
@@ -479,8 +235,8 @@ select:focus {
 }
 
 .score-resultaat {
-  background: #f3f3f3;
-  border: 1px solid #d8d8d8;
+  background: var(--color-bg-table-head);
+  border: 1px solid var(--color-border);
   font-weight: bold;
   font-size: 20px;
   display: flex;
@@ -488,9 +244,80 @@ select:focus {
   justify-content: center;
 }
 
-.competentie-card textarea {
+/* === Actief stage dashboard === */
+.dashboard-welcome h1 {
+  font-size: 28px;
+  margin: 0 0 var(--sp-1);
+}
+
+.dashboard-card--wide {
+  grid-column: 1 / -1;
+}
+
+.info-rij {
+  margin-bottom: var(--sp-2);
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+.groot-nummer {
+  font-size: 32px;
+  font-weight: bold;
+  color: var(--color-text);
+  margin: var(--sp-2) 0;
+}
+
+.progress-balk-wrapper {
   width: 100%;
-  min-height: 45px;
-  border: 1px solid #d8d8d8;
-  padding: 10px;
+  height: 12px;
+  background: var(--color-border);
+  border-radius: 6px;
+  overflow: hidden;
+  margin: var(--sp-2) 0;
+}
+
+.progress-balk {
+  height: 100%;
+  background: var(--rol-accent, var(--color-success));
+  border-radius: 6px;
+  transition: width 0.5s ease;
+}
+
+.tekst-muted {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin: var(--sp-1) 0 0;
+}
+
+.actie-item {
+  padding: var(--sp-2) 0;
+  font-size: 14px;
+  color: var(--color-text);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.actie-item:last-child {
+  border-bottom: none;
+}
+
+.evaluatie-tabel-wrapper {
+  overflow-x: auto;
+}
+
+.evaluatie-tabel {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.evaluatie-tabel th,
+.evaluatie-tabel td {
+  border: 1px solid var(--color-border);
+  padding: var(--sp-2) var(--sp-3);
+  text-align: left;
+  font-size: 14px;
+}
+
+.evaluatie-tabel th {
+  background: var(--color-bg-table-head, #f5f5f5);
+  font-weight: 600;
 }
