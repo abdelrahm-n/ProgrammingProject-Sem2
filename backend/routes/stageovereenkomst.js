@@ -313,6 +313,7 @@ router.get("/student/:persoonId", controleerToken, async (req, res) => {
         os.id AS status_id,
         sv.id AS stagevoorstel_id,
         sv.omschrijving_opdracht,
+        sv.functie,
         sv.startdatum,
         sv.einddatum,
         sv.status_id AS voorstel_status_id,
@@ -328,6 +329,7 @@ router.get("/student/:persoonId", controleerToken, async (req, res) => {
         b.email AS email_bedrijf,
         b.telefoon AS telefoon_bedrijf,
         b.adres AS adres_bedrijf,
+
         sm.persoon_id AS mentor_persoon_id,
         mp.voornaam AS mentor_voornaam,
         mp.achternaam AS mentor_achternaam,
