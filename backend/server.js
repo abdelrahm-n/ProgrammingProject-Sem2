@@ -1,35 +1,31 @@
 import express from 'express'
 import cors from 'cors'
 import dotenv from 'dotenv'
-import path from 'path'
-import { fileURLToPath } from 'url'
+
+import authRoutes         from './routes/auth.js'
+import stagesRoutes       from './routes/stages.js'
+import logboekenRoutes    from './routes/logboeken.js'
+import evaluatiesRoutes   from './routes/evaluaties.js'
+import competentiesRoutes from './routes/competenties.js'
+import adminRoutes        from './routes/admin.js'
+import stageovereenkomstRoutes from "./routes/stageovereenkomst.js"
 
 dotenv.config()
 
-const app = express()
+const app  = express()
 const PORT = process.env.PORT || 3000
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url))
-
-// Middleware
 app.use(cors())
 app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
 
-// Serve static files from frontend folder
-app.use(express.static(path.join(__dirname, '../frontend')))
+app.use('/api/auth',              authRoutes)
+app.use('/api/stages',            stagesRoutes)
+app.use('/api/logboeken',         logboekenRoutes)
+app.use('/api/evaluaties',        evaluatiesRoutes)
+app.use('/api/competenties',      competentiesRoutes)
+app.use('/api/admin',             adminRoutes)
+app.use('/api/stageovereenkomst', stageovereenkomstRoutes)
 
-// Routes
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/index.html'))
-})
-
-// Health check
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'Server is running' })
-})
-
-// Start server
 app.listen(PORT, () => {
-  console.log(`🚀 Server draait op http://localhost:${PORT}`)
+  console.log(`Server draait op http://localhost:${PORT}`)
 })

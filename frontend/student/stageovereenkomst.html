@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Stageplatform - Student - Stageovereenkomst</title>
+
+  <link rel="stylesheet" href="../css/stijl.css" />
+  <link rel="stylesheet" href="../css/student.css" />
+</head>
+
+<body>
+  <div id="app">
+
+    <header class="header">
+      <div class="header-logo">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+          <path d="M2 17l10 5 10-5"/>
+          <path d="M2 12l10 5 10-5"/>
+        </svg>
+        <span class="header-logo-text">Stageplatform</span>
+      </div>
+
+      <div class="header-actions">
+        <span class="header-rol-badge">Student</span>
+        <button class="btn-terug" onclick="window.location.href='dashboard.html'">
+          Terug
+        </button>
+      </div>
+    </header>
+
+    <div class="app-body">
+
+      <nav class="sidebar">
+        <a href="dashboard.html" class="nav-item">Dashboard</a>
+        <a href="logboek.html" class="nav-item">Logboek</a>
+        <a href="evaluatie.html" class="nav-item">Evaluatie</a>
+        <a href="profiel.html" class="nav-item">Profiel</a>
+
+        <a href="../index.html" class="nav-item" id="uitlogBtn" style="margin-top:auto">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/>
+            <line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          Uitloggen
+        </a>
+      </nav>
+
+<main class="content-area">
+
+  <!-- STAP 1: OVERZICHT -->
+  <section id="stapOverzicht">
+    <section class="page-header">
+      <h1>Stageovereenkomst</h1>
+
+    </section>
+
+    <section class="student-card">
+      <h2>Voortgang van je stage</h2>
+
+      <div class="progress-box">
+          <div class="progress-container">
+
+            <div class="progress-track"></div>
+            <div class="progress-track-active"></div>
+
+
+            <div class="progress-step done">
+              <div class="progress-circle"></div>
+              <span>Aanvraag goedgekeurd</span>
+        </div>
+
+        <div class="progress-step active">
+          <div class="progress-circle"></div>
+          <span>Overeenkomst ondertekend</span>
+        </div>
+
+
+        <div class="progress-step">
+          <div class="progress-circle"></div>
+          <span>Activatie</span>
+        </div>
+
+
+        <div class="progress-step">
+          <div class="progress-circle"></div>
+          <span>Stage actief</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="student-card">
+      <h2>Stageovereenkomst</h2>
+      <p>
+        Je stageovereenkomst is klaar om gecontroleerd en ondertekend te worden.
+      </p>
+
+      <button type="button" id="bekijkBtn" class="btn-primary">
+        Bekijk en onderteken
+      </button>
+    </section>
+  </section>
+
+
+  <!-- STAP 2: CONTRACT -->
+  <section id="stapContract" style="display: none;">
+    <section class="page-header">
+      <h1>Stageovereenkomst ondertekenen</h1>
+      <p>Controleer je stageovereenkomst en plaats je handtekening.</p>
+    </section>
+
+    <section class="student-card">
+      <div class="contract-wrapper">
+        <div class="contract-document">
+
+          <h2 class="contract-title">STAGEOVEREENKOMST</h2>
+
+          <p id="melding" class="form-message"></p>
+
+          <div class="contract-info">
+            <p><strong>Status:</strong> <span id="status">Wacht op student</span></p>
+
+            <hr />
+
+            <p><strong>Student:</strong> <span id="studentNaam">Iman Obenali</span></p>
+            <p><strong>Studentnummer:</strong> <span id="studentnummer">123456</span></p>
+            <p><strong>Opleiding:</strong> <span id="opleiding">Toegepaste Informatica</span></p>
+            <p><strong>E-mail student:</strong> <span id="emailStudent">iman@student.ehb.be</span></p>
+
+            <hr />
+
+            <p><strong>Stagebedrijf:</strong> <span id="bedrijfNaam">Orange Belgium NV</span></p>
+            <p><strong>Contactpersoon:</strong> <span id="contactpersoon">Steven De Vla</span></p>
+            <p><strong>E-mail bedrijf:</strong> <span id="emailBedrijf">stage@orange.be</span></p>
+            <p><strong>Telefoon:</strong> <span id="telefoon">02 000 00 00</span></p>
+
+            <hr />
+
+            <p><strong>Stageperiode:</strong> <span id="stageperiode">15/02/2026 - 31/05/2026</span></p>
+            <p><strong>Functie:</strong> <span id="functie">Webdeveloper stagiair</span></p>
+            <p><strong>Stageopdracht:</strong> <span id="stageopdracht">Meewerken aan een interne webapplicatie.</span></p>
+          </div>
+
+          <hr />
+
+          <p class="contract-text">
+            Deze stageovereenkomst werd automatisch opgesteld op basis van de goedgekeurde stageaanvraag.
+            Door te ondertekenen verklaart de student akkoord te gaan met de voorwaarden van de stage.
+          </p>
+
+<div class="signature-status">
+  <div class="signature-row active-signature">
+    <div>
+      <strong>Handtekening student</strong>
+    </div>
+    <span id="studentCheck" class="signature-badge waiting">Nog niet ondertekend</span>
+  </div>
+
+  <div class="signature-row">
+    <div>
+      <strong>Handtekening bedrijf</strong>
+    </div>
+    <span id="bedrijfCheck" class="signature-badge pending">In afwachting</span>
+  </div>
+
+  <div class="signature-row">
+    <div>
+      <strong>Handtekening hogeschool</strong>
+    </div>
+    <span id="schoolCheck" class="signature-badge pending">In afwachting</span>
+  </div>
+</div>   
+<div class="signature-input-box">
+  <label for="studentHandtekening">Digitale handtekening student</label>
+  <input 
+    type="text" 
+    id="studentHandtekening" 
+    placeholder="Typ je volledige naam"
+  />
+  
+
+  <label class="checkbox-row">
+    <input type="checkbox" id="akkoordCheck" />
+    Ik bevestig dat ik deze stageovereenkomst heb gelezen en akkoord ga.
+  </label>
+</div>
+   
+ <button
+  type="button"
+  id="ondertekenBtn"
+  class="btn-primary"
+  disabled
+>
+  Ondertekenen als student
+</button>
+</div>
+      </div>
+    </section>
+  </section>
+
+
+  <!-- STAP 3: ACTIVATIE -->
+  <section id="stapActivatie" style="display: none;">
+    <section class="page-header">
+      <h1>Stage wacht op activering</h1>
+      <p>Je hebt de stageovereenkomst succesvol ondertekend.</p>
+    </section>
+
+    <section class="student-card">
+      <h2>Stage wacht op activering</h2>
+
+      <p>
+        De stageovereenkomst werd door jou ondertekend.
+        Nu moeten het bedrijf en de hogeschool nog ondertekenen.
+      </p>
+
+      <div class="status-box">
+        Status: Wacht op bedrijf
+      </div>
+
+      <div class="signature-overview">
+        <p><strong>Handtekening student:</strong> <span class="status-ok">Ontvangen</span></p>
+        <p><strong>Handtekening bedrijf:</strong> <span class="status-wait">In afwachting</span></p>
+        <p><strong>Handtekening hogeschool:</strong> <span class="status-wait">In afwachting</span></p>
+      </div>
+
+      <p><strong>Startdatum stage:</strong> 10 maart 2026</p>
+
+      <p>
+        Zodra alle partijen hebben ondertekend en de startdatum bereikt is,
+        wordt je stage automatisch geactiveerd. Daarna krijg je toegang tot logboeken en evaluaties.
+      </p>
+    </section>
+  </section>
+
+</main>    </div>
+  </div>
+
+  <script src="../js/nav.js"></script>
+  <script src="../js/stageovereenkomst.js"></script>
+</body>
+</html>

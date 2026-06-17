@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Stageplatform - Stageovereenkomst getekend</title>
+
+  <link rel="stylesheet" href="../css/stijl.css" />
+  <link rel="stylesheet" href="../css/student.css" />
+</head>
+
+<body>
+  <div id="app">
+
+    <header class="header">
+      <div class="header-logo">
+        <span class="header-logo-text">Stageplatform</span>
+      </div>
+
+      <div class="header-actions">
+        <span class="header-rol-badge">Student</span>
+        <button class="btn-terug" onclick="window.location.href='dashboard.html'">
+          Terug
+        </button>
+      </div>
+    </header>
+
+    <div class="app-body">
+
+      <nav class="sidebar">
+        <a href="dashboard.html" class="nav-item">Dashboard</a>
+        <a href="logboek.html" class="nav-item">Logboek</a>
+        <a href="evaluatie.html" class="nav-item">Evaluatie</a>
+        <a href="profiel.html" class="nav-item">Profiel</a>
+        <a href="../index.html" class="nav-item" style="margin-top:auto">Uitloggen</a>
+      </nav>
+
+      <main class="content-area">
+
+        <section class="page-header">
+          <h1>Stage wacht op activering</h1>
+          <p>Je hebt de stageovereenkomst succesvol ondertekend.</p>
+        </section>
+
+        <section class="student-card">
+  <h2>Voortgang van je stage</h2>
+
+  <div class="progress-box">
+    <div class="progress-container">
+
+      <div class="progress-track"></div>
+      <div class="progress-track-active progress-50"></div>
+
+      <div class="progress-step done">
+        <div class="progress-circle"></div>
+        <span>Aanvraag goedgekeurd</span>
+      </div>
+
+      <div class="progress-step done">
+        <div class="progress-circle"></div>
+        <span>Overeenkomst ondertekend</span>
+      </div>
+
+      <div class="progress-step active">
+        <div class="progress-circle"></div>
+        <span>Activatie</span>
+      </div>
+
+      <div class="progress-step">
+        <div class="progress-circle"></div>
+        <span>Stage actief</span>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+        <section class="student-card">
+          <h2>Ondertekeningsoverzicht</h2>
+
+          <div class="status-box">
+            Status: Wacht op bedrijf
+          </div>
+
+          <div class="signature-overview">
+            <p>
+              <strong>Handtekening student</strong>
+              <span class="status-ok">Ondertekend</span>
+            </p>
+
+            <p>
+              <strong>Handtekening bedrijf</strong>
+              <span class="status-wait">In afwachting</span>
+            </p>
+
+            <p>
+              <strong>Handtekening hogeschool</strong>
+              <span class="status-wait">In afwachting</span>
+            </p>
+          </div>
+
+          <p><strong>Volgende stap:</strong></p>
+          <p>
+            Je stageovereenkomst werd succesvol ondertekend.
+            De overeenkomst wacht momenteel op ondertekening door het bedrijf en de hogeschool.
+          </p>
+        </section>
+
+      </main>
+    </div>
+  </div>
+</body>
+</html>

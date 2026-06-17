@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="nl">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,13 +8,16 @@
   <link rel="stylesheet" href="../css/stijl.css" />
   <link rel="stylesheet" href="../css/student.css" />
 </head>
+
 <body>
 
   <div id="app">
     <header class="header">
       <div class="header-logo">
         <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+          <path d="M12 2L2 7l10 5 10-5-10-5z" />
+          <path d="M2 17l10 5 10-5" />
+          <path d="M2 12l10 5 10-5" />
         </svg>
         <span class="header-logo-text">Stageplatform</span>
       </div>
@@ -26,25 +30,150 @@
     <div class="app-body">
       <nav class="sidebar">
         <a href="dashboard.html" class="nav-item">Dashboard</a>
-        <a href="stage-indienen.html" class="nav-item">Stage indienen</a>
+        <a href="profiel.html" class="nav-item">Profiel</a>
         <a href="logboek.html" class="nav-item">Logboek</a>
         <a href="evaluatie.html" class="nav-item">Evaluatie</a>
         <a href="../index.html" class="nav-item" id="uitlogBtn" style="margin-top:auto">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-            <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
           </svg>
           Uitloggen
         </a>
       </nav>
 
       <main class="content-area">
-        <!-- inhoud komt hier -->
+
+        <div class="view-header">
+          <h1 class="view-titel">Evaluatie</h1>
+          <p class="view-subtitel">Bekijk je evaluatiemomenten en vul je zelfevaluaties in.</p>
+        </div>
+
+        <section class="dashboard-card">
+          <h2>Evaluatiemomenten</h2>
+
+          <div class="evaluatie-overzicht">
+            <div>
+              <strong>Tussentijdse evaluatie</strong>
+              <p>30 april 2026</p>
+              <span class="status-badge status-ingediend">Beschikbaar</span>
+
+              <button id="invullenTussenBtn" class="btn btn--primair" onclick="toonZelfevaluatie('tussen')">
+                Invullen
+              </button>
+
+              <span id="ingediendTussenBadge" class="status-badge status-goedgekeurd" style="display:none;">
+                Ingediend
+              </span>
+            </div>
+
+            <div>
+              <strong>Eindevaluatie</strong>
+              <p>31 mei 2026</p>
+              <span class="status-badge status-ingediend">Beschikbaar</span>
+
+              <button id="invullenEindeBtn" class="btn btn--primair" onclick="toonZelfevaluatie('einde')">
+                Invullen
+              </button>
+
+              <span id="ingediendEindeBadge" class="status-badge status-goedgekeurd" style="display:none;">
+                Ingediend
+              </span>
+            </div>
+          </div>
+        </section>
+
+        <section class="dashboard-card" id="zelfevaluatieCard" style="display:none;">
+          <h2 id="zelfevaluatieTitel">Zelfevaluatie</h2>
+          <p class="tekst-muted">Kies per competentie een score en voeg een korte reflectie toe.</p>
+
+          <div id="competentieLijst"></div>
+
+          <button class="btn btn--primair" onclick="zelfEvaluatieOpslaan()">
+            Indienen
+          </button>
+        </section>
+
+        <section class="dashboard-card">
+          <h2>Tussentijdse evaluatie</h2>
+
+          <p><strong>Studentenscore totaal:</strong> <span id="studentTussenTotaal">Nog niet ingevuld</span></p>
+          <p><strong>Mentorscore totaal:</strong> <span id="mentorTussenTotaal">Nog niet ingevuld door mentor</span></p>
+          <p><strong>Status:</strong> <span class="status-badge status-goedgekeurd">Tussentijdse evaluatie</span></p>
+
+          <table class="evaluatie-tabel">
+            <thead>
+              <tr>
+                <th>Competentie</th>
+                <th>Zelfscore student</th>
+                <th>Mentorscore</th>
+                <th>Reflectie student</th>
+                <th>Feedback mentor</th>
+              </tr>
+            </thead>
+            <tbody id="evaluatieResultaat">
+              <tr>
+                <td colspan="5">Nog geen tussentijdse evaluatiegegevens beschikbaar.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="dashboard-card">
+          <h2>Eindevaluatie</h2>
+
+          <p><strong>Studentenscore totaal:</strong> <span id="studentEindeTotaal">Nog niet ingevuld</span></p>
+          <p><strong>Mentorscore totaal:</strong> <span id="mentorEindeTotaal">Nog niet ingevuld door mentor</span></p>
+          <p><strong>Resultaat:</strong> <span id="eindResultaat" class="status-badge status-aanpassing">Nog niet
+              beschikbaar</span></p>
+
+          <table class="evaluatie-tabel">
+            <thead>
+              <tr>
+                <th>Competentie</th>
+                <th>Zelfscore student</th>
+                <th>Mentorscore</th>
+                <th>Reflectie student</th>
+                <th>Feedback mentor</th>
+              </tr>
+            </thead>
+            <tbody id="eindeEvaluatieResultaat">
+              <tr>
+                <td colspan="5">Nog geen eindevaluatiegegevens beschikbaar.</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="dashboard-card" id="eindoverzichtCard" style="display:none;">
+          <h2>Gefeliciteerd met het afronden van je stage!</h2>
+          <p>Hier vind je jouw definitieve eindoverzicht en beoordelingen.</p>
+
+          <div class="evaluatie-overzicht">
+            <div>
+              <strong>Eindscore</strong>
+              <h2><span id="eindscoreTotaal">0</span> / 100</h2>
+            </div>
+
+            <div>
+              <strong>Logboeken</strong>
+              <h2>60 / 60</h2>
+            </div>
+
+            <div>
+              <strong>Resultaat</strong><br>
+              <span class="status-badge status-goedgekeurd">Geslaagd</span>
+            </div>
+          </div>
+        </section>
+
       </main>
     </div>
   </div>
 
   <script src="../js/nav.js"></script>
-
+  <script src="../js/evaluatie-student.js"></script>
 </body>
+
 </html>

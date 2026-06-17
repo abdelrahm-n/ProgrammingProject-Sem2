@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>Stageplatform - Mentor - Stageovereenkomst</title>
+
+  <link rel="stylesheet" href="../css/stijl.css" />
+  <link rel="stylesheet" href="../css/student.css" />
+</head>
+
+<body>
+<div id="app">
+
+  <header class="header">
+    <div class="header-logo">
+      <span class="header-logo-text">Stageplatform</span>
+    </div>
+
+    <div class="header-actions">
+      <span class="header-rol-badge">Stagementor</span>
+      <button class="btn-terug" onclick="window.location.href='dashboard.html'">Terug</button>
+    </div>
+  </header>
+
+  <div class="app-body">
+
+    <nav class="sidebar">
+      <a href="dashboard.html" class="nav-item">Home</a>
+      <a href="stagiairs.html" class="nav-item actief">Stagiairs</a>
+      <a href="logboeken.html" class="nav-item">Logboeken</a>
+      <a href="evaluatie.html" class="nav-item">Evaluatie</a>
+      <a href="profiel.html" class="nav-item">Profiel</a>
+      <a href="../index.html" class="nav-item" style="margin-top:auto">Uitloggen</a>
+    </nav>
+
+    <main class="content-area">
+
+      <section class="page-header">
+        <h1>Stageovereenkomst ondertekenen</h1>
+        <p>Controleer de stageovereenkomst en plaats de handtekening namens het bedrijf.</p>
+      </section>
+
+      <section class="student-card">
+        <h2>Ondertekeningsstatus</h2>
+
+        <div class="signature-status">
+          <div class="signature-row">
+            <strong>Handtekening student</strong>
+            <span class="signature-badge done">Ondertekend</span>
+          </div>
+
+          <div class="signature-row active-signature">
+            <strong>Handtekening bedrijf</strong>
+            <span class="signature-badge waiting">Nog niet ondertekend</span>
+          </div>
+
+          <div class="signature-row">
+            <strong>Handtekening hogeschool</strong>
+            <span class="signature-badge pending">In afwachting</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="student-card">
+        <div class="contract-wrapper">
+          <div class="contract-document">
+
+            <h2 class="contract-title">STAGEOVEREENKOMST</h2>
+
+            <div class="contract-info">
+              <p><strong>Status:</strong> Wacht op bedrijf</p>
+
+              <hr />
+
+              <p><strong>Student:</strong> <span id="studentNaam"></span></p>
+                <p><strong>Opleiding:</strong> <span id="opleiding"></span></p>
+                <p><strong>Stagebedrijf:</strong> <span id="bedrijfNaam"></span></p>
+                <p><strong>Contactpersoon bedrijf:</strong> <span id="contactpersoon"></span></p>
+
+              <hr />
+
+              <p><strong>Stageperiode:</strong> <span id="stageperiode"></span></p>
+                <p><strong>Functie:</strong> <span id="functie"></span></p>
+                <p><strong>Stageopdracht:</strong> <span id="stageopdracht"></span></p>
+            </div>
+
+            <hr />
+
+            <p class="contract-text">
+              Deze stageovereenkomst werd opgesteld op basis van de goedgekeurde stageaanvraag.
+              Door te ondertekenen bevestigt het bedrijf akkoord te gaan met de stagevoorwaarden.
+            </p>
+
+            <div class="signature-input-box">
+              <label for="bedrijfHandtekening">Digitale handtekening bedrijf</label>
+              <input 
+                type="text" 
+                id="bedrijfHandtekening" 
+                placeholder="Typ je volledige naam"
+              />
+
+              <label class="checkbox-row">
+                <input type="checkbox" id="bedrijfAkkoordCheck" />
+                Ik bevestig dat ik deze stageovereenkomst namens het bedrijf heb gelezen en goedkeur.
+              </label>
+            </div>
+
+            <button type="button" id="bedrijfOndertekenBtn" class="btn-primary" disabled>
+              Ondertekenen als bedrijf
+            </button>
+
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<script>
+const params = new URLSearchParams(window.location.search);
+const student = params.get("student");
+
+const studenten = {
+  iman: {
+    naam: "Iman Obenali",
+    opleiding: "Toegepaste Informatica",
+    bedrijf: "Orange Belgium NV",
+    contactpersoon: "Steven De Vla",
+    periode: "10/03/2026 - 31/05/2026",
+    functie: "Webdeveloper stagiair",
+    opdracht: "Meewerken aan een interne webapplicatie."
+  },
+
+  ranya: {
+    naam: "Ranya Rabib",
+    opleiding: "Toegepaste Informatica",
+    bedrijf: "Orange Belgium NV",
+    contactpersoon: "Steven De Vla",
+    periode: "10/03/2026 - 31/05/2026",
+    functie: "Frontend developer stagiair",
+    opdracht: "Ondersteunen bij de ontwikkeling van de gebruikersinterface."
+  },
+
+  ryan: {
+    naam: "Ryan Machiels",
+    opleiding: "Toegepaste Informatica",
+    bedrijf: "Orange Belgium NV",
+    contactpersoon: "Steven De Vla",
+    periode: "10/03/2026 - 31/05/2026",
+    functie: "Backend developer stagiair",
+    opdracht: "Meewerken aan API-routes en databankkoppelingen."
+  }
+};
+
+const data = studenten[student] || studenten.iman;
+
+document.getElementById("studentNaam").textContent = data.naam;
+document.getElementById("opleiding").textContent = data.opleiding;
+document.getElementById("bedrijfNaam").textContent = data.bedrijf;
+document.getElementById("contactpersoon").textContent = data.contactpersoon;
+document.getElementById("stageperiode").textContent = data.periode;
+document.getElementById("functie").textContent = data.functie;
+document.getElementById("stageopdracht").textContent = data.opdracht;
+
+  const bedrijfInput = document.getElementById("bedrijfHandtekening");
+  const bedrijfCheck = document.getElementById("bedrijfAkkoordCheck");
+  const bedrijfBtn = document.getElementById("bedrijfOndertekenBtn");
+
+  function controleerBedrijfOndertekening() {
+    const naamIngevuld = bedrijfInput.value.trim().length >= 2;
+    const akkoord = bedrijfCheck.checked;
+
+    bedrijfBtn.disabled = !(naamIngevuld && akkoord);
+  }
+
+  bedrijfInput.addEventListener("input", controleerBedrijfOndertekening);
+  bedrijfCheck.addEventListener("change", controleerBedrijfOndertekening);
+
+bedrijfBtn.addEventListener("click", () => {
+  window.location.href = `stageovereenkomst-getekend.html?student=${student}`;
+});
+</script>
+
+
+
+</body>
+</html>
