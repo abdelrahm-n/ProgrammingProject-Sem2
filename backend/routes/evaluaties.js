@@ -4,7 +4,44 @@ import controleerToken from '../middleware/controleerToken.js'
 
 const router = express.Router()
 
-/* GET /api/evaluaties/mijn - student haalt zijn eigen evaluaties op */
+/* Haal een evaluatie op en controleer of de gebruiker het mag zien.
+   Studenten: alleen eigen evaluaties. Mentoren/docenten: alleen hun eigen stages. */
+async function haalEvaluatieOpMetToegang(req, res, evaluatieId) {
+  const [rijen] = await db.query(
+    `SELECT em.*, et.naam AS type_naam, s.student_id
+     FROM evaluatie_moment em
+     JOIN evaluatie_type et ON em.type_id = et.id
+     JOIN stage s ON em.stage_id = s.id
+     WHERE em.id = ?`,
+    [evaluatieId]
+  )
+
+  if (rijen.length === 0) {
+    res.status(404).json({ fout: 'Evaluatiemoment niet gevonden' })
+    return null
+  }
+
+  const evaluatie = rijen[0]
+
+  if (req.gebruiker.rol === 'student' && evaluatie.student_id !== req.gebruiker.id) {
+    res.status(403).json({ fout: 'Je mag alleen je eigen evaluaties bekijken' })
+    return null
+  }
+
+  if (req.gebruiker.rol === 'stagementor' && evaluatie.mentor_id !== req.gebruiker.id) {
+    res.status(403).json({ fout: 'Je mag alleen evaluaties van je eigen stagiairs bekijken' })
+    return null
+  }
+
+  if (req.gebruiker.rol === 'docent' && evaluatie.docent_id !== req.gebruiker.id) {
+    res.status(403).json({ fout: 'Je mag alleen evaluaties van je eigen studenten bekijken' })
+    return null
+  }
+
+  return evaluatie
+}
+
+/* Haal eigen evaluaties op (student) */
 router.get('/mijn', controleerToken, async (req, res) => {
   try {
     const [rijen] = await db.query(
@@ -23,9 +60,19 @@ router.get('/mijn', controleerToken, async (req, res) => {
   }
 })
 
-/* GET /api/evaluaties/stage/:stageId - evaluaties van een specifieke stage */
+/* Haal evaluaties op voor een specifieke stage */
 router.get('/stage/:stageId', controleerToken, async (req, res) => {
   try {
+    const [stage] = await db.query('SELECT student_id FROM stage WHERE id = ?', [req.params.stageId])
+
+    if (stage.length === 0) {
+      return res.status(404).json({ fout: 'Stage niet gevonden' })
+    }
+
+    if (req.gebruiker.rol === 'student' && stage[0].student_id !== req.gebruiker.id) {
+      return res.status(403).json({ fout: 'Je mag alleen je eigen stage evalueren' })
+    }
+
     const [rijen] = await db.query(
       `SELECT em.*, et.naam AS type_naam
        FROM evaluatie_moment em
@@ -41,9 +88,12 @@ router.get('/stage/:stageId', controleerToken, async (req, res) => {
   }
 })
 
-/* GET /api/evaluaties/:id/beoordelingen - haal competentiebeoordelingen op */
+/* Haal competentiebeoordelingen op voor een evaluatie */
 router.get('/:id/beoordelingen', controleerToken, async (req, res) => {
   try {
+    const evaluatie = await haalEvaluatieOpMetToegang(req, res, req.params.id)
+    if (!evaluatie) return
+
     const [rijen] = await db.query(
       `SELECT cb.*, c.naam AS competentie_naam, c.gewicht
        FROM competentie_beoordeling cb
@@ -59,7 +109,7 @@ router.get('/:id/beoordelingen', controleerToken, async (req, res) => {
   }
 })
 
-/* POST /api/evaluaties - maak een nieuw evaluatiemoment aan */
+/* Maak een nieuw evaluatiemoment aan (docent of mentor) */
 router.post('/', controleerToken, async (req, res) => {
   const { stage_id, type_id, datum } = req.body
 
@@ -67,10 +117,13 @@ router.post('/', controleerToken, async (req, res) => {
     return res.status(400).json({ fout: 'Stage, type en datum zijn verplicht' })
   }
 
+  if (!['docent', 'stagementor'].includes(req.gebruiker.rol)) {
+    return res.status(403).json({ fout: 'Alleen docenten en mentoren mogen evaluaties aanmaken' })
+  }
+
   try {
-    /* Bepaal of de ingelogde persoon docent of mentor is */
     const docent_id = req.gebruiker.rol === 'docent' ? req.gebruiker.id : null
-    const mentor_id = req.gebruiker.rol === 'mentor' ? req.gebruiker.id : null
+    const mentor_id = req.gebruiker.rol === 'stagementor' ? req.gebruiker.id : null
 
     const [resultaat] = await db.query(
       `INSERT INTO evaluatie_moment (stage_id, docent_id, mentor_id, type_id, datum)
@@ -78,7 +131,6 @@ router.post('/', controleerToken, async (req, res) => {
       [stage_id, docent_id, mentor_id, type_id, datum]
     )
 
-    /* Maak automatisch een beoordeling aan voor elke actieve competentie */
     const [competenties] = await db.query(
       'SELECT id FROM competentie WHERE actief = TRUE'
     )
@@ -97,7 +149,7 @@ router.post('/', controleerToken, async (req, res) => {
   }
 })
 
-/* PUT /api/evaluaties/:id/reflectie - student vult reflectie in per competentie */
+/* Student vult reflectie in per competentie */
 router.put('/:id/reflectie', controleerToken, async (req, res) => {
   const { competentie_id, student_reflectie } = req.body
 
@@ -106,6 +158,13 @@ router.put('/:id/reflectie', controleerToken, async (req, res) => {
   }
 
   try {
+    const evaluatie = await haalEvaluatieOpMetToegang(req, res, req.params.id)
+    if (!evaluatie) return
+
+    if (req.gebruiker.rol !== 'student') {
+      return res.status(403).json({ fout: 'Alleen studenten mogen reflecties invullen' })
+    }
+
     await db.query(
       `UPDATE competentie_beoordeling
        SET student_reflectie = ?
@@ -119,7 +178,7 @@ router.put('/:id/reflectie', controleerToken, async (req, res) => {
   }
 })
 
-/* PUT /api/evaluaties/:id/score - mentor geeft score per competentie */
+/* Mentor geeft score per competentie */
 router.put('/:id/score', controleerToken, async (req, res) => {
   const { competentie_id, mentor_score, mentor_feedback } = req.body
 
@@ -128,6 +187,13 @@ router.put('/:id/score', controleerToken, async (req, res) => {
   }
 
   try {
+    const evaluatie = await haalEvaluatieOpMetToegang(req, res, req.params.id)
+    if (!evaluatie) return
+
+    if (req.gebruiker.rol !== 'stagementor') {
+      return res.status(403).json({ fout: 'Alleen mentoren mogen scores geven' })
+    }
+
     await db.query(
       `UPDATE competentie_beoordeling
        SET mentor_score = ?, mentor_feedback = ?
@@ -141,7 +207,7 @@ router.put('/:id/score', controleerToken, async (req, res) => {
   }
 })
 
-/* PUT /api/evaluaties/:id/docent-feedback - docent geeft feedback per competentie */
+/* Docent geeft feedback per competentie */
 router.put('/:id/docent-feedback', controleerToken, async (req, res) => {
   const { competentie_id, docent_feedback } = req.body
 
@@ -150,6 +216,13 @@ router.put('/:id/docent-feedback', controleerToken, async (req, res) => {
   }
 
   try {
+    const evaluatie = await haalEvaluatieOpMetToegang(req, res, req.params.id)
+    if (!evaluatie) return
+
+    if (req.gebruiker.rol !== 'docent') {
+      return res.status(403).json({ fout: 'Alleen docenten mogen feedback geven' })
+    }
+
     await db.query(
       `UPDATE competentie_beoordeling
        SET docent_feedback = ?
@@ -163,11 +236,18 @@ router.put('/:id/docent-feedback', controleerToken, async (req, res) => {
   }
 })
 
-/* PUT /api/evaluaties/:id/afsluiten - docent sluit evaluatie af met eindscore */
+/* Docent sluit evaluatie af met eindscore */
 router.put('/:id/afsluiten', controleerToken, async (req, res) => {
   const { eindresultaat_score, algemene_feedback } = req.body
 
   try {
+    const evaluatie = await haalEvaluatieOpMetToegang(req, res, req.params.id)
+    if (!evaluatie) return
+
+    if (req.gebruiker.rol !== 'docent') {
+      return res.status(403).json({ fout: 'Alleen docenten mogen evaluaties afsluiten' })
+    }
+
     await db.query(
       `UPDATE evaluatie_moment
        SET eindresultaat_score = ?, algemene_feedback = ?
