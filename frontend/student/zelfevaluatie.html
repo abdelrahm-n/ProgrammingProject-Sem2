@@ -119,6 +119,9 @@
         melding.style.display = 'block';
         return;
       }
+      // Markeer de tussentijdse zelfreflectie als ingediend
+      localStorage.setItem('zelfeval_tussentijds_ingediend', 'true');
+
       melding.textContent = 'Zelfevaluatie ingediend!';
       melding.style.color = '#2E9E49';
       melding.style.display = 'block';

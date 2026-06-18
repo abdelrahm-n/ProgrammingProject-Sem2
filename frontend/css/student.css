@@ -397,6 +397,11 @@
   color: #1d4ed8;
 }
 
+.eval-status--ingediend {
+  background: #9ca3af;
+  color: #ffffff;
+}
+
 .btn-eval-invullen {
   background: #6b7280;
   color: #ffffff;
