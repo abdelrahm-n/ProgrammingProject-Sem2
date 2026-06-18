@@ -126,11 +126,11 @@
           </td>
           <td>${escape(s.opleiding) || '-'}</td>
           <td><span class="logboek-status">${s.aantal_weken} week/weken</span></td>
-          <td><button class="btn-open" data-id="${s.student_id}">Open</button></td>`;
+           <td><button class="btn btn--secundair btn--sm" data-id="${s.student_id}">Open</button></td>`;
         body.appendChild(rij);
       });
 
-      document.querySelectorAll('.btn-open').forEach(btn => {
+      document.querySelectorAll('.btn[data-id]').forEach(btn => {
         btn.addEventListener('click', () => {
           window.location.href = 'logboeken-detail.html?student=' + btn.dataset.id;
         });
