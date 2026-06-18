@@ -7,7 +7,6 @@
   <link rel="stylesheet" href="../css/stijl.css" />
   <link rel="stylesheet" href="../css/mentor.css" />
   <style>
-    /* Evaluatie-lijst (in de pagina zelf zodat de opmaak altijd werkt) */
     .eval-titel {
       font-size: 16px;
       font-weight: 800;
@@ -15,29 +14,14 @@
       color: #111827;
       margin: 0 0 22px 0;
     }
-    .eval-tabel {
-      width: 100%;
-      max-width: 900px;
-      border-collapse: collapse;
-    }
+    .eval-tabel { width: 100%; max-width: 900px; border-collapse: collapse; }
     .eval-tabel th {
-      text-align: left;
-      font-size: 13px;
-      font-weight: 600;
-      color: #6b7280;
-      padding: 0 16px 14px 0;
+      text-align: left; font-size: 13px; font-weight: 600; color: #6b7280; padding: 0 16px 14px 0;
     }
     .eval-tabel td {
-      padding: 18px 16px 18px 0;
-      font-size: 16px;
-      color: #111827;
-      border-top: 1px solid #ececec;
+      padding: 18px 16px 18px 0; font-size: 16px; color: #111827; border-top: 1px solid #ececec;
     }
-    .eval-evalueren {
-      color: #111827;
-      text-decoration: none;
-      font-weight: 600;
-    }
+    .eval-evalueren { color: #111827; text-decoration: none; font-weight: 600; }
     .eval-evalueren:hover { text-decoration: underline; }
   </style>
 </head>
@@ -77,27 +61,8 @@
               <th></th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td>Ryan Machiels</td>
-              <td>Toegepaste Informatica</td>
-              <td><a href="evaluatie-student.html?naam=Ryan%20Machiels&opleiding=Toegepaste%20Informatica" class="eval-evalueren">Evalueren</a></td>
-            </tr>
-            <tr>
-              <td>Abdelrahman</td>
-              <td>Toegepaste Informatica</td>
-              <td><a href="evaluatie-student.html?naam=Abdelrahman&opleiding=Toegepaste%20Informatica" class="eval-evalueren">Evalueren</a></td>
-            </tr>
-            <tr>
-              <td>Iman Obenali</td>
-              <td>Toegepaste Informatica</td>
-              <td><a href="evaluatie-student.html?naam=Iman%20Obenali&opleiding=Toegepaste%20Informatica" class="eval-evalueren">Evalueren</a></td>
-            </tr>
-            <tr>
-              <td>Ranya Rabib</td>
-              <td>Toegepaste Informatica</td>
-              <td><a href="evaluatie-student.html?naam=Ranya%20Rabib&opleiding=Toegepaste%20Informatica" class="eval-evalueren">Evalueren</a></td>
-            </tr>
+          <tbody id="studentenBody">
+            <tr><td colspan="3">Laden...</td></tr>
           </tbody>
         </table>
       </main>
@@ -105,5 +70,45 @@
   </div>
 
   <script src="../js/nav.js"></script>
+  <script>
+    const API_URL = 'http://localhost:3000';
+    const token = localStorage.getItem('token') || '';
+    const body = document.getElementById('studentenBody');
+
+    function escape(t){ if(t==null) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+
+    (async function () {
+      let studenten;
+      try {
+        const res = await fetch(API_URL + '/api/mentor/mijn-stagiairs', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (!res.ok) throw new Error('niet ok');
+        studenten = await res.json();
+      } catch (e) {
+        body.innerHTML = '<tr><td colspan="3">Kon studenten niet laden. Log opnieuw in als stagementor.</td></tr>';
+        return;
+      }
+
+      if (!studenten.length) {
+        body.innerHTML = '<tr><td colspan="3">Je hebt nog geen toegewezen stagiairs.</td></tr>';
+        return;
+      }
+
+      body.innerHTML = '';
+      studenten.forEach(s => {
+        const naam = s.voornaam + ' ' + s.achternaam;
+        const url = `evaluatie-student.html?stage=${s.stage_id}`
+          + `&naam=${encodeURIComponent(naam)}`
+          + `&opleiding=${encodeURIComponent(s.opleiding || '')}`;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${escape(naam)}</td>
+          <td>${escape(s.opleiding) || '-'}</td>
+          <td><a href="${url}" class="eval-evalueren">Evalueren</a></td>`;
+        body.appendChild(tr);
+      });
+    })();
+  </script>
 </body>
 </html>

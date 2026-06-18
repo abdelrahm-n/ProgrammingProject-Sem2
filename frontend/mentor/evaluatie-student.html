@@ -101,6 +101,7 @@
   <script src="../js/nav.js"></script>
   <script>
     const params = new URLSearchParams(window.location.search);
+    const stage = params.get('stage') || '';
     const naam = params.get('naam') || 'Student';
     const opleiding = params.get('opleiding') || '';
     document.getElementById('studentNaam').textContent = naam;
@@ -111,10 +112,13 @@
       knop.addEventListener('click', (e) => {
         const doel = knop.dataset.doel;
         const type = knop.dataset.type;
-        const q = `?naam=${encodeURIComponent(naam)}&opleiding=${encodeURIComponent(opleiding)}&type=${type}`;
-        if (doel === 'zelfreflectie') {
+        const q = `?stage=${encodeURIComponent(stage)}&naam=${encodeURIComponent(naam)}&opleiding=${encodeURIComponent(opleiding)}&type=${type}`;
+        if (doel === 'zelfreflectie' && type === 'tussentijds') {
           e.preventDefault();
           window.location.href = 'evaluatie-zelfreflectie.html' + q;
+        } else if (doel === 'zelfreflectie' && type === 'eind') {
+          e.preventDefault();
+          window.location.href = 'evaluatie-eind.html' + q;
         }
       });
     });
