@@ -117,5 +117,45 @@
       </main>
     </div>
   </div>
+
+  <script src="../js/nav.js"></script>
+  <script>
+    (async function() {
+      var API = "http://localhost:3000";
+      var token = localStorage.getItem("token");
+      if (!token) return;
+
+      try {
+        var resp = await fetch(API + "/api/stageovereenkomst/mijn", {
+          headers: { "Authorization": "Bearer " + token }
+        });
+        if (!resp.ok) return;
+        var data = await resp.json();
+
+        var statusBox = document.querySelector(".status-box");
+        var sigs = document.querySelectorAll(".signature-overview p span");
+
+        if (data.getekend_door_bedrijf && data.getekend_door_school) {
+          if (statusBox) statusBox.textContent = "Status: Alle handtekeningen ontvangen";
+        } else if (data.getekend_door_bedrijf) {
+          if (statusBox) statusBox.textContent = "Status: Wacht op hogeschool";
+        } else {
+          if (statusBox) statusBox.textContent = "Status: Wacht op bedrijf";
+        }
+
+        if (sigs[0]) { sigs[0].textContent = "Ondertekend"; sigs[0].className = "status-ok"; }
+        if (sigs[1]) {
+          sigs[1].textContent = data.getekend_door_bedrijf ? "Ondertekend" : "In afwachting";
+          sigs[1].className = data.getekend_door_bedrijf ? "status-ok" : "status-wait";
+        }
+        if (sigs[2]) {
+          sigs[2].textContent = data.getekend_door_school ? "Ondertekend" : "In afwachting";
+          sigs[2].className = data.getekend_door_school ? "status-ok" : "status-wait";
+        }
+      } catch (err) {
+        console.error("Fout bij ophalen status:", err);
+      }
+    })();
+  </script>
 </body>
 </html>
