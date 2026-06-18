@@ -132,6 +132,7 @@ async function laadBeoordelingen(evaluatieId) {
       rij.innerHTML = `
         <p style="font-weight:bold;margin-bottom:8px">${b.competentie_naam}</p>
 
+        ${b.student_score != null ? `<p style="margin-bottom:4px"><em>Zelfscore student:</em> ${b.student_score}/5</p>` : ''}
         ${b.student_reflectie ? `<p style="margin-bottom:8px"><em>Reflectie student:</em> ${b.student_reflectie}</p>` : '<p class="tekst-muted" style="margin-bottom:8px">Student heeft nog geen reflectie ingevuld.</p>'}
         ${b.mentor_score !== null ? `<p style="margin-bottom:8px"><strong>Score mentor:</strong> ${b.mentor_score}/10 &mdash; ${b.mentor_feedback || 'geen feedback'}</p>` : ''}
 

@@ -90,15 +90,38 @@
 
   <script src="../js/nav.js"></script>
   <script>
-    // Na het indienen van de zelfevaluatie tonen we de juiste statussen
-    if (localStorage.getItem('zelfeval_tussentijds_ingediend') === 'true') {
-      const tussen = document.getElementById('tussenStatus');
-      tussen.textContent = 'In afwachting';
-      tussen.className = 'eval-status eval-status--wacht';
+    const API_URL = 'http://localhost:3000';
+    const token = localStorage.getItem('token') || '';
 
-      document.getElementById('zelfreflectieActie').innerHTML =
-        '<span class="eval-status eval-status--ingediend">Ingediend</span>';
-    }
+    // Toon "Ingediend"/"In afwachting" op basis van de database
+    (async function () {
+      if (!token) return;
+      try {
+        const resM = await fetch(API_URL + '/api/evaluaties/mijn', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const momenten = await resM.json();
+        const tussen = momenten.find(m => m.type_naam === 'tussentijdse_evaluatie') || momenten[0];
+        if (!tussen) return;
+
+        const resB = await fetch(API_URL + '/api/evaluaties/' + tussen.id + '/beoordelingen', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const beoordelingen = await resB.json();
+
+        // Zelfreflectie is "ingediend" als de student alles ingevuld heeft
+        const ingediend = beoordelingen.length > 0 &&
+          beoordelingen.every(b => b.student_score != null && b.student_reflectie);
+
+        if (ingediend) {
+          const t = document.getElementById('tussenStatus');
+          t.textContent = 'In afwachting';
+          t.className = 'eval-status eval-status--wacht';
+          document.getElementById('zelfreflectieActie').innerHTML =
+            '<span class="eval-status eval-status--ingediend">Ingediend</span>';
+        }
+      } catch (e) { /* laat standaard 'Gepland' + Invullen staan */ }
+    })();
   </script>
 </body>
 
