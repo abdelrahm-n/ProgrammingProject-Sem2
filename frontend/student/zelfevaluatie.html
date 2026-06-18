@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="nl">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stageplatform - Student - Zelfevaluatie</title>
+  <link rel="stylesheet" href="../css/stijl.css" />
+  <link rel="stylesheet" href="../css/student.css" />
+</head>
+
+<body>
+
+  <div id="app">
+    <header class="header">
+      <div class="header-logo">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5z" />
+          <path d="M2 17l10 5 10-5" />
+          <path d="M2 12l10 5 10-5" />
+        </svg>
+        <span class="header-logo-text">Stageplatform</span>
+      </div>
+      <div class="header-actions">
+        <span class="header-rol-badge">Student</span>
+        <button class="btn-terug" onclick="window.location.href='evaluatie.html'">Terug</button>
+      </div>
+    </header>
+
+    <div class="app-body">
+      <nav class="sidebar">
+        <a href="dashboard.html" class="nav-item">Dashboard</a>
+        <a href="logboek.html" class="nav-item">Logboek</a>
+        <a href="evaluatie.html" class="nav-item actief">Evaluatie</a>
+        <a href="profiel.html" class="nav-item">Profiel</a>
+        <a href="../index.html" class="nav-item" id="uitlogBtn" style="margin-top:auto">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+            <polyline points="16 17 21 12 16 7" />
+            <line x1="21" y1="12" x2="9" y2="12" />
+          </svg>
+          Uitloggen
+        </a>
+      </nav>
+
+      <main class="content-area">
+        <div class="view-header">
+          <h1 class="view-titel">Zelfevaluatie + tussentijdse evaluatie</h1>
+          <p class="view-subtitel">
+            Kies per competentie de score die het best bij je past en voeg een korte reflectie toe.
+            Deze zelfevaluatie wordt samen met de mentor besproken tijdens de tussentijdse evaluatie.
+          </p>
+        </div>
+
+        <div class="zelfevaluatie-wrapper">
+          <div id="competentieLijst"></div>
+
+          <button type="button" class="btn btn--primair" id="indienenBtn" style="margin-top:8px;">indienen</button>
+          <p id="evalMelding" style="display:none; margin-top:12px; font-weight:600;"></p>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../js/nav.js"></script>
+  <script>
+    // Competenties zoals in de mockup (LO5 - LO9)
+    const competenties = [
+      { code: 'LO5', naam: 'Onderzoekende houding' },
+      { code: 'LO6', naam: 'Communicatie' },
+      { code: 'LO7', naam: 'Probleemoplossend vermogen' },
+      { code: 'LO8', naam: 'Persoonlijke ontwikkeling' },
+      { code: 'LO9', naam: 'Professionele attitude' }
+    ];
+
+    const scoreOpties = [
+      { punten: 1, label: 'Zwak',      tekst: 'Voldoet nog niet aan de verwachtingen, heeft veel begeleiding nodig.' },
+      { punten: 3, label: 'Goed',      tekst: 'Voldoet aan de verwachtingen en werkt grotendeels zelfstandig.' },
+      { punten: 5, label: 'Uitstekend', tekst: 'Overtreft de verwachtingen en neemt zelf initiatief.' }
+    ];
+
+    const lijst = document.getElementById('competentieLijst');
+
+    competenties.forEach((c, i) => {
+      const card = document.createElement('div');
+      card.className = 'competentie-card';
+
+      const optiesHtml = scoreOpties.map(o => `
+        <label class="score-optie">
+          <input type="radio" name="score-${i}" value="${o.punten}" onchange="updateScore(${i}, ${o.punten})">
+          <strong>${o.punten} punt${o.punten > 1 ? 'en' : ''} - ${o.label}</strong><br>
+          <span>${o.tekst}</span>
+        </label>`).join('');
+
+      card.innerHTML = `
+        <div class="competentie-header">
+          <h3>${c.code} - ${c.naam}</h3>
+          <span class="gewicht">Score</span>
+        </div>
+        <div class="score-keuzes">
+          ${optiesHtml}
+          <div class="score-resultaat" id="resultaat-${i}">-/5</div>
+        </div>
+        <textarea placeholder="In deze tekstbox kan je je reflectie schrijven over deze competentie..."></textarea>`;
+      lijst.appendChild(card);
+    });
+
+    function updateScore(index, punten) {
+      document.getElementById('resultaat-' + index).textContent = punten + '/5';
+    }
+
+    document.getElementById('indienenBtn').addEventListener('click', () => {
+      const melding = document.getElementById('evalMelding');
+      // Controle: alle competenties een score?
+      const ingevuld = competenties.every((c, i) => document.querySelector(`input[name="score-${i}"]:checked`));
+      if (!ingevuld) {
+        melding.textContent = 'Gelieve voor elke competentie een score te kiezen.';
+        melding.style.color = '#990018';
+        melding.style.display = 'block';
+        return;
+      }
+      melding.textContent = 'Zelfevaluatie ingediend!';
+      melding.style.color = '#2E9E49';
+      melding.style.display = 'block';
+      setTimeout(() => { window.location.href = 'evaluatie.html'; }, 900);
+    });
+  </script>
+</body>
+
+</html>
