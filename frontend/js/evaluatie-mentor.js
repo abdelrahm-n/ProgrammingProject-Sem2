@@ -108,6 +108,7 @@ async function laadBeoordelingen(evaluatieId) {
       rij.innerHTML = `
         <p style="font-weight:bold;margin-bottom:8px">${b.competentie_naam}</p>
 
+        ${b.student_score != null ? `<p style="margin-bottom:4px"><em>Zelfscore student:</em> ${b.student_score}/5</p>` : ''}
         ${b.student_reflectie ? `<p style="margin-bottom:12px"><em>Reflectie student:</em> ${b.student_reflectie}</p>` : '<p class="tekst-muted" style="margin-bottom:12px">Student heeft nog geen reflectie ingevuld.</p>'}
 
         <div class="form-rij form-rij--2">

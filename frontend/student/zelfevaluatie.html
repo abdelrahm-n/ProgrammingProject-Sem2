@@ -64,69 +64,114 @@
 
   <script src="../js/nav.js"></script>
   <script>
-    // Competenties zoals in de mockup (LO5 - LO9)
-    const competenties = [
-      { code: 'LO5', naam: 'Onderzoekende houding' },
-      { code: 'LO6', naam: 'Communicatie' },
-      { code: 'LO7', naam: 'Probleemoplossend vermogen' },
-      { code: 'LO8', naam: 'Persoonlijke ontwikkeling' },
-      { code: 'LO9', naam: 'Professionele attitude' }
-    ];
+    const API_URL = 'http://localhost:3000';
+    const token = localStorage.getItem('token') || '';
+    const lijst = document.getElementById('competentieLijst');
+    const melding = document.getElementById('evalMelding');
+    const indienenBtn = document.getElementById('indienenBtn');
 
     const scoreOpties = [
-      { punten: 1, label: 'Zwak',      tekst: 'Voldoet nog niet aan de verwachtingen, heeft veel begeleiding nodig.' },
-      { punten: 3, label: 'Goed',      tekst: 'Voldoet aan de verwachtingen en werkt grotendeels zelfstandig.' },
-      { punten: 5, label: 'Uitstekend', tekst: 'Overtreft de verwachtingen en neemt zelf initiatief.' }
+      { punten: 5, label: 'Sterk',        tekst: 'Ik voer deze competentie sterk uit en neem initiatief.' },
+      { punten: 3, label: 'Goed',         tekst: 'Ik kan dit meestal zelfstandig toepassen.' },
+      { punten: 1, label: 'Onvoldoende',  tekst: 'Ik ontwikkel deze competentie nog onvoldoende.' }
     ];
 
-    const lijst = document.getElementById('competentieLijst');
+    let evaluatieId = null;
+    let beoordelingen = [];
 
-    competenties.forEach((c, i) => {
-      const card = document.createElement('div');
-      card.className = 'competentie-card';
+    function escape(t){ if(t==null) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
 
-      const optiesHtml = scoreOpties.map(o => `
-        <label class="score-optie">
-          <input type="radio" name="score-${i}" value="${o.punten}" onchange="updateScore(${i}, ${o.punten})">
-          <strong>${o.punten} punt${o.punten > 1 ? 'en' : ''} - ${o.label}</strong><br>
-          <span>${o.tekst}</span>
-        </label>`).join('');
-
-      card.innerHTML = `
-        <div class="competentie-header">
-          <h3>${c.code} - ${c.naam}</h3>
-          <span class="gewicht">Score</span>
-        </div>
-        <div class="score-keuzes">
-          ${optiesHtml}
-          <div class="score-resultaat" id="resultaat-${i}">-/5</div>
-        </div>
-        <textarea placeholder="In deze tekstbox kan je je reflectie schrijven over deze competentie..."></textarea>`;
-      lijst.appendChild(card);
-    });
-
-    function updateScore(index, punten) {
-      document.getElementById('resultaat-' + index).textContent = punten + '/5';
+    function toonMelding(tekst, kleur) {
+      melding.textContent = tekst;
+      melding.style.color = kleur;
+      melding.style.display = 'block';
     }
 
-    document.getElementById('indienenBtn').addEventListener('click', () => {
-      const melding = document.getElementById('evalMelding');
-      // Controle: alle competenties een score?
-      const ingevuld = competenties.every((c, i) => document.querySelector(`input[name="score-${i}"]:checked`));
-      if (!ingevuld) {
-        melding.textContent = 'Gelieve voor elke competentie een score te kiezen.';
-        melding.style.color = '#990018';
-        melding.style.display = 'block';
+    function renderCompetenties() {
+      lijst.innerHTML = '';
+      beoordelingen.forEach((b, i) => {
+        const card = document.createElement('div');
+        card.className = 'competentie-card';
+        const optiesHtml = scoreOpties.map(o => `
+          <label class="score-optie">
+            <input type="radio" name="score-${i}" value="${o.punten}"
+              ${Number(b.student_score) === o.punten ? 'checked' : ''}
+              onchange="document.getElementById('resultaat-${i}').textContent='${o.punten}/5'">
+            <strong>${o.punten} punt${o.punten > 1 ? 'en' : ''} - ${o.label}</strong><br>
+            <span>${o.tekst}</span>
+          </label>`).join('');
+
+        card.innerHTML = `
+          <div class="competentie-header">
+            <h3>${escape(b.competentie_naam)}</h3>
+            <span class="gewicht">Gewicht: ${b.gewicht ?? '-'}</span>
+          </div>
+          <div class="score-keuzes">
+            ${optiesHtml}
+            <div class="score-resultaat" id="resultaat-${i}">${b.student_score != null ? b.student_score + '/5' : '-/5'}</div>
+          </div>
+          <textarea id="reflectie-${i}" placeholder="In deze tekstbox kan je je reflectie schrijven over deze competentie...">${escape(b.student_reflectie)}</textarea>`;
+        lijst.appendChild(card);
+      });
+    }
+
+    async function laad() {
+      if (!token) { toonMelding('Je bent niet ingelogd. Log opnieuw in via de startpagina.', '#990018'); return; }
+      try {
+        // Zoek de tussentijdse evaluatie van de student
+        const resMomenten = await fetch(API_URL + '/api/evaluaties/mijn', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const momenten = await resMomenten.json();
+        const tussen = momenten.find(m => m.type_naam === 'tussentijdse_evaluatie') || momenten[0];
+        if (!tussen) {
+          lijst.innerHTML = '<p>Er is nog geen tussentijdse evaluatie aangemaakt door je begeleider.</p>';
+          indienenBtn.style.display = 'none';
+          return;
+        }
+        evaluatieId = tussen.id;
+
+        const resB = await fetch(API_URL + '/api/evaluaties/' + evaluatieId + '/beoordelingen', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        beoordelingen = await resB.json();
+        renderCompetenties();
+      } catch (e) {
+        toonMelding('Kon de evaluatie niet laden.', '#990018');
+      }
+    }
+
+    indienenBtn.addEventListener('click', async () => {
+      melding.style.display = 'none';
+      // Verzamel per competentie score + reflectie
+      const invoer = beoordelingen.map((b, i) => ({
+        competentie_id: b.competentie_id,
+        student_score: document.querySelector(`input[name="score-${i}"]:checked`)?.value || null,
+        student_reflectie: document.getElementById(`reflectie-${i}`).value.trim()
+      }));
+
+      if (invoer.some(x => !x.student_score || !x.student_reflectie)) {
+        toonMelding('Gelieve voor elke competentie een score en reflectie in te vullen.', '#990018');
         return;
       }
-      // Markeer de tussentijdse zelfreflectie als ingediend
-      localStorage.setItem('zelfeval_tussentijds_ingediend', 'true');
 
-      melding.textContent = 'Zelfevaluatie ingediend!';
-      melding.style.color = '#2E9E49';
-      melding.style.display = 'block';
-      setTimeout(() => { window.location.href = 'evaluatie.html'; }, 900);
+      try {
+        for (const x of invoer) {
+          const res = await fetch(API_URL + '/api/evaluaties/' + evaluatieId + '/reflectie', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+            body: JSON.stringify(x)
+          });
+          if (!res.ok) { const r = await res.json(); throw new Error(r.fout || 'Opslaan mislukt'); }
+        }
+        toonMelding('Zelfevaluatie ingediend!', '#2E9E49');
+        setTimeout(() => { window.location.href = 'evaluatie.html'; }, 900);
+      } catch (e) {
+        toonMelding('Opslaan mislukt: ' + e.message, '#990018');
+      }
     });
+
+    laad();
   </script>
 </body>
 
