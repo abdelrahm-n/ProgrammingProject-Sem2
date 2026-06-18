@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stageplatform - Stagementor - Evaluatie</title>
+  <link rel="stylesheet" href="../css/stijl.css" />
+  <link rel="stylesheet" href="../css/mentor.css" />
+  <style>
+    .ev-titel { font-size: 22px; font-weight: 800; margin: 0 0 18px 0; color: #111827; }
+    .ev-kaart { background: #fff; border: 1px solid #d8d8d8; border-radius: 8px; padding: 16px; margin-bottom: 26px; }
+    .ev-tabel { width: 100%; border-collapse: collapse; }
+    .ev-tabel th, .ev-tabel td {
+      text-align: left; vertical-align: top; padding: 12px;
+      border-bottom: 1px solid #ececec; font-size: 13px; line-height: 1.5;
+    }
+    .ev-tabel th { font-size: 12px; font-weight: 700; color: #374151; background: #fafafa; }
+    .ev-crit-titel { font-weight: 700; color: #0f766e; }
+    .ev-score-input { width: 70px; padding: 8px; border: 1px solid #d8d8d8; border-radius: 6px; font-size: 14px; }
+
+    .ev-fb-titel { font-size: 22px; font-weight: 800; margin: 0 0 18px 0; }
+    .ev-fb-item { margin-bottom: 18px; }
+    .ev-fb-vraag { font-size: 13px; font-weight: 700; margin: 0 0 6px 0; color: #111827; }
+    .ev-fb-tekst {
+      width: 100%; min-height: 56px; padding: 10px 12px; border: 1px solid #d8d8d8;
+      border-radius: 6px; background: #fff; font-family: inherit; font-size: 14px; color: #111827; line-height: 1.5;
+    }
+    .ev-acties { display: flex; justify-content: flex-end; gap: 12px; margin-top: 8px; }
+    .ev-knop {
+      background: var(--rol-accent, #6b7280); color: #fff; border: none; padding: 10px 26px;
+      border-radius: 999px; font-weight: 600; cursor: pointer; text-decoration: none; font-size: 14px;
+    }
+    .ev-knop--grijs { background: #9ca3af; }
+    .ev-knop:hover { opacity: .92; }
+    .ev-melding { display:none; margin-top:12px; font-weight:600; text-align:right; }
+    .ev-leeg { color:#6b7280; }
+  </style>
+</head>
+<body>
+
+  <div id="app">
+    <header class="header">
+      <div class="header-logo">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+        </svg>
+        <span class="header-logo-text">Stageplatform</span>
+      </div>
+      <div class="header-actions">
+        <span class="header-rol-badge">Stagementor</span>
+        <button class="btn-terug" onclick="window.location.href='../index.html'">Terug</button>
+      </div>
+    </header>
+
+    <div class="app-body">
+      <nav class="sidebar">
+        <a href="dashboard.html" class="nav-item">Dashboard</a>
+        <a href="stagiairs.html" class="nav-item">Stagiairs</a>
+        <a href="logboeken.html" class="nav-item">Logboeken</a>
+        <a href="evaluatie.html" class="nav-item actief">Evaluatie</a>
+        <a href="../index.html" class="nav-item" id="uitlogBtn" style="margin-top:auto">Uitloggen</a>
+      </nav>
+
+      <main class="content-area">
+        <h2 class="ev-titel" id="evTitel">Evaluatie</h2>
+        <div id="inhoud"><p class="ev-leeg">Laden...</p></div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../js/nav.js"></script>
+  <script>
+    const API_URL = 'http://localhost:3000';
+    const token = localStorage.getItem('token') || '';
+    const params = new URLSearchParams(window.location.search);
+    const stage = params.get('stage') || '';
+    const naam = params.get('naam') || 'Student';
+    const opleiding = params.get('opleiding') || '';
+    const type = params.get('type') || 'tussentijds';
+    const voornaam = naam.split(' ')[0];
+
+    const typeNaam = type === 'eind' ? 'eindevaluatie' : 'tussentijdse_evaluatie';
+    const typeId = type === 'eind' ? 2 : 1;
+    document.getElementById('evTitel').textContent =
+      (type === 'eind' ? 'Eindevaluatie ' : 'Tussentijdse evaluatie ') + voornaam.toUpperCase();
+
+    const inhoud = document.getElementById('inhoud');
+    const escape = (t) => { if (t == null) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; };
+    const headers = { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token };
+
+    let evaluatieId = null;
+    let beoordelingen = [];
+
+    async function vindOfMaakMoment() {
+      const res = await fetch(API_URL + '/api/evaluaties/stage/' + stage, { headers });
+      const momenten = await res.json();
+      let moment = (momenten || []).find(m => m.type_naam === typeNaam);
+      if (!moment) {
+        // Nog geen evaluatiemoment van dit type -> aanmaken
+        const datum = new Date().toISOString().slice(0, 10);
+        const maak = await fetch(API_URL + '/api/evaluaties', {
+          method: 'POST', headers,
+          body: JSON.stringify({ stage_id: stage, type_id: typeId, datum })
+        });
+        if (!maak.ok) return null;
+        const data = await maak.json();
+        return data.id;
+      }
+      return moment.id;
+    }
+
+    async function laad() {
+      if (!token) { inhoud.innerHTML = '<p class="ev-leeg">Niet ingelogd als stagementor.</p>'; return; }
+      try {
+        evaluatieId = await vindOfMaakMoment();
+        if (!evaluatieId) { inhoud.innerHTML = '<p class="ev-leeg">Kon de evaluatie niet aanmaken/laden.</p>'; return; }
+        const resB = await fetch(API_URL + '/api/evaluaties/' + evaluatieId + '/beoordelingen', { headers });
+        beoordelingen = await resB.json();
+        render();
+      } catch (e) {
+        inhoud.innerHTML = '<p class="ev-leeg">Kon de evaluatie niet laden.</p>';
+      }
+    }
+
+    function render() {
+      const rijen = beoordelingen.map((b, i) => `
+        <tr>
+          <td><span class="ev-crit-titel">${escape(b.competentie_naam)}</span></td>
+          <td>${b.student_score != null ? b.student_score + '/5' : '-'}</td>
+          <td>${b.student_reflectie ? escape(b.student_reflectie) : '<span style="color:#9ca3af">(geen reflectie)</span>'}</td>
+          <td><input type="number" min="0" max="5" class="ev-score-input" id="score-${i}" value="${b.mentor_score != null ? b.mentor_score : ''}" placeholder="0-5"></td>
+        </tr>`).join('');
+
+      const feedback = beoordelingen.map((b, i) => `
+        <div class="ev-fb-item">
+          <p class="ev-fb-vraag">${i + 1}. ${escape(b.competentie_naam)}</p>
+          <textarea class="ev-fb-tekst" id="fb-${i}" placeholder="Feedback van de mentor...">${escape(b.mentor_feedback)}</textarea>
+        </div>`).join('');
+
+      inhoud.innerHTML = `
+        <div class="ev-kaart">
+          <table class="ev-tabel">
+            <thead><tr>
+              <th style="width:22%">Criterium</th>
+              <th style="width:10%">Zelfscore</th>
+              <th>Reflectie student</th>
+              <th style="width:110px">Score (0-5)</th>
+            </tr></thead>
+            <tbody>${rijen}</tbody>
+          </table>
+        </div>
+
+        <h2 class="ev-fb-titel">Feedback Mentor</h2>
+        ${feedback}
+
+        <div class="ev-acties">
+          <a href="evaluatie-student.html?stage=${stage}&naam=${encodeURIComponent(naam)}&opleiding=${encodeURIComponent(opleiding)}" class="ev-knop ev-knop--grijs">Terug</a>
+          <button type="button" class="ev-knop" id="evIndienen">Indienen</button>
+        </div>
+        <p id="evMelding" class="ev-melding"></p>`;
+
+      document.getElementById('evIndienen').addEventListener('click', indienen);
+    }
+
+    async function indienen() {
+      const m = document.getElementById('evMelding');
+      m.style.display = 'none';
+      try {
+        for (let i = 0; i < beoordelingen.length; i++) {
+          const score = document.getElementById('score-' + i).value;
+          const fb = document.getElementById('fb-' + i).value;
+          if (score === '') continue; // sla competenties zonder score over
+          const res = await fetch(API_URL + '/api/evaluaties/' + evaluatieId + '/score', {
+            method: 'PUT', headers,
+            body: JSON.stringify({ competentie_id: beoordelingen[i].competentie_id, mentor_score: parseInt(score), mentor_feedback: fb })
+          });
+          if (!res.ok) { const r = await res.json(); throw new Error(r.fout || 'Opslaan mislukt'); }
+        }
+        m.textContent = 'Beoordeling opgeslagen!';
+        m.style.color = '#2E9E49';
+        m.style.display = 'block';
+      } catch (e) {
+        m.textContent = 'Opslaan mislukt: ' + e.message;
+        m.style.color = '#990018';
+        m.style.display = 'block';
+      }
+    }
+
+    laad();
+  </script>
+</body>
+</html>

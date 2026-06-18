@@ -119,6 +119,9 @@
         } else if (doel === 'zelfreflectie' && type === 'eind') {
           e.preventDefault();
           window.location.href = 'evaluatie-eind.html' + q;
+        } else if (doel === 'evaluatie') {
+          e.preventDefault();
+          window.location.href = 'evaluatie-beoordeling.html' + q;
         }
       });
     });

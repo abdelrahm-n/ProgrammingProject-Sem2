@@ -58,6 +58,12 @@
           <button type="button" class="btn btn--primair" id="indienenBtn" style="margin-top:8px;">indienen</button>
           <p id="evalMelding" style="display:none; margin-top:12px; font-weight:600;"></p>
         </div>
+
+        <!-- Feedback van de mentor (alleen-lezen, verschijnt zodra de mentor beoordeeld heeft) -->
+        <div id="mentorFeedbackSectie" style="display:none; margin-top:28px;">
+          <h2 style="font-size:20px; font-weight:800; margin:0 0 14px 0;">Feedback van je mentor</h2>
+          <div id="mentorFeedbackLijst"></div>
+        </div>
       </main>
     </div>
   </div>
@@ -136,9 +142,24 @@
         });
         beoordelingen = await resB.json();
         renderCompetenties();
+        renderMentorFeedback();
       } catch (e) {
         toonMelding('Kon de evaluatie niet laden.', '#990018');
       }
+    }
+
+    function renderMentorFeedback() {
+      const metFeedback = beoordelingen.filter(b => b.mentor_score != null || (b.mentor_feedback && b.mentor_feedback.trim()));
+      if (!metFeedback.length) return;
+      document.getElementById('mentorFeedbackSectie').style.display = 'block';
+      document.getElementById('mentorFeedbackLijst').innerHTML = beoordelingen.map(b => `
+        <div class="competentie-card">
+          <div class="competentie-header">
+            <h3>${escape(b.competentie_naam)}</h3>
+            <span class="gewicht">${b.mentor_score != null ? 'Score mentor: ' + b.mentor_score + '/5' : ''}</span>
+          </div>
+          <p style="margin:6px 0 0 0;">${b.mentor_feedback ? escape(b.mentor_feedback) : '<span style="color:#9ca3af">(nog geen feedback)</span>'}</p>
+        </div>`).join('');
     }
 
     indienenBtn.addEventListener('click', async () => {

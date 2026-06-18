@@ -10,25 +10,25 @@ if (!token || rol !== 'docent') {
 const inhoud        = document.getElementById('evaluatieInhoud')
 const stageSelectie = document.getElementById('stageSelectie')
 
-/* Laad stages die de docent begeleidt */
+/* Laad de studenten die deze docent begeleidt */
 async function laadStages() {
   try {
-    const antwoord = await fetch(API_URL + '/api/stages/mijn', {
+    const antwoord = await fetch(API_URL + '/api/docent/mijn-studenten', {
       headers: { 'Authorization': 'Bearer ' + token }
     })
 
     if (!antwoord.ok) {
-      stageSelectie.innerHTML = '<option value="">Kan stages niet laden</option>'
+      stageSelectie.innerHTML = '<option value="">Kan studenten niet laden</option>'
       return
     }
 
-    const stages = await antwoord.json()
+    const studenten = await antwoord.json()
 
     stageSelectie.innerHTML = '<option value="">Kies een student...</option>'
-    for (const s of stages) {
+    for (const s of studenten) {
       const optie = document.createElement('option')
-      optie.value = s.id
-      optie.textContent = s.student_naam || 'Student ' + s.student_id
+      optie.value = s.stage_id
+      optie.textContent = (s.voornaam + ' ' + s.achternaam).trim() || 'Student'
       stageSelectie.appendChild(optie)
     }
 
