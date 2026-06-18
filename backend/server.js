@@ -19,6 +19,8 @@ dotenv.config()
 const app  = express()
 const PORT = process.env.PORT || 3000
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
+
 app.use(cors())
 app.use(express.json())
 
@@ -37,3 +39,4 @@ app.use('/api/mentor',            mentorRoutes)
 app.listen(PORT, () => {
   console.log(`Server draait op http://localhost:${PORT}`)
 })
+
