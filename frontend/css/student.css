@@ -321,3 +321,93 @@
   background: var(--color-bg-table-head, #f5f5f5);
   font-weight: 600;
 }
+
+/* === Evaluatie-overzicht (student) === */
+.evaluatie-panel {
+  background: #e3e3e3;
+  border-radius: 14px;
+  padding: 28px 32px 32px;
+}
+
+.evaluatie-titel {
+  font-size: 30px;
+  font-weight: 400;
+  color: #1E1E1E;
+  margin: 0 0 14px 0;
+}
+
+.evaluatie-intro {
+  margin: 0 0 6px 0;
+  color: #333333;
+  font-size: 15px;
+}
+
+.eval-card {
+  background: #ffffff;
+  border: 1px solid #d8d8d8;
+  border-radius: 8px;
+  padding: 6px 22px;
+  margin-top: 22px;
+}
+
+.eval-rij {
+  display: grid;
+  grid-template-columns: 1.6fr 1.3fr 1fr;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid #ededed;
+}
+
+.eval-rij:last-child {
+  border-bottom: none;
+}
+
+.eval-label {
+  font-size: 15px;
+  color: #1E1E1E;
+}
+
+.eval-mid {
+  font-size: 14px;
+  color: #555555;
+}
+
+.eval-waarde {
+  font-size: 15px;
+  color: #1E1E1E;
+  text-align: right;
+}
+
+.eval-status {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.eval-status--wacht {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+.eval-status--gepland {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.btn-eval-invullen {
+  background: #6b7280;
+  color: #ffffff;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-eval-invullen:hover {
+  background: #4b5563;
+}
