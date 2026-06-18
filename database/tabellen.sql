@@ -179,13 +179,13 @@ CREATE TABLE commissie_beoordeling (
 CREATE TABLE stageovereenkomst (
     id INT AUTO_INCREMENT PRIMARY KEY,
 
-    stagevoorstel_id INT NOT NULL,
+    stagevoorstel_id INT,
 
     getekend_door_student BOOLEAN DEFAULT FALSE,
     getekend_door_bedrijf BOOLEAN DEFAULT FALSE,
     getekend_door_school BOOLEAN DEFAULT FALSE,
 
-    status_id INT NOT NULL,
+    status_id INT,
 
     gevalideerd_door_id INT,
     gevalideerd_op TIMESTAMP NULL,
