@@ -38,41 +38,14 @@
             <h2>LOGBOEK STUDENT</h2>
           </div>
 
-          <div class="mentor-logboeken-list">
+          <div class="mentor-logboeken-list" id="studentenLijst">
             <div class="row-headings">
               <span>Naam</span>
               <span>Richting</span>
               <span>Status</span>
               <span></span>
             </div>
-
-            <a href="logboek-detail.html?student=ryan" class="row-item status-action clickable-row">
-              <span>Ryan Machiels</span>
-              <span>Toegepaste Informatica</span>
-              <span class="status-text">Actie vereist</span>
-              <span class="details-link">Bekijken</span>
-            </a>
-
-            <a href="logboek-detail.html?student=abdelrahman" class="row-item status-approved clickable-row">
-              <span>Abdelrahman</span>
-              <span>Toegepaste Informatica</span>
-              <span class="status-text">Goedgekeurd</span>
-              <span class="details-link">Bekijken</span>
-            </a>
-
-            <a href="logboek-detail.html?student=iman" class="row-item status-approved clickable-row">
-              <span>Iman Obenali</span>
-              <span>Toegepaste Informatica</span>
-              <span class="status-text">Goedgekeurd</span>
-              <span class="details-link">Bekijken</span>
-            </a>
-
-            <a href="logboek-detail.html?student=ranya" class="row-item status-approved clickable-row">
-              <span>Ranya Rabib</span>
-              <span>Toegepaste Informatica</span>
-              <span class="status-text">Goedgekeurd</span>
-              <span class="details-link">Bekijken</span>
-            </a>
+            <!-- Rijen via JavaScript -->
           </div>
         </div>
       </main>
@@ -80,5 +53,49 @@
   </div>
 
   <script src="../js/nav.js"></script>
+  <script>
+    const API_URL = 'http://localhost:3000';
+    const token = localStorage.getItem('token') || '';
+    const lijst = document.getElementById('studentenLijst');
+
+    function escape(t){ if(t==null) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+
+    (async function () {
+      let studenten;
+      try {
+        const res = await fetch(API_URL + '/api/logboeken/studenten', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (!res.ok) throw new Error('niet ok');
+        studenten = await res.json();
+      } catch (e) {
+        lijst.insertAdjacentHTML('beforeend',
+          '<div class="week-status-item status-action">Kon studenten niet laden. Log opnieuw in via de startpagina.</div>');
+        return;
+      }
+
+      if (!studenten.length) {
+        lijst.insertAdjacentHTML('beforeend',
+          '<div class="week-status-item">Je hebt nog geen toegewezen stagiairs.</div>');
+        return;
+      }
+
+      studenten.forEach(s => {
+        const actie = Number(s.aantal_ingediend) > 0;
+        const klasse = actie ? 'status-action' : 'status-approved';
+        const tekst = actie ? 'Actie vereist' : 'Goedgekeurd';
+        const naam = escape(s.voornaam + ' ' + s.achternaam);
+        const rij = document.createElement('a');
+        rij.href = 'logboek-detail.html?student=' + s.student_id;
+        rij.className = 'row-item ' + klasse + ' clickable-row';
+        rij.innerHTML = `
+          <span>${naam}</span>
+          <span>${escape(s.opleiding) || '-'}</span>
+          <span class="status-text">${tekst}</span>
+          <span class="details-link">Bekijken</span>`;
+        lijst.appendChild(rij);
+      });
+    })();
+  </script>
 </body>
 </html>

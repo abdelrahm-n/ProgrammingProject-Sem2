@@ -39,17 +39,14 @@
 
           <div class="student-summary">
             <div class="student-summary-name-block">
-              <div class="student-name" id="studentName">Ryan Machiels</div>
-              <div class="student-year">1ste jaar</div>
+              <div class="student-name" id="studentName">Student</div>
+              <div class="student-year" id="studentBedrijf"></div>
             </div>
-            <div class="student-study">Toegepaste Informatica</div>
+            <div class="student-study" id="studentStudy"></div>
           </div>
 
           <div class="week-status-list" id="weekStatusList">
-            <div class="week-status-item status-approved">logboek week 1 - <span class="status-text">goedgekeurd</span></div>
-            <div class="week-status-item status-approved">logboek week 2 - <span class="status-text">goedgekeurd</span></div>
-            <div class="week-status-item status-action"><a href="logboek-week.html?student=ryan&week=3" class="status-link">logboek week 3 - <span class="status-text">actie vereist</span></a></div>
-            <div class="week-status-item status-unavailable">logboek week 4 - <span class="status-text">nog niet beschikbaar</span></div>
+            <!-- Weken via JavaScript -->
           </div>
         </div>
       </main>
@@ -58,27 +55,54 @@
 
   <script src="../js/nav.js"></script>
   <script>
-    (function(){
-      const params = new URLSearchParams(window.location.search);
-      const student = params.get('student') || 'ryan';
+    const API_URL = 'http://localhost:3000';
+    const token = localStorage.getItem('token') || '';
+    const params = new URLSearchParams(window.location.search);
+    const studentId = params.get('student');
+    const lijst = document.getElementById('weekStatusList');
 
-      const namen = {
-        ryan: 'Ryan Machiels',
-        abdelrahman: 'Abdelrahman',
-        iman: 'Iman Obenali',
-        ranya: 'Ranya Rabib'
-      };
+    function escape(t){ if(t==null) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
 
-      const nameEl = document.getElementById('studentName');
-      if (nameEl && namen[student]) {
-        nameEl.textContent = namen[student];
+    // status uit db -> weergave
+    const statusInfo = {
+      goedgekeurd: { klasse: 'status-approved',    tekst: 'goedgekeurd' },
+      ingediend:   { klasse: 'status-action',      tekst: 'actie vereist' },
+      open:        { klasse: 'status-unavailable', tekst: 'in bewerking' }
+    };
+
+    (async function () {
+      let data;
+      try {
+        const res = await fetch(API_URL + '/api/logboeken/student/' + studentId, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (!res.ok) throw new Error('niet ok');
+        data = await res.json();
+      } catch (e) {
+        lijst.innerHTML = '<div class="week-status-item status-action">Kon logboek niet laden.</div>';
+        return;
       }
 
-      // Zorg dat de weeklinks de juiste student meegeven
-      document.querySelectorAll('#weekStatusList .status-link').forEach(link => {
-        const url = new URL(link.getAttribute('href'), window.location.href);
-        url.searchParams.set('student', student);
-        link.setAttribute('href', url.pathname.split('/').pop() + url.search);
+      if (data.student) {
+        document.getElementById('studentName').textContent = data.student.voornaam + ' ' + data.student.achternaam;
+        document.getElementById('studentStudy').textContent = data.student.opleiding || '';
+      }
+      if (data.stage) {
+        document.getElementById('studentBedrijf').textContent = data.stage.bedrijf || '';
+      }
+
+      const weken = data.weken || [];
+      if (!weken.length) {
+        lijst.innerHTML = '<div class="week-status-item status-unavailable">Nog geen logboeken ingevuld.</div>';
+        return;
+      }
+
+      weken.forEach(w => {
+        const info = statusInfo[w.status] || statusInfo.open;
+        const item = document.createElement('div');
+        item.className = 'week-status-item ' + info.klasse;
+        item.innerHTML = `<a href="logboek-week.html?student=${studentId}&week=${w.id}" class="status-link">logboek week ${w.week_nummer} - <span class="status-text">${info.tekst}</span></a>`;
+        lijst.appendChild(item);
       });
     })();
   </script>

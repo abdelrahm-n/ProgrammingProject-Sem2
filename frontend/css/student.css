@@ -725,6 +725,38 @@ select:focus {
   background: #f3f3f3;
 }
 
+/* Uitklapbare weekdetails ("Bekijken") */
+.week-detail-cel {
+  background: #faf7f7;
+  padding: 16px 18px !important;
+}
+
+.dag-detail {
+  background: #ffffff;
+  border: 1px solid #ececec;
+  border-radius: 8px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.dag-detail:last-child {
+  margin-bottom: 0;
+}
+
+.dag-detail strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #1E1E1E;
+}
+
+.dag-detail em {
+  color: #777777;
+  font-style: normal;
+  font-weight: 600;
+}
+
 
 /* ==========================================
    MONITORING-FRAME (header + sidebar)

@@ -26,16 +26,10 @@
     <div class="app-body">
       <nav class="sidebar">
         <a href="dashboard.html" class="nav-item">Dashboard</a>
-        <a href="stage-indienen.html" class="nav-item">Stage indienen</a>
-        <a href="logboek.html" class="nav-item">Logboek</a>
+        <a href="logboek.html" class="nav-item actief">Logboek</a>
         <a href="evaluatie.html" class="nav-item">Evaluatie</a>
-        <a href="../index.html" class="nav-item" id="uitlogBtn" style="margin-top:auto">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-            <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
-          </svg>
-          Uitloggen
-        </a>
+        <a href="profiel.html" class="nav-item">Profiel</a>
+        <a href="../index.html" class="nav-item" id="uitlogBtn" style="margin-top:auto">Uitloggen</a>
       </nav>
 
       <main class="content-area">
@@ -45,19 +39,19 @@
             <div class="progress-info">
               <div class="progress-item">
                 <span class="progress-label">Huidige week</span>
-                <span class="progress-value">Week 4 / 12</span>
+                <span class="progress-value" id="statHuidigeWeek">-</span>
               </div>
               <div class="progress-item">
                 <span class="progress-label">Deze week ingevuld</span>
-                <span class="progress-value">4 / 5 dagen</span>
+                <span class="progress-value" id="statDezeWeek">-</span>
               </div>
               <div class="progress-item">
                 <span class="progress-label">Totaal logboeken</span>
-                <span class="progress-value">19 / 60</span>
+                <span class="progress-value" id="statTotaal">-</span>
               </div>
               <div class="progress-item">
                 <span class="progress-label">Laatste feedback</span>
-                <span class="progress-value">Week 3</span>
+                <span class="progress-value" id="statFeedback">-</span>
               </div>
             </div>
           </div>
@@ -75,7 +69,7 @@
                 </tr>
               </thead>
               <tbody id="logboekTableBody">
-                <!-- Rows worden hier ingevoegd via JavaScript -->
+                <!-- Rijen worden via JavaScript ingevuld -->
               </tbody>
             </table>
           </div>
@@ -88,50 +82,31 @@
     </div>
   </div>
 
-  <!-- Modal voor nieuw logboek -->
+  <!-- Modal voor nieuwe logboekdag -->
   <div id="newLogboekModal" class="modal hidden">
     <div class="modal-content">
       <div class="modal-header">
-        <h2>Nieuw logboek invullen</h2>
+        <h2>Nieuwe logboekdag</h2>
         <button class="modal-close" id="closeModal">&times;</button>
       </div>
       <form id="newLogboekForm">
         <div class="form-group">
-          <label>Week</label>
-          <select id="weekSelect" required>
-            <option value="">Kies een week</option>
-            <option value="4">Week 4</option>
-            <option value="5">Week 5</option>
-            <option value="6">Week 6</option>
-            <option value="7">Week 7</option>
-            <option value="8">Week 8</option>
-            <option value="9">Week 9</option>
-            <option value="10">Week 10</option>
-            <option value="11">Week 11</option>
-            <option value="12">Week 12</option>
-          </select>
-        </div>
-
-        <div class="form-group">
           <label>Datum</label>
           <input type="date" id="datumInput" required />
         </div>
-
         <div class="form-group">
-          <label>Aantal items ingevuld</label>
-          <input type="number" id="itemsInput" min="1" max="10" required />
+          <label>Uitgevoerde taken</label>
+          <textarea id="takenInput" placeholder="Wat heb je vandaag gedaan?" required></textarea>
         </div>
-
         <div class="form-group">
           <label>Reflectie</label>
-          <textarea id="reflectieInput" placeholder="Wat heb je vandaag geleerd?"></textarea>
+          <textarea id="reflectieInput" placeholder="Wat heb je geleerd of ervaren?"></textarea>
         </div>
-
         <div class="form-group">
           <label>Problemen / leerpunten</label>
-          <textarea id="probiemenInput" placeholder="Waar wil je nog in groeien?"></textarea>
+          <textarea id="problemenInput" placeholder="Welke problemen kwam je tegen?"></textarea>
         </div>
-
+        <p id="modalFout" style="color:#990018; display:none; margin:0 0 10px;"></p>
         <div class="modal-actions">
           <button type="button" class="btn-secondary" id="cancelModal">Annuleren</button>
           <button type="submit" class="btn-primary">Opslaan</button>
@@ -142,148 +117,150 @@
 
   <script src="../js/nav.js"></script>
   <script>
-    // Sample logboeken data
-    const sampleLogboeken = [
-      {
-        week: 4,
-        logboeken: '4 / 5',
-        items: 6,
-        submitted: false,
-        details: 'Verder aanvullen'
-      },
-      {
-        week: 3,
-        logboeken: '5 / 5',
-        items: 8,
-        submitted: true,
-        status: 'feedback',
-        statusText: 'Feedback ontvangen',
-        feedback: 'Meer initiatief nemen',
-        details: 'Bekijken'
-      },
-      {
-        week: 2,
-        logboeken: '5 / 5',
-        items: 6,
-        submitted: true,
-        status: 'goedgekeurd',
-        statusText: 'Goedgekeurd',
-        feedback: 'Taken correct uitgevoerd',
-        details: 'Bekijken'
-      },
-      {
-        week: 1,
-        logboeken: '5 / 5',
-        items: 7,
-        submitted: true,
-        status: 'goedgekeurd',
-        statusText: 'Goedgekeurd',
-        feedback: 'Goede start',
-        details: 'Bekijken'
+    const API_URL = 'http://localhost:3000';
+    const token = localStorage.getItem('token') || '';
+
+    const statusInfo = {
+      open:        { tekst: 'Nog niet ingediend', klasse: 'status-nog-ingediend' },
+      ingediend:   { tekst: 'Ingediend',          klasse: 'status-feedback' },
+      goedgekeurd: { tekst: 'Goedgekeurd',         klasse: 'status-goedgekeurd' }
+    };
+
+    const tableBody = document.getElementById('logboekTableBody');
+
+    function toonDatum(waarde) {
+      if (!waarde) return '-';
+      return new Date(waarde).toLocaleDateString('nl-BE');
+    }
+    function escape(t) {
+      if (t == null) return '';
+      const d = document.createElement('div');
+      d.textContent = t;
+      return d.innerHTML;
+    }
+
+    async function laadLogboek() {
+      let data;
+      try {
+        const res = await fetch(API_URL + '/api/logboeken/mijn', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (!res.ok) throw new Error('niet ingelogd');
+        data = await res.json();
+      } catch (e) {
+        tableBody.innerHTML = '<tr><td colspan="6">Kon logboek niet laden. Log opnieuw in via de startpagina.</td></tr>';
+        return;
       }
-    ];
 
-    // Laad eigen logboeken uit localStorage
-    function getEigenLogboeken() {
-      const stored = localStorage.getItem('eigenLogboeken');
-      return stored ? JSON.parse(stored) : [];
-    }
+      if (!data.stage) {
+        tableBody.innerHTML = '<tr><td colspan="6">Je hebt nog geen actieve stage.</td></tr>';
+        document.querySelector('.btn-nieuw-logboek').style.display = 'none';
+        return;
+      }
 
-    // Sla eigen logboek op in localStorage
-    function saveEigenLogboek(logboek) {
-      const eigen = getEigenLogboeken();
-      eigen.push(logboek);
-      localStorage.setItem('eigenLogboeken', JSON.stringify(eigen));
-    }
+      const weken = data.weken || [];
 
-    // Render tabel met sample + eigen logboeken
-    function renderLogboeken() {
-      const tableBody = document.getElementById('logboekTableBody');
+      // Statistiek-kaarten
+      let totaalDagen = 0;
+      let laatsteFeedbackWeek = null;
+      weken.forEach(w => {
+        totaalDagen += w.dagen.length;
+        if (w.feedback_mentor) laatsteFeedbackWeek = w.week_nummer;
+      });
+      const laatste = weken[weken.length - 1];
+      document.getElementById('statHuidigeWeek').textContent = 'Week ' + (laatste ? laatste.week_nummer : 0) + ' / 12';
+      document.getElementById('statDezeWeek').textContent = (laatste ? laatste.dagen.length : 0) + ' / 5 dagen';
+      document.getElementById('statTotaal').textContent = totaalDagen + ' / 60';
+      document.getElementById('statFeedback').textContent = laatsteFeedbackWeek ? ('Week ' + laatsteFeedbackWeek) : '-';
+
+      // Tabel
       tableBody.innerHTML = '';
+      if (weken.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="6">Nog geen logboeken. Klik op "Nieuw logboek invullen".</td></tr>';
+        return;
+      }
 
-      // Combineer sample en eigen logboeken
-      const allLogboeken = [...sampleLogboeken, ...getEigenLogboeken()];
-      
-      allLogboeken.forEach((entry, index) => {
-        const row = document.createElement('tr');
-        
-        const statusText = entry.submitted ? entry.statusText : 'Nog niet ingediend';
-        const statusClass = entry.submitted ? `status-${entry.status}` : 'status-nog-ingediend';
-        const feedbackText = entry.submitted ? entry.feedback : '';
-        const detailsText = entry.submitted ? entry.details : 'Verder aanvullen';
-        const isEigen = index >= sampleLogboeken.length;
-        
-        row.innerHTML = `
-          <td><span class="week-badge">Week ${entry.week}</span></td>
-          <td>${entry.logboeken || '? / 5'}</td>
-          <td>${entry.items}</td>
-          <td><span class="${statusClass}">${statusText}</span></td>
-          <td><span class="feedback-text">${feedbackText}</span></td>
-          <td><a class="details-link" href="logboek-detail.html?week=${entry.week}${isEigen ? '&eigen=1' : ''}">${detailsText}</a></td>
-        `;
-        
-        tableBody.appendChild(row);
+      weken.forEach(week => {
+        const info = statusInfo[week.status] || statusInfo.open;
+        const rij = document.createElement('tr');
+        rij.innerHTML = `
+          <td><span class="week-badge">Week ${week.week_nummer}</span></td>
+          <td>${week.dagen.length} / 5</td>
+          <td>${week.dagen.length}</td>
+          <td><span class="${info.klasse}">${info.tekst}</span></td>
+          <td><span class="feedback-text">${escape(week.feedback_mentor) || '-'}</span></td>
+          <td><a class="details-link" href="#" data-week="${week.id}">Bekijken</a></td>`;
+        tableBody.appendChild(rij);
+
+        // Detailrij (verborgen) met de dagen van die week
+        const detail = document.createElement('tr');
+        detail.className = 'week-detail-rij';
+        detail.style.display = 'none';
+        const dagenHtml = week.dagen.length
+          ? week.dagen.map(d => `
+              <div class="dag-detail">
+                <strong>${toonDatum(d.datum)}</strong>
+                <div><em>Taken:</em> ${escape(d.uitgevoerde_taken)}</div>
+                <div><em>Reflectie:</em> ${escape(d.reflectie) || '-'}</div>
+                <div><em>Problemen:</em> ${escape(d.problemen_leerpunten) || '-'}</div>
+              </div>`).join('')
+          : '<p>Geen dagen in deze week.</p>';
+        detail.innerHTML = `<td colspan="6" class="week-detail-cel">${dagenHtml}</td>`;
+        tableBody.appendChild(detail);
+      });
+
+      // Bekijken -> detailrij tonen/verbergen
+      tableBody.querySelectorAll('.details-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const detailRij = link.closest('tr').nextElementSibling;
+          if (detailRij && detailRij.classList.contains('week-detail-rij')) {
+            detailRij.style.display = detailRij.style.display === 'none' ? '' : 'none';
+          }
+        });
       });
     }
 
-    // Modal handling
+    // Modal
     const modal = document.getElementById('newLogboekModal');
-    const openBtn = document.querySelector('.btn-nieuw-logboek');
-    const closeBtn = document.getElementById('closeModal');
-    const cancelBtn = document.getElementById('cancelModal');
-    const form = document.getElementById('newLogboekForm');
+    document.querySelector('.btn-nieuw-logboek').addEventListener('click', () => modal.classList.remove('hidden'));
+    document.getElementById('closeModal').addEventListener('click', () => modal.classList.add('hidden'));
+    document.getElementById('cancelModal').addEventListener('click', () => modal.classList.add('hidden'));
 
-    openBtn.addEventListener('click', () => {
-      modal.classList.remove('hidden');
-    });
-
-    closeBtn.addEventListener('click', () => {
-      modal.classList.add('hidden');
-    });
-
-    cancelBtn.addEventListener('click', () => {
-      modal.classList.add('hidden');
-    });
-
-    form.addEventListener('submit', (e) => {
+    document.getElementById('newLogboekForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      
-      const week = parseInt(document.getElementById('weekSelect').value);
-      const datum = document.getElementById('datumInput').value;
-      const items = parseInt(document.getElementById('itemsInput').value);
-      const reflectie = document.getElementById('reflectieInput').value;
-      const problemen = document.getElementById('probiemenInput').value;
+      const fout = document.getElementById('modalFout');
+      fout.style.display = 'none';
 
-      const newLogboek = {
-        week,
-        logboeken: '? / 5',
-        items,
-        submitted: false,
-        details: 'Verder aanvullen',
-        datum,
-        reflectie,
-        problemen,
-        isEigen: true,
-        tasks: [
-          { title: 'Taak 1', description: '' },
-          { title: 'Taak 2', description: '' },
-          { title: 'Taak 3', description: '' }
-        ]
+      const payload = {
+        datum: document.getElementById('datumInput').value,
+        uitgevoerde_taken: document.getElementById('takenInput').value.trim(),
+        reflectie: document.getElementById('reflectieInput').value.trim(),
+        problemen_leerpunten: document.getElementById('problemenInput').value.trim()
       };
 
-      saveEigenLogboek(newLogboek);
-      renderLogboeken();
-      modal.classList.add('hidden');
-      form.reset();
+      try {
+        const res = await fetch(API_URL + '/api/logboeken/dag', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          fout.textContent = data.fout || 'Opslaan mislukt.';
+          fout.style.display = 'block';
+          return;
+        }
+        modal.classList.add('hidden');
+        e.target.reset();
+        laadLogboek();
+      } catch (err) {
+        fout.textContent = 'Kan geen verbinding maken met de server.';
+        fout.style.display = 'block';
+      }
     });
 
-    // Initial render
-    renderLogboeken();
-
-    // Event listeners
-    document.querySelector('.btn-nieuw-logboek').addEventListener('click', () => {
-      // Modal wordt al geopend door click handler hierboven
-    });
+    laadLogboek();
   </script>
 
 </body>
