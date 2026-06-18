@@ -10,20 +10,18 @@ const competenties = [
   { id: "lo9", naam: "LO9 - Professionele attitude De lerende professional ontwikkelt een professionele attitude en handelt kwaliteitsvol." },
   { id: "lo10", naam: "LO10 - Ondernemend handelen De lerende professional demonstreert ondernemend handelen in functie van waardecreatie." },
   { id: "lo11", naam: "LO11 - Ethisch en deontologisch handelen De lerende professional handelt ethisch en deontologisch." }
-];
-let huidigeEvaluatieType = "tussen";
+]
 
+let huidigeEvaluatieType = "tussen";
 
 function toonZelfevaluatie(type) {
   huidigeEvaluatieType = type;
 
   document.getElementById("zelfevaluatieCard").style.display = "block";
-
-  if (type === "tussen") {
-    document.getElementById("zelfevaluatieTitel").textContent = "Zelfevaluatie - tussentijdse evaluatie";
-  } else {
-    document.getElementById("zelfevaluatieTitel").textContent = "Zelfevaluatie - eindevaluatie";
-  }
+  document.getElementById("zelfevaluatieTitel").textContent =
+    type === "tussen"
+      ? "Zelfevaluatie - tussentijdse evaluatie"
+      : "Zelfevaluatie - eindevaluatie";
 
   const lijst = document.getElementById("competentieLijst");
   lijst.innerHTML = "";
@@ -62,12 +60,12 @@ function toonZelfevaluatie(type) {
   });
 }
 
-
 function zelfEvaluatieOpslaan() {
   const zelfEvaluatie = competenties.map((comp) => {
     return {
       naam: comp.naam,
-      zelfscore: document.querySelector(`input[name="${comp.id}-score"]:checked`)?.value || "", reflectie: document.getElementById(`${comp.id}-reflectie`).value,
+      zelfscore: document.querySelector(`input[name="${comp.id}-score"]:checked`)?.value || "",
+      reflectie: document.getElementById(`${comp.id}-reflectie`).value,
       mentorscore: "Nog niet ingevuld",
       feedbackMentor: "Nog niet ingevuld"
     };
@@ -88,41 +86,25 @@ function zelfEvaluatieOpslaan() {
     localStorage.setItem("zelfEvaluatieEinde", JSON.stringify(zelfEvaluatie));
   }
 
+  alert("Zelfevaluatie opgeslagen.");
+
   document.getElementById("zelfevaluatieCard").style.display = "none";
 
   toonResultaat();
+  toonEindeResultaat();
   updateInvullenKnop();
 }
 
-function toonResultaat() {
-  const data = JSON.parse(localStorage.getItem("zelfEvaluatieTussen"));
-  const tbody = document.getElementById("evaluatieResultaat");
-
-  if (!data) return;
-
-  tbody.innerHTML = "";
-
-  data.forEach((item) => {
-    tbody.innerHTML += `
-      <tr>
-        <td>${item.naam}</td>
-        <td>${item.zelfscore}</td>
-        <td>${item.mentorscore}</td>
-        <td>${item.reflectie}</td>
-        <td>${item.feedbackMentor}</td>
-      </tr>
-
-      
-    `;
-  });
+function scoreNaarGetal(score) {
+  if (!score || score === "Nog niet ingevuld") return 0;
+  return Number(score.split("/")[0]);
 }
 
+function toonResultaat() {
+  const data = JSON.parse(localStorage.getItem("zelfEvaluatieTussen")) || [];
+  const tbody = document.getElementById("evaluatieResultaat");
 
-function toonEindeResultaat() {
-  const data = JSON.parse(localStorage.getItem("zelfEvaluatieEinde"));
-  const tbody = document.getElementById("eindeEvaluatieResultaat");
-
-  if (!data) return;
+  if (data.length === 0) return;
 
   tbody.innerHTML = "";
 
@@ -137,20 +119,53 @@ function toonEindeResultaat() {
       </tr>
     `;
   });
+
+  const studentTotaal = data.reduce((totaal, item) => totaal + scoreNaarGetal(item.zelfscore), 0);
+  document.getElementById("studentTussenTotaal").textContent = `${studentTotaal}/55`;
+}
+
+function toonEindeResultaat() {
+  const data = JSON.parse(localStorage.getItem("zelfEvaluatieEinde")) || [];
+  const tbody = document.getElementById("eindeEvaluatieResultaat");
+
+  if (data.length === 0) return;
+
+  tbody.innerHTML = "";
+
+  data.forEach((item) => {
+    tbody.innerHTML += `
+      <tr>
+        <td>${item.naam}</td>
+        <td>${item.zelfscore}</td>
+        <td>${item.mentorscore}</td>
+        <td>${item.reflectie}</td>
+        <td>${item.feedbackMentor}</td>
+      </tr>
+    `;
+  });
+
+  const studentTotaal = data.reduce((totaal, item) => totaal + scoreNaarGetal(item.zelfscore), 0);
+  document.getElementById("studentEindeTotaal").textContent = `${studentTotaal}/55`;
+
+  document.getElementById("eindResultaat").textContent = "In afwachting van mentor";
 }
 
 function updateInvullenKnop() {
-  const tussen = localStorage.getItem("zelfEvaluatieTussen");
-  const einde = localStorage.getItem("zelfEvaluatieEinde");
+  const tussen = JSON.parse(localStorage.getItem("zelfEvaluatieTussen")) || [];
+  const einde = JSON.parse(localStorage.getItem("zelfEvaluatieEinde")) || [];
 
-  if (tussen) {
+  if (tussen.length > 0) {
     document.getElementById("invullenTussenBtn").style.display = "none";
     document.getElementById("ingediendTussenBadge").style.display = "inline-block";
   }
 
-  if (einde) {
+  if (einde.length > 0) {
     document.getElementById("invullenEindeBtn").style.display = "none";
     document.getElementById("ingediendEindeBadge").style.display = "inline-block";
+  }
+
+  if (tussen.length > 0 && einde.length > 0) {
+    document.getElementById("eindoverzichtCard").style.display = "block";
   }
 }
 
