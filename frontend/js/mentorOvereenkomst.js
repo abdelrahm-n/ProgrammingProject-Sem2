@@ -65,6 +65,12 @@ async function haalOvereenkomstOp() {
       document.getElementById('signingSection').style.display = 'none';
       document.getElementById('alreadySigned').style.display = 'block';
     }
+
+    /* Toon waarschuwing als student nog niet heeft getekend */
+    if (!overeenkomstData.getekend_door_student) {
+      document.getElementById('signingSection').style.display = 'none';
+      document.getElementById('waitingForStudent').style.display = 'block';
+    }
   } catch (err) {
     console.error('Fout bij ophalen overeenkomst:', err);
   }
