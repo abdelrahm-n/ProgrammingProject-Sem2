@@ -75,7 +75,7 @@
           </div>
 
           <div class="logboeken-actions">
-            <button class="btn-nieuw-logboek">Nieuw logboek invullen</button>
+            <button class="btn btn--primair">Nieuw logboek invullen</button>
           </div>
         </div>
       </main>
@@ -108,8 +108,8 @@
         </div>
         <p id="modalFout" style="color:#990018; display:none; margin:0 0 10px;"></p>
         <div class="modal-actions">
-          <button type="button" class="btn-secondary" id="cancelModal">Annuleren</button>
-          <button type="submit" class="btn-primary">Opslaan</button>
+          <button type="button" class="btn btn--secundair" id="cancelModal">Annuleren</button>
+          <button type="submit" class="btn btn--primair">Opslaan</button>
         </div>
       </form>
     </div>
@@ -121,9 +121,9 @@
     const token = localStorage.getItem('token') || '';
 
     const statusInfo = {
-      open:        { tekst: 'Nog niet ingediend', klasse: 'status-nog-ingediend' },
-      ingediend:   { tekst: 'Ingediend',          klasse: 'status-feedback' },
-      goedgekeurd: { tekst: 'Goedgekeurd',         klasse: 'status-goedgekeurd' }
+      open:        { tekst: 'Nog niet ingediend', klasse: 'badge badge--afgekeurd' },
+      ingediend:   { tekst: 'Ingediend',          klasse: 'badge badge--actief' },
+      goedgekeurd: { tekst: 'Goedgekeurd',         klasse: 'badge badge--goedgekeurd' }
     };
 
     const tableBody = document.getElementById('logboekTableBody');
@@ -154,7 +154,7 @@
 
       if (!data.stage) {
         tableBody.innerHTML = '<tr><td colspan="6">Je hebt nog geen actieve stage.</td></tr>';
-        document.querySelector('.btn-nieuw-logboek').style.display = 'none';
+        document.querySelector('.btn.btn--primair').style.display = 'none';
         return;
       }
 
@@ -223,7 +223,7 @@
 
     // Modal
     const modal = document.getElementById('newLogboekModal');
-    document.querySelector('.btn-nieuw-logboek').addEventListener('click', () => modal.classList.remove('hidden'));
+    document.querySelector('.btn.btn--primair').addEventListener('click', () => modal.classList.remove('hidden'));
     document.getElementById('closeModal').addEventListener('click', () => modal.classList.add('hidden'));
     document.getElementById('cancelModal').addEventListener('click', () => modal.classList.add('hidden'));
 
