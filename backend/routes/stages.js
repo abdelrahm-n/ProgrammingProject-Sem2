@@ -102,10 +102,6 @@ router.get('/mijn', controleerToken, async (req, res) => {
   try {
     const [rijen] = await db.query(
       `SELECT sv.*, st.naam AS status,
-              b.naam AS bedrijf, b.adres, b.email AS bedrijf_email, b.telefoon, b.contactpersoon,
-              cb.feedback AS commissie_feedback,
-              cb.beoordeeld_op
-      `SELECT sv.*, st.naam AS status,
               b.naam AS bedrijf, b.adres, b.email AS bedrijf_email, b.telefoon,
               cb.feedback
        FROM stagevoorstel sv
@@ -329,31 +325,6 @@ router.get('/:id', controleerToken, async (req, res) => {
     const voorstel = await haalVoorstelOpMetToegang(req, res, req.params.id)
     if (!voorstel) return
     res.json(voorstel)
-    const [rijen] = await db.query(
-      `SELECT sv.*, st.naam AS status,
-              p.voornaam, p.achternaam, p.email AS student_email, s.studentnummer,
-              o.naam AS opleiding,
-              b.naam AS bedrijf, b.adres, b.email AS bedrijf_email, b.telefoon,
-              mp.voornaam AS mentor_voornaam, mp.achternaam AS mentor_achternaam, sm.functie AS mentor_functie,
-              aj.naam AS academiejaar
-       FROM stagevoorstel sv
-       JOIN stagevoorstel_status st ON sv.status_id = st.id
-       JOIN student s ON sv.student_id = s.persoon_id
-       JOIN persoon p ON s.persoon_id = p.id
-       LEFT JOIN opleiding o ON s.opleiding_id = o.id
-       JOIN bedrijf b ON sv.bedrijf_id = b.id
-       LEFT JOIN stagementor sm ON sv.mentor_id = sm.persoon_id
-       LEFT JOIN persoon mp ON sm.persoon_id = mp.id
-       LEFT JOIN academiejaar aj ON sv.academiejaar_id = aj.id
-       WHERE sv.id = ?`,
-      [req.params.id]
-    )
-
-    if (rijen.length === 0) {
-      return res.status(404).json({ fout: 'Voorstel niet gevonden' })
-    }
-
-    res.json(rijen[0])
   } catch (err) {
     console.error(err)
     res.status(500).json({ fout: 'Serverfout' })
