@@ -39,12 +39,116 @@
       </nav>
 
       <main class="content-area">
-        <!-- inhoud komt hier -->
+        <!-- Header Section -->
+        <div class="page-header">
+          <div class="header-content">
+            <h1>Naam docent</h1>
+            <div class="stats-container">
+              <div class="stat-item">
+                <span class="stat-label">aantal studenten</span>
+                <span class="stat-value">52</span>
+              </div>
+              <div class="stat-item">
+                <span class="stat-label">ingevulde logboeken</span>
+                <span class="stat-value">343</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Search and Navigation -->
+        <div class="search-section">
+          <input type="text" class="search-input" placeholder="Zoeken..." />
+        </div>
+
+        <!-- Logboeken Table -->
+        <div class="table-container">
+          <table class="logboeken-table">
+            <thead>
+              <tr>
+                <th>Naam</th>
+                <th>Richting</th>
+                <th>Logboek</th>
+                <th>Zie Logboek</th>
+              </tr>
+            </thead>
+            <tbody id="studentenBody">
+              <!-- Rijen via JavaScript -->
+            </tbody>
+          </table>
+        </div>
       </main>
     </div>
   </div>
 
   <script src="../js/nav.js"></script>
+  <script>
+    const API_URL = 'http://localhost:3000';
+    const token = localStorage.getItem('token') || '';
+    const body = document.getElementById('studentenBody');
+
+    function escape(t){ if(t==null) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+
+    async function laadStudenten() {
+      let studenten;
+      try {
+        const res = await fetch(API_URL + '/api/logboeken/studenten', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (!res.ok) throw new Error('niet ok');
+        studenten = await res.json();
+      } catch (e) {
+        body.innerHTML = '<tr><td colspan="4">Kon studenten niet laden. Log opnieuw in via de startpagina.</td></tr>';
+        return;
+      }
+
+      if (!studenten.length) {
+        body.innerHTML = '<tr><td colspan="4">Geen toegewezen studenten.</td></tr>';
+        return;
+      }
+
+      // Statistiek bovenaan
+      const totaalWeken = studenten.reduce((s, x) => s + Number(x.aantal_weken || 0), 0);
+      const statEls = document.querySelectorAll('.stat-value');
+      if (statEls[0]) statEls[0].textContent = studenten.length;
+      if (statEls[1]) statEls[1].textContent = totaalWeken;
+
+      body.innerHTML = '';
+      studenten.forEach(s => {
+        const naam = escape(s.voornaam + ' ' + s.achternaam);
+        const rij = document.createElement('tr');
+        rij.innerHTML = `
+          <td>
+            <div class="student-name">
+              <div>${naam}</div>
+              <span class="label-jaar">${escape(s.bedrijf) || ''}</span>
+            </div>
+          </td>
+          <td>${escape(s.opleiding) || '-'}</td>
+          <td><span class="logboek-status">${s.aantal_weken} week/weken</span></td>
+          <td><button class="btn-open" data-id="${s.student_id}">Open</button></td>`;
+        body.appendChild(rij);
+      });
+
+      document.querySelectorAll('.btn-open').forEach(btn => {
+        btn.addEventListener('click', () => {
+          window.location.href = 'logboeken-detail.html?student=' + btn.dataset.id;
+        });
+      });
+    }
+
+    // Zoekfunctionaliteit
+    document.querySelector('.search-input').addEventListener('input', (e) => {
+      const term = e.target.value.toLowerCase();
+      document.querySelectorAll('#studentenBody tr').forEach(row => {
+        const naam = row.querySelector('.student-name div')?.textContent.toLowerCase() || '';
+        const richting = row.querySelector('td:nth-child(2)')?.textContent.toLowerCase() || '';
+        row.style.display = (naam.includes(term) || richting.includes(term)) ? '' : 'none';
+      });
+    });
+
+    laadStudenten();
+  </script>
 
 </body>
 </html>
