@@ -1,120 +1,222 @@
-let huidigeEvaluatieType = "tussen";
+const API_URL = 'http://localhost:3000'
 
-const competenties = [
-  { id: "lo1", naam: "LO1 - Beheersing van het planningsproces. De lerende professional beheerst het volledige project - of operationeel planningsproces." },
-  { id: "lo2", naam: "LO2 - Ontwerpen van IT-oplossingen. De lerende professional ontwerpt IT-oplossingen volgens de industriestandaarden." },
-  { id: "lo3", naam: "LO3 - Implementatie van digitale producten. De lerende professional implementeert digitale producten in een professionele omgeving." },
-  { id: "lo4", naam: "LO4 - Integratie van technologie en infrastructuur De lerende professional integreert technologie en infrastructuur binnen een professionele omgeving." },
-  { id: "lo5", naam: "LO5 - Onderzoekende houding De lerende professional hanteert een onderzoekende houding om tot innovatieve oplossingen te komen." },
-  { id: "lo6", naam: "LO6 - Helder en transparant communiceren De lerende professional communiceert helder en transparant in een professionele omgeving en/of in teamverband." },
-  { id: "lo7", naam: "LO7 - Probleemoplossend vermogen De lerende professional denkt kritisch na om problemen efficiënt en effectief op te lossen." },
-  { id: "lo8", naam: "LO8 - Persoonlijke ontwikkeling De lerende professional ziet persoonlijke ontwikkeling als de basis voor professionele groei." },
-  { id: "lo9", naam: "LO9 - Professionele attitude De lerende professional ontwikkelt een professionele attitude en handelt kwaliteitsvol." },
-  { id: "lo10", naam: "LO10 - Ondernemend handelen De lerende professional demonstreert ondernemend handelen in functie van waardecreatie." },
-  { id: "lo11", naam: "LO11 - Ethisch en deontologisch handelen De lerende professional handelt ethisch en deontologisch." }
-]
+const token = localStorage.getItem('token')
+const rol   = localStorage.getItem('rol')
 
-
-function openMentorEvaluatie() {
-  document.getElementById("studentenLijstCard").style.display = "none";
-  document.getElementById("mentorKeuzeCard").style.display = "block";
+if (!token || rol !== 'mentor') {
+  window.location.href = '../index.html'
 }
 
-function terugNaarStudenten() {
-  document.getElementById("studentenLijstCard").style.display = "block";
-  document.getElementById("mentorKeuzeCard").style.display = "none";
-  document.getElementById("mentorFormulierCard").style.display = "none";
+const inhoud        = document.getElementById('evaluatieInhoud')
+const stageSelectie = document.getElementById('stageSelectie')
+
+/* Laad de stages die de mentor begeleidt */
+async function laadStages() {
+  try {
+    const antwoord = await fetch(API_URL + '/api/stages/mijn', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    })
+
+    if (!antwoord.ok) {
+      stageSelectie.innerHTML = '<option value="">Kan stages niet laden</option>'
+      return
+    }
+
+    const stages = await antwoord.json()
+
+    stageSelectie.innerHTML = '<option value="">Kies een student...</option>'
+    for (const s of stages) {
+      const optie = document.createElement('option')
+      optie.value = s.id
+      optie.textContent = s.student_naam || 'Student ' + s.student_id
+      stageSelectie.appendChild(optie)
+    }
+
+  } catch (fout) {
+    stageSelectie.innerHTML = '<option value="">Serverfout</option>'
+  }
 }
 
-function toonMentorEvaluatie(type) {
-  huidigeEvaluatieType = type;
+/* Laad evaluaties voor de gekozen stage */
+async function laadEvaluaties(stageId) {
+  inhoud.innerHTML = '<p class="tekst-muted">Laden...</p>'
 
-  document.getElementById("mentorKeuzeCard").style.display = "none";
-  document.getElementById("mentorFormulierCard").style.display = "block";
+  try {
+    const antwoord = await fetch(API_URL + '/api/evaluaties/stage/' + stageId, {
+      headers: { 'Authorization': 'Bearer ' + token }
+    })
 
-  document.getElementById("mentorEvaluatieTitel").textContent =
-    type === "tussen" ? "Tussentijdse evaluatie" : "Eindevaluatie";
+    const evaluaties = await antwoord.json()
 
-  const studentData =
-    type === "tussen"
-      ? JSON.parse(localStorage.getItem("zelfEvaluatieTussen")) || []
-      : JSON.parse(localStorage.getItem("zelfEvaluatieEinde")) || [];
+    if (evaluaties.length === 0) {
+      inhoud.innerHTML = `
+        <p class="tekst-muted" style="margin-bottom:16px">Nog geen evaluatiemomenten voor deze student.</p>
+        <button class="btn btn--primair btn--sm" onclick="maakEvaluatie(${stageId})">Nieuw evaluatiemoment aanmaken</button>
+      `
+      return
+    }
 
-  const lijst = document.getElementById("mentorCompetentieLijst");
-  lijst.replaceChildren();
+    inhoud.innerHTML = `
+      <div style="margin-bottom:16px">
+        <button class="btn btn--primair btn--sm" onclick="maakEvaluatie(${stageId})">Nieuw evaluatiemoment aanmaken</button>
+      </div>
+    `
 
-  competenties.forEach((comp, index) => {
-    const kaart = document.createElement("div");
-    kaart.className = "competentie-card";
+    for (const ev of evaluaties) {
+      const kaart = document.createElement('div')
+      kaart.className = 'kaart'
+      kaart.style.marginBottom = '24px'
+      kaart.innerHTML = `
+        <div class="kaart-titel">
+          ${ev.type_naam === 'finaal' ? 'Finale evaluatie' : 'Tussentijdse evaluatie'} &mdash; ${formateerDatum(ev.datum)}
+        </div>
+        <div class="formulier-kaart" id="beoordelingen-${ev.id}">
+          <p class="tekst-muted">Laden...</p>
+        </div>
+      `
+      inhoud.appendChild(kaart)
+      laadBeoordelingen(ev.id)
+    }
 
-    const titel = document.createElement("h3");
-    titel.textContent = comp.naam;
-
-    const zelfscore = document.createElement("p");
-    zelfscore.innerHTML = `<strong>Zelfscore student:</strong> ${studentData[index]?.zelfscore || "Nog niet ingevuld"}`;
-
-    const reflectie = document.createElement("p");
-    reflectie.innerHTML = `<strong>Reflectie student:</strong> ${studentData[index]?.reflectie || "Nog niet ingevuld"}`;
-
-    const scoreLabel = document.createElement("label");
-    scoreLabel.textContent = "Mentorscore";
-
-    const select = document.createElement("select");
-    select.id = `${comp.id}-mentor-score`;
-
-    ["", "5/5", "3/5", "0/5"].forEach((score) => {
-      const option = document.createElement("option");
-      option.value = score;
-      option.textContent = score === "" ? "Kies score" : score;
-      select.appendChild(option);
-    });
-
-    const feedbackLabel = document.createElement("label");
-    feedbackLabel.textContent = "Feedback mentor";
-
-    const feedback = document.createElement("textarea");
-    feedback.id = `${comp.id}-mentor-feedback`;
-    feedback.placeholder = "Schrijf hier feedback voor de student...";
-
-    kaart.appendChild(titel);
-    kaart.appendChild(zelfscore);
-    kaart.appendChild(reflectie);
-    kaart.appendChild(scoreLabel);
-    kaart.appendChild(select);
-    kaart.appendChild(feedbackLabel);
-    kaart.appendChild(feedback);
-
-    lijst.appendChild(kaart);
-  });
+  } catch (fout) {
+    inhoud.innerHTML = '<p class="melding melding--fout">Kan geen verbinding maken met de server.</p>'
+  }
 }
 
-function mentorEvaluatieOpslaan() {
-  const studentData =
-    huidigeEvaluatieType === "tussen"
-      ? JSON.parse(localStorage.getItem("zelfEvaluatieTussen")) || []
-      : JSON.parse(localStorage.getItem("zelfEvaluatieEinde")) || [];
+async function laadBeoordelingen(evaluatieId) {
+  const container = document.getElementById('beoordelingen-' + evaluatieId)
 
-  const evaluatie = competenties.map((comp, index) => {
-    return {
-      naam: comp.naam,
-      zelfscore: studentData[index]?.zelfscore || "Nog niet ingevuld",
-      reflectie: studentData[index]?.reflectie || "Nog niet ingevuld",
-      mentorscore: document.getElementById(`${comp.id}-mentor-score`).value,
-      feedbackMentor: document.getElementById(`${comp.id}-mentor-feedback`).value
-    };
-  });
+  try {
+    const antwoord = await fetch(API_URL + '/api/evaluaties/' + evaluatieId + '/beoordelingen', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    })
 
-  const nietAllesIngevuld = evaluatie.some(
-    item => !item.mentorscore || !item.feedbackMentor
-  );
+    const beoordelingen = await antwoord.json()
 
-  if (nietAllesIngevuld) {
-    alert("Vul voor elke competentie een mentorscore en feedback in.");
-    return;
+    if (beoordelingen.length === 0) {
+      container.innerHTML = '<p class="tekst-muted">Geen competenties gevonden.</p>'
+      return
+    }
+
+    container.innerHTML = ''
+
+    for (const b of beoordelingen) {
+      const rij = document.createElement('div')
+      rij.style.borderBottom = '1px solid var(--color-border-light)'
+      rij.style.padding = '16px 0'
+
+      rij.innerHTML = `
+        <p style="font-weight:bold;margin-bottom:8px">${b.competentie_naam}</p>
+
+        ${b.student_score != null ? `<p style="margin-bottom:4px"><em>Zelfscore student:</em> ${b.student_score}/5</p>` : ''}
+        ${b.student_reflectie ? `<p style="margin-bottom:12px"><em>Reflectie student:</em> ${b.student_reflectie}</p>` : '<p class="tekst-muted" style="margin-bottom:12px">Student heeft nog geen reflectie ingevuld.</p>'}
+
+        <div class="form-rij form-rij--2">
+          <div class="form-group">
+            <label>Score (1-10)</label>
+            <input
+              type="number" min="1" max="10"
+              id="score-${evaluatieId}-${b.competentie_id}"
+              value="${b.mentor_score !== null ? b.mentor_score : ''}"
+              placeholder="1 t/m 10"
+            />
+          </div>
+          <div class="form-group">
+            <label>Feedback</label>
+            <input
+              type="text"
+              id="feedback-${evaluatieId}-${b.competentie_id}"
+              value="${b.mentor_feedback || ''}"
+              placeholder="Optionele feedback..."
+            />
+          </div>
+        </div>
+
+        <div class="form-acties">
+          <button
+            class="btn btn--primair btn--sm"
+            onclick="slaScoreOp(${evaluatieId}, ${b.competentie_id})"
+          >Score opslaan</button>
+        </div>
+      `
+
+      container.appendChild(rij)
+    }
+
+  } catch (fout) {
+    container.innerHTML = '<p class="melding melding--fout">Kon beoordelingen niet laden.</p>'
+  }
+}
+
+/* Maak een nieuw evaluatiemoment aan */
+async function maakEvaluatie(stageId) {
+  const type = prompt('Welk type evaluatie?\n1 = Tussentijds\n2 = Finaal\n\nVoer 1 of 2 in:')
+  const type_id = type === '2' ? 2 : 1
+  const datum = new Date().toISOString().split('T')[0]
+
+  try {
+    const antwoord = await fetch(API_URL + '/api/evaluaties', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({ stage_id: stageId, type_id, datum })
+    })
+
+    if (antwoord.ok) {
+      laadEvaluaties(stageId)
+    } else {
+      const data = await antwoord.json()
+      alert(data.fout || 'Aanmaken mislukt.')
+    }
+  } catch (fout) {
+    alert('Kan geen verbinding maken met de server.')
+  }
+}
+
+/* Sla de score op van de mentor */
+async function slaScoreOp(evaluatieId, competentieId) {
+  const score    = document.getElementById('score-' + evaluatieId + '-' + competentieId).value
+  const feedback = document.getElementById('feedback-' + evaluatieId + '-' + competentieId).value
+
+  if (!score || score < 1 || score > 10) {
+    alert('Voer een score in tussen 1 en 10.')
+    return
   }
 
-  if (huidigeEvaluatieType === "tussen") {
-    localStorage.setItem("zelfEvaluatieTussen", JSON.stringify(evaluatie));
+  try {
+    const antwoord = await fetch(API_URL + '/api/evaluaties/' + evaluatieId + '/score', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({ competentie_id: competentieId, mentor_score: parseInt(score), mentor_feedback: feedback })
+    })
+
+    if (antwoord.ok) {
+      alert('Score opgeslagen.')
+    } else {
+      alert('Opslaan mislukt.')
+    }
+  } catch (fout) {
+    alert('Kan geen verbinding maken met de server.')
+  }
+}
+
+function formateerDatum(datum) {
+  if (!datum) return ''
+  return new Date(datum).toLocaleDateString('nl-BE')
+}
+
+/* Globale functies voor onclick in HTML */
+window.maakEvaluatie  = maakEvaluatie
+window.slaScoreOp     = slaScoreOp
+
+stageSelectie.addEventListener('change', function () {
+  if (this.value) {
+    laadEvaluaties(this.value)
   } else {
     localStorage.setItem("zelfEvaluatieEinde", JSON.stringify(evaluatie));
   }

@@ -26,6 +26,9 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 app.use(cors())
 app.use(express.json())
 
+// Frontend serveren zodat alles via http://localhost:3000 werkt
+app.use(express.static(path.join(__dirname, '../frontend')))
+
 app.use('/api/auth',              authRoutes)
 app.use('/api/stages',            stagesRoutes)
 app.use('/api/logboeken',         logboekenRoutes)

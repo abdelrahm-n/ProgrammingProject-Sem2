@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Stageplatform - Mentor - Profiel</title>
+  <title>Stageplatform - Docent - Profiel</title>
   <link rel="stylesheet" href="../css/stijl.css" />
-  <link rel="stylesheet" href="../css/mentor.css" />
+  <link rel="stylesheet" href="../css/docent.css" />
 </head>
 <body>
   <div id="app">
@@ -19,7 +19,7 @@
         <span class="header-logo-text">Stageplatform</span>
       </div>
       <div class="header-actions">
-        <span class="header-rol-badge">Stagementor</span>
+        <span class="header-rol-badge">Docent</span>
         <button class="btn-terug" onclick="window.location.href='../index.html'">Terug</button>
       </div>
     </header>
@@ -39,17 +39,7 @@
             <p><strong>Naam:</strong> <span id="naam"></span></p>
             <p><strong>E-mail:</strong> <span id="email"></span></p>
             <p><strong>Rol:</strong> <span id="rol"></span></p>
-            <p><strong>Functie:</strong> <span id="functie"></span></p>
-          </div>
-        </section>
-
-        <section class="student-card">
-          <h2>Bedrijfsgegevens</h2>
-          <div class="contract-info">
-            <p><strong>Bedrijf:</strong> <span id="bedrijfNaam"></span></p>
-            <p><strong>Adres:</strong> <span id="bedrijfAdres"></span></p>
-            <p><strong>E-mail:</strong> <span id="bedrijfEmail"></span></p>
-            <p><strong>Telefoon:</strong> <span id="bedrijfTelefoon"></span></p>
+            <p><strong>Vakgroep:</strong> <span id="vakgroep"></span></p>
           </div>
         </section>
       </main>
@@ -75,14 +65,8 @@ async function laadProfiel() {
     var data = await resp.json();
     zet('naam', data.voornaam + ' ' + data.achternaam);
     zet('email', data.email);
-    zet('rol', 'Stagementor');
-    zet('functie', data.functie);
-    if (data.bedrijf) {
-      zet('bedrijfNaam', data.bedrijf.naam);
-      zet('bedrijfAdres', data.bedrijf.adres);
-      zet('bedrijfEmail', data.bedrijf.email);
-      zet('bedrijfTelefoon', data.bedrijf.telefoon);
-    }
+    zet('rol', 'Docent');
+    zet('vakgroep', data.vakgroep);
   } catch (e) { console.error(e); }
 }
 laadProfiel();
