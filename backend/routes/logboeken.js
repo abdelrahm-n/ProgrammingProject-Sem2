@@ -233,7 +233,7 @@ router.get('/studenten', controleerToken, async (req, res) => {
               (SELECT COUNT(*) FROM logboek_week lw WHERE lw.stage_id = s.id) AS aantal_weken,
               (SELECT COUNT(*) FROM logboek_week lw
                  JOIN logboek_status ls ON lw.status_id = ls.id
-                 WHERE lw.stage_id = s.id AND ls.naam = 'ingediend') AS aantal_ingediend
+                 WHERE lw.stage_id = s.id AND ls.naam IN ('ingediend', 'goedgekeurd')) AS aantal_ingediend
        FROM stage s
        JOIN persoon p ON s.student_id = p.id
        LEFT JOIN student st ON st.persoon_id = p.id

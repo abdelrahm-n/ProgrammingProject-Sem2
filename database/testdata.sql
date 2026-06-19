@@ -145,10 +145,12 @@ INSERT INTO stage
 VALUES
   (1, 1, 1, 1, 8, 6, '2026-02-03', '2026-06-26', TRUE, '2026-01-15 11:10:00');
 
+-- De student heeft zijn weken ingediend; de mentor heeft nog niets goedgekeurd
+-- (status 2 = 'ingediend', geen mentor-feedback of afcheck-datum).
 INSERT INTO logboek_week
   (id, stage_id, week_nummer, week_start, week_einde, status_id, feedback_mentor, afgecheckt_op)
 VALUES
-  (1, 1, 1, '2026-02-02', '2026-02-08', 3, 'Uitstekende start, heeft het team snel leren kennen.', '2026-02-09 09:00:00'),
+  (1, 1, 1, '2026-02-02', '2026-02-08', 2, NULL, NULL),
   (2, 1, 2, '2026-02-09', '2026-02-15', 2, NULL, NULL);
 
 INSERT INTO logboek_dag_item
