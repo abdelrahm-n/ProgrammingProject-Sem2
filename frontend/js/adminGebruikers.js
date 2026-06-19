@@ -1,10 +1,8 @@
 const API_URL = "http://localhost:3000";
 const token = localStorage.getItem("token") || "";
 
-/* Alle gebruikers worden hier bewaard voor filtering */
 let alleGebruikers = [];
 
-/* Rol-labels voor weergave */
 const rolLabels = {
   student: "Student",
   docent: "Docent",
@@ -13,7 +11,6 @@ const rolLabels = {
   admin: "Admin"
 };
 
-/* Kleur per rol voor de badge */
 const rolKleuren = {
   student: "#2563EB",
   docent: "#2E9E49",
@@ -22,7 +19,13 @@ const rolKleuren = {
   admin: "#8B0015"
 };
 
-/* Laad alle gebruikers van de API */
+function escape(tekst) {
+  if (tekst == null) return "";
+  const div = document.createElement("div");
+  div.textContent = tekst;
+  return div.innerHTML;
+}
+
 async function laadGebruikers() {
   try {
     const antwoord = await fetch(API_URL + "/api/admin/gebruikers", {
@@ -42,7 +45,6 @@ async function laadGebruikers() {
   }
 }
 
-/* Toon de gebruikerslijst in de HTML */
 function toonGebruikers(gebruikers) {
   const lijst = document.getElementById("gebruikers-lijst");
 
@@ -51,7 +53,6 @@ function toonGebruikers(gebruikers) {
     return;
   }
 
-  /* Bouw een tabel */
   let html =
     '<table class="aanvraag-tabel" style="width:100%;border-collapse:collapse;">' +
     '<thead><tr style="border-bottom:2px solid #e2e8f0;text-align:left;">' +
@@ -59,6 +60,7 @@ function toonGebruikers(gebruikers) {
       '<th style="padding:10px;">E-mail</th>' +
       '<th style="padding:10px;">Rol</th>' +
       '<th style="padding:10px;">Status</th>' +
+      '<th style="padding:10px;">Acties</th>' +
     '</tr></thead><tbody>';
 
   gebruikers.forEach(g => {
@@ -73,6 +75,11 @@ function toonGebruikers(gebruikers) {
         '<td style="padding:10px;color:#64748b;">' + escape(g.email) + '</td>' +
         '<td style="padding:10px;"><span class="status-badge" style="background:' + kleur + ';">' + label + '</span></td>' +
         '<td style="padding:10px;"><span style="color:' + statusKleur + ';font-weight:600;">' + statusTekst + '</span></td>' +
+        '<td style="padding:10px;white-space:nowrap;">' +
+          '<button class="btn btn--secundair" style="padding:4px 10px;font-size:0.8em;" onclick="openRolWijzig(' + g.id + ', \'' + g.rol + '\')">Rol</button> ' +
+          '<button class="btn btn--secundair" style="padding:4px 10px;font-size:0.8em;" onclick="openWachtwoord(' + g.id + ')">Wachtwoord</button> ' +
+          '<button class="btn btn--secundair" style="padding:4px 10px;font-size:0.8em;color:#990018;" onclick="verwijderGebruiker(' + g.id + ', \'' + escape(g.voornaam + " " + g.achternaam) + '\')">Verwijder</button>' +
+        '</td>' +
       '</tr>';
   });
 
@@ -80,7 +87,7 @@ function toonGebruikers(gebruikers) {
   lijst.innerHTML = html;
 }
 
-/* Zoekfunctie: filter op naam of e-mail */
+/* Zoekfunctie */
 document.getElementById("zoekVeld").addEventListener("input", function () {
   const zoekwoord = this.value.trim().toLowerCase();
 
@@ -98,13 +105,142 @@ document.getElementById("zoekVeld").addEventListener("input", function () {
   toonGebruikers(gefilterd);
 });
 
-/* XSS-veilig tekst tonen */
-function escape(tekst) {
-  if (tekst == null) return "";
-  const div = document.createElement("div");
-  div.textContent = tekst;
-  return div.innerHTML;
+/* ============================================================
+   ROL WIJZIGEN
+   ============================================================ */
+
+function openRolWijzig(id, huidigeRol) {
+  document.getElementById("rolModalId").value = id;
+  document.getElementById("rolSelect").value = huidigeRol;
+  document.getElementById("rolMelding").className = "melding";
+  document.getElementById("rolMelding").textContent = "";
+  document.getElementById("rolModal").style.display = "flex";
 }
 
-/* Laad gebruikers bij het openen van de pagina */
+function sluitRolModal() {
+  document.getElementById("rolModal").style.display = "none";
+}
+
+document.getElementById("rolForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  const id = document.getElementById("rolModalId").value;
+  const nieuweRol = document.getElementById("rolSelect").value;
+  const melding = document.getElementById("rolMelding");
+
+  try {
+    const antwoord = await fetch(API_URL + "/api/admin/gebruikers/" + id + "/rol", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      },
+      body: JSON.stringify({ nieuweRol })
+    });
+
+    const data = await antwoord.json().catch(() => ({}));
+
+    if (!antwoord.ok) {
+      melding.className = "melding melding--fout";
+      melding.textContent = data.fout || "Rol wijzigen mislukt.";
+      return;
+    }
+
+    melding.className = "melding melding--succes";
+    melding.textContent = data.bericht || "Rol gewijzigd.";
+    setTimeout(() => {
+      sluitRolModal();
+      laadGebruikers();
+    }, 1000);
+
+  } catch (fout) {
+    melding.className = "melding melding--fout";
+    melding.textContent = "Kan geen verbinding maken met de server.";
+  }
+});
+
+/* ============================================================
+   WACHTWOORD WIJZIGEN
+   ============================================================ */
+
+function openWachtwoord(id) {
+  document.getElementById("wwModalId").value = id;
+  document.getElementById("nieuwWachtwoord").value = "";
+  document.getElementById("wwMelding").className = "melding";
+  document.getElementById("wwMelding").textContent = "";
+  document.getElementById("wwModal").style.display = "flex";
+}
+
+function sluitWwModal() {
+  document.getElementById("wwModal").style.display = "none";
+}
+
+document.getElementById("wwForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  const id = document.getElementById("wwModalId").value;
+  const nieuwWachtwoord = document.getElementById("nieuwWachtwoord").value;
+  const melding = document.getElementById("wwMelding");
+
+  if (nieuwWachtwoord.length < 6) {
+    melding.className = "melding melding--fout";
+    melding.textContent = "Wachtwoord moet minstens 6 tekens hebben.";
+    return;
+  }
+
+  try {
+    const antwoord = await fetch(API_URL + "/api/admin/gebruikers/" + id + "/wachtwoord", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      },
+      body: JSON.stringify({ nieuwWachtwoord })
+    });
+
+    const data = await antwoord.json().catch(() => ({}));
+
+    if (!antwoord.ok) {
+      melding.className = "melding melding--fout";
+      melding.textContent = data.fout || "Wachtwoord wijzigen mislukt.";
+      return;
+    }
+
+    melding.className = "melding melding--succes";
+    melding.textContent = "Wachtwoord succesvol gewijzigd.";
+    setTimeout(() => sluitWwModal(), 1500);
+
+  } catch (fout) {
+    melding.className = "melding melding--fout";
+    melding.textContent = "Kan geen verbinding maken met de server.";
+  }
+});
+
+/* ============================================================
+   GEBRUIKER VERWIJDEREN
+   ============================================================ */
+
+async function verwijderGebruiker(id, naam) {
+  if (!confirm("Weet je zeker dat je " + naam + " wilt deactiveren?")) return;
+
+  try {
+    const antwoord = await fetch(API_URL + "/api/admin/gebruikers/" + id, {
+      method: "DELETE",
+      headers: { "Authorization": "Bearer " + token }
+    });
+
+    const data = await antwoord.json().catch(() => ({}));
+
+    if (!antwoord.ok) {
+      alert(data.fout || "Verwijderen mislukt.");
+      return;
+    }
+
+    laadGebruikers();
+
+  } catch (fout) {
+    alert("Kan geen verbinding maken met de server.");
+  }
+}
+
 laadGebruikers();
