@@ -44,136 +44,85 @@
       </nav>
 
       <main class="content-area">
+        <div class="evaluatie-panel">
+          <h1 class="evaluatie-titel">Evaluatie</h1>
+          <p class="evaluatie-intro">De eindevaluatie is nog niet beschikbaar.</p>
+          <p class="evaluatie-intro">Deze wordt op het einde van je stage door het bedrijf ingevuld.</p>
 
-        <div class="view-header">
-          <h1 class="view-titel">Evaluatie</h1>
-          <p class="view-subtitel">Bekijk je evaluatiemomenten en vul je zelfevaluaties in.</p>
+          <!-- Eindevaluatie -->
+          <div class="eval-card">
+            <div class="eval-rij">
+              <span class="eval-label">Beschikbaarheid</span>
+              <span class="eval-mid"></span>
+              <span class="eval-waarde">31 mei 2026</span>
+            </div>
+            <div class="eval-rij">
+              <span class="eval-label">Beoordelaar</span>
+              <span class="eval-mid"></span>
+              <span class="eval-waarde">Inne De Stoel</span>
+            </div>
+            <div class="eval-rij">
+              <span class="eval-label">Zelfreflectie (eindevaluatie)</span>
+              <span class="eval-mid">voor 31 mei 2026</span>
+              <span class="eval-waarde"><span class="eval-status eval-status--wacht">In afwachting</span></span>
+            </div>
+          </div>
+
+          <!-- Tussentijdse evaluatie -->
+          <div class="eval-card">
+            <div class="eval-rij">
+              <span class="eval-label">Tussentijdsevaluatie</span>
+              <span class="eval-mid">30 april 2026</span>
+              <span class="eval-waarde"><span class="eval-status eval-status--gepland" id="tussenStatus">Gepland</span></span>
+            </div>
+            <div class="eval-rij">
+              <span class="eval-label">Zelfreflectie</span>
+              <span class="eval-mid">voor 30 april 2026</span>
+              <span class="eval-waarde" id="zelfreflectieActie">
+                <button type="button" class="btn-eval-invullen" onclick="window.location.href='zelfevaluatie.html'">Invullen</button>
+              </span>
+            </div>
+          </div>
         </div>
-
-        <section class="dashboard-card">
-          <h2>Evaluatiemomenten</h2>
-
-          <div class="evaluatie-overzicht">
-            <div>
-              <strong>Tussentijdse evaluatie</strong>
-              <p>30 april 2026</p>
-              <span class="status-badge status-ingediend">Beschikbaar</span>
-
-              <button id="invullenTussenBtn" class="btn btn--primair" onclick="toonZelfevaluatie('tussen')">
-                Invullen
-              </button>
-
-              <span id="ingediendTussenBadge" class="status-badge status-goedgekeurd" style="display:none;">
-                Ingediend
-              </span>
-            </div>
-
-            <div>
-              <strong>Eindevaluatie</strong>
-              <p>31 mei 2026</p>
-              <span class="status-badge status-ingediend">Beschikbaar</span>
-
-              <button id="invullenEindeBtn" class="btn btn--primair" onclick="toonZelfevaluatie('einde')">
-                Invullen
-              </button>
-
-              <span id="ingediendEindeBadge" class="status-badge status-goedgekeurd" style="display:none;">
-                Ingediend
-              </span>
-            </div>
-          </div>
-        </section>
-
-        <section class="dashboard-card" id="zelfevaluatieCard" style="display:none;">
-          <h2 id="zelfevaluatieTitel">Zelfevaluatie</h2>
-          <p class="tekst-muted">Kies per competentie een score en voeg een korte reflectie toe.</p>
-
-          <div id="competentieLijst"></div>
-
-          <button class="btn btn--primair" onclick="zelfEvaluatieOpslaan()">
-            Indienen
-          </button>
-        </section>
-
-        <section class="dashboard-card">
-          <h2>Tussentijdse evaluatie</h2>
-
-          <p><strong>Studentenscore totaal:</strong> <span id="studentTussenTotaal">Nog niet ingevuld</span></p>
-          <p><strong>Mentorscore totaal:</strong> <span id="mentorTussenTotaal">Nog niet ingevuld door mentor</span></p>
-          <p><strong>Status:</strong> <span class="status-badge status-goedgekeurd">Tussentijdse evaluatie</span></p>
-
-          <table class="evaluatie-tabel">
-            <thead>
-              <tr>
-                <th>Competentie</th>
-                <th>Zelfscore student</th>
-                <th>Mentorscore</th>
-                <th>Reflectie student</th>
-                <th>Feedback mentor</th>
-              </tr>
-            </thead>
-            <tbody id="evaluatieResultaat">
-              <tr>
-                <td colspan="5">Nog geen tussentijdse evaluatiegegevens beschikbaar.</td>
-              </tr>
-            </tbody>
-          </table>
-        </section>
-
-        <section class="dashboard-card">
-          <h2>Eindevaluatie</h2>
-
-          <p><strong>Studentenscore totaal:</strong> <span id="studentEindeTotaal">Nog niet ingevuld</span></p>
-          <p><strong>Mentorscore totaal:</strong> <span id="mentorEindeTotaal">Nog niet ingevuld door mentor</span></p>
-          <p><strong>Resultaat:</strong> <span id="eindResultaat" class="status-badge status-aanpassing">Nog niet
-              beschikbaar</span></p>
-
-          <table class="evaluatie-tabel">
-            <thead>
-              <tr>
-                <th>Competentie</th>
-                <th>Zelfscore student</th>
-                <th>Mentorscore</th>
-                <th>Reflectie student</th>
-                <th>Feedback mentor</th>
-              </tr>
-            </thead>
-            <tbody id="eindeEvaluatieResultaat">
-              <tr>
-                <td colspan="5">Nog geen eindevaluatiegegevens beschikbaar.</td>
-              </tr>
-            </tbody>
-          </table>
-        </section>
-
-        <section class="dashboard-card" id="eindoverzichtCard" style="display:none;">
-          <h2>Gefeliciteerd met het afronden van je stage!</h2>
-          <p>Hier vind je jouw definitieve eindoverzicht en beoordelingen.</p>
-
-          <div class="evaluatie-overzicht">
-            <div>
-              <strong>Eindscore</strong>
-              <h2><span id="eindscoreTotaal">0</span> / 100</h2>
-            </div>
-
-            <div>
-              <strong>Logboeken</strong>
-              <h2>60 / 60</h2>
-            </div>
-
-            <div>
-              <strong>Resultaat</strong><br>
-              <span class="status-badge status-goedgekeurd">Geslaagd</span>
-            </div>
-          </div>
-        </section>
-
       </main>
     </div>
   </div>
 
   <script src="../js/nav.js"></script>
-  <script src="../js/evaluatie-student.js"></script>
+  <script>
+    const API_URL = 'http://localhost:3000';
+    const token = localStorage.getItem('token') || '';
+
+    // Toon "Ingediend"/"In afwachting" op basis van de database
+    (async function () {
+      if (!token) return;
+      try {
+        const resM = await fetch(API_URL + '/api/evaluaties/mijn', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const momenten = await resM.json();
+        const tussen = momenten.find(m => m.type_naam === 'tussentijdse_evaluatie') || momenten[0];
+        if (!tussen) return;
+
+        const resB = await fetch(API_URL + '/api/evaluaties/' + tussen.id + '/beoordelingen', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        const beoordelingen = await resB.json();
+
+        // Zelfreflectie is "ingediend" als de student alles ingevuld heeft
+        const ingediend = beoordelingen.length > 0 &&
+          beoordelingen.every(b => b.student_score != null && b.student_reflectie);
+
+        if (ingediend) {
+          const t = document.getElementById('tussenStatus');
+          t.textContent = 'In afwachting';
+          t.className = 'eval-status eval-status--wacht';
+          document.getElementById('zelfreflectieActie').innerHTML =
+            '<span class="eval-status eval-status--ingediend">Ingediend</span>';
+        }
+      } catch (e) { /* laat standaard 'Gepland' + Invullen staan */ }
+    })();
+  </script>
 </body>
 
 </html>

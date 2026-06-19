@@ -399,6 +399,7 @@ CREATE TABLE competentie_beoordeling (
     competentie_id INT,
 
     student_reflectie TEXT,
+    student_score INT,
     mentor_score INT,
     mentor_feedback TEXT,
     docent_feedback TEXT,

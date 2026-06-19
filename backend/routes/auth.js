@@ -69,6 +69,104 @@ router.post('/login', async (req, res) => {
   }
 })
 
+/* GET /api/auth/me - huidige gebruiker ophalen op basis van JWT token */
+router.get('/me', controleerToken, async (req, res) => {
+  try {
+    const [rijen] = await db.query(
+      'SELECT id, voornaam, achternaam, email, rol FROM persoon WHERE id = ?',
+      [req.gebruiker.id]
+    )
+
+    if (rijen.length === 0) {
+      return res.status(404).json({ fout: 'Gebruiker niet gevonden' })
+    }
+
+    const persoon = rijen[0]
+    const antwoord = {
+      id: persoon.id,
+      voornaam: persoon.voornaam,
+      achternaam: persoon.achternaam,
+      email: persoon.email,
+      rol: persoon.rol
+    }
+
+    switch (persoon.rol) {
+      case 'student': {
+        const [studentRijen] = await db.query(
+          `SELECT s.studentnummer, o.naam AS opleiding
+           FROM student s
+           LEFT JOIN opleiding o ON s.opleiding_id = o.id
+           WHERE s.persoon_id = ?`,
+          [persoon.id]
+        )
+        if (studentRijen.length > 0) {
+          antwoord.studentnummer = studentRijen[0].studentnummer
+          antwoord.opleiding = studentRijen[0].opleiding
+        }
+        break
+      }
+      case 'docent': {
+        const [docentRijen] = await db.query(
+          'SELECT vakgroep FROM docent WHERE persoon_id = ?',
+          [persoon.id]
+        )
+        if (docentRijen.length > 0) {
+          antwoord.vakgroep = docentRijen[0].vakgroep
+        }
+        break
+      }
+      case 'stagementor': {
+        const [mentorRijen] = await db.query(
+          `SELECT sm.functie, b.naam AS bedrijf_naam, b.adres AS bedrijf_adres,
+                  b.email AS bedrijf_email, b.telefoon AS bedrijf_telefoon
+           FROM stagementor sm
+           LEFT JOIN bedrijf b ON sm.bedrijf_id = b.id
+           WHERE sm.persoon_id = ?`,
+          [persoon.id]
+        )
+        if (mentorRijen.length > 0) {
+          antwoord.functie = mentorRijen[0].functie
+          if (mentorRijen[0].bedrijf_naam) {
+            antwoord.bedrijf = {
+              naam: mentorRijen[0].bedrijf_naam,
+              adres: mentorRijen[0].bedrijf_adres,
+              email: mentorRijen[0].bedrijf_email,
+              telefoon: mentorRijen[0].bedrijf_telefoon
+            }
+          }
+        }
+        break
+      }
+      case 'stagecommissie': {
+        const [commissieRijen] = await db.query(
+          'SELECT commissie_rol FROM stagecommissielid WHERE persoon_id = ?',
+          [persoon.id]
+        )
+        if (commissieRijen.length > 0) {
+          antwoord.commissie_rol = commissieRijen[0].commissie_rol
+        }
+        break
+      }
+      case 'admin': {
+        const [adminRijen] = await db.query(
+          'SELECT dienst FROM administratie WHERE persoon_id = ?',
+          [persoon.id]
+        )
+        if (adminRijen.length > 0) {
+          antwoord.dienst = adminRijen[0].dienst
+        }
+        break
+      }
+    }
+
+    res.json(antwoord)
+
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ fout: 'Serverfout' })
+  }
+})
+
 /* POST /api/auth/registreren - stagementor account aanmaken */
 router.post('/registreren', async (req, res) => {
   const { voornaam, achternaam, wachtwoord } = req.body

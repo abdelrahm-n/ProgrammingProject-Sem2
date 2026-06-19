@@ -13,21 +13,21 @@ let overeenkomstData = null;
 
 /* Stappen tonen of verbergen */
 function toonOverzicht() {
-  stapOverzicht.style.display = "block";
-  stapContract.style.display = "none";
-  stapActivatie.style.display = "none";
+  if (stapOverzicht) stapOverzicht.style.display = "block";
+  if (stapContract) stapContract.style.display = "none";
+  if (stapActivatie) stapActivatie.style.display = "none";
 }
 
 function toonContract() {
-  stapOverzicht.style.display = "none";
-  stapContract.style.display = "block";
-  stapActivatie.style.display = "none";
+  if (stapOverzicht) stapOverzicht.style.display = "none";
+  if (stapContract) stapContract.style.display = "block";
+  if (stapActivatie) stapActivatie.style.display = "none";
 }
 
 function toonActivatie() {
-  stapOverzicht.style.display = "none";
-  stapContract.style.display = "none";
-  stapActivatie.style.display = "block";
+  if (stapOverzicht) stapOverzicht.style.display = "none";
+  if (stapContract) stapContract.style.display = "none";
+  if (stapActivatie) stapActivatie.style.display = "block";
 }
 
 /* Zet een waarde in een veld */
@@ -94,8 +94,39 @@ function toonJuisteStap(data) {
   if (data.getekend_door_student) {
     zet("studentCheck", "Ondertekend");
     toonActivatie();
+    vulActivatieIn(data);
   } else {
     toonOverzicht();
+  }
+}
+
+/* Vul de activatie-pagina dynamisch in op basis van ondertekenstatus */
+function vulActivatieIn(data) {
+  var statusBox = document.querySelector("#stapActivatie .status-box");
+  var studentSpan = document.querySelector("#stapActivatie .signature-overview p:nth-child(1) span");
+  var bedrijfSpan = document.querySelector("#stapActivatie .signature-overview p:nth-child(2) span");
+  var schoolSpan = document.querySelector("#stapActivatie .signature-overview p:nth-child(3) span");
+
+  if (studentSpan) { studentSpan.textContent = "Ondertekend"; studentSpan.className = "status-ok"; }
+
+  if (data.getekend_door_bedrijf) {
+    if (bedrijfSpan) { bedrijfSpan.textContent = "Ondertekend"; bedrijfSpan.className = "status-ok"; }
+  } else {
+    if (bedrijfSpan) { bedrijfSpan.textContent = "In afwachting"; bedrijfSpan.className = "status-wait"; }
+  }
+
+  if (data.getekend_door_school) {
+    if (schoolSpan) { schoolSpan.textContent = "Ondertekend"; schoolSpan.className = "status-ok"; }
+  } else {
+    if (schoolSpan) { schoolSpan.textContent = "In afwachting"; schoolSpan.className = "status-wait"; }
+  }
+
+  if (data.getekend_door_bedrijf && data.getekend_door_school) {
+    if (statusBox) statusBox.textContent = "Status: Alle handtekeningen ontvangen";
+  } else if (data.getekend_door_bedrijf) {
+    if (statusBox) statusBox.textContent = "Status: Wacht op hogeschool";
+  } else {
+    if (statusBox) statusBox.textContent = "Status: Wacht op bedrijf";
   }
 }
 
@@ -123,8 +154,10 @@ async function ondertekenAlsStudent() {
       return;
     }
 
+    overeenkomstData.getekend_door_student = true;
     zet("studentCheck", "Ondertekend");
     toonActivatie();
+    vulActivatieIn(overeenkomstData);
   } catch (err) {
     console.error("Fout bij ondertekenen:", err);
     alert("Kan geen verbinding maken met de server.");
@@ -133,16 +166,14 @@ async function ondertekenAlsStudent() {
 
 /* Knop pas actief als naam ingevuld en akkoord aangevinkt */
 function controleerOndertekening() {
+  if (!handtekeningInput || !ondertekenBtn) return;
   const naamOk = handtekeningInput.value.trim().length >= 2;
   ondertekenBtn.disabled = !(naamOk && akkoordCheck.checked);
 }
 
-bekijkBtn.addEventListener("click", toonContract);
-handtekeningInput.addEventListener("input", controleerOndertekening);
-akkoordCheck.addEventListener("change", controleerOndertekening);
-
-ondertekenBtn.addEventListener("click", function () {
-  ondertekenAlsStudent();
-});
+if (bekijkBtn) bekijkBtn.addEventListener("click", toonContract);
+if (handtekeningInput) handtekeningInput.addEventListener("input", controleerOndertekening);
+if (akkoordCheck) akkoordCheck.addEventListener("change", controleerOndertekening);
+if (ondertekenBtn) ondertekenBtn.addEventListener("click", ondertekenAlsStudent);
 
 haalOvereenkomstOp();
