@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="nl">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,16 +7,13 @@
   <link rel="stylesheet" href="../css/stijl.css" />
   <link rel="stylesheet" href="../css/student.css" />
 </head>
-
 <body>
 
   <div id="app">
     <header class="header">
       <div class="header-logo">
         <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 2L2 7l10 5 10-5-10-5z" />
-          <path d="M2 17l10 5 10-5" />
-          <path d="M2 12l10 5 10-5" />
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
         </svg>
         <span class="header-logo-text">Stageplatform</span>
       </div>
@@ -30,70 +26,242 @@
     <div class="app-body">
       <nav class="sidebar">
         <a href="dashboard.html" class="nav-item">Dashboard</a>
-        <a href="logboek.html" class="nav-item">Logboek</a>
+        <a href="logboek.html" class="nav-item actief">Logboek</a>
         <a href="evaluatie.html" class="nav-item">Evaluatie</a>
         <a href="profiel.html" class="nav-item">Profiel</a>
-        <a href="../index.html" class="nav-item" id="uitlogBtn" style="margin-top:auto">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-            <polyline points="16 17 21 12 16 7" />
-            <line x1="21" y1="12" x2="9" y2="12" />
-          </svg>
-          Uitloggen
-        </a>
+        <a href="../index.html" class="nav-item" id="uitlogBtn" style="margin-top:auto">Uitloggen</a>
       </nav>
 
       <main class="content-area">
-
-        <section class="dashboard-welcome">
-          <h1>Logboek</h1>
-          <p id="logboek-intro">Houd hier dagelijks bij waar je aan gewerkt hebt tijdens je stage.</p>
-        </section>
-
-        <!-- Melding als er nog geen actieve stage is -->
-        <section class="dashboard-card" id="geen-stage-card" style="display:none;">
-          <h2>Nog geen actieve stage</h2>
-          <p>Je kan pas een logboek bijhouden zodra je stage actief is.</p>
-        </section>
-
-        <!-- Formulier om een dagitem toe te voegen -->
-        <section class="dashboard-card" id="toevoeg-card" style="display:none;">
-          <h2>Nieuwe logboekdag toevoegen</h2>
-          <div class="form-grid">
-            <div class="form-group">
-              <label>Datum</label>
-              <input type="date" id="logDatum" />
+        <div class="logboeken-panel">
+          <div class="logboeken-header">
+            <h1>Overzicht logboeken</h1>
+            <div class="progress-info">
+              <div class="progress-item">
+                <span class="progress-label">Huidige week</span>
+                <span class="progress-value" id="statHuidigeWeek">-</span>
+              </div>
+              <div class="progress-item">
+                <span class="progress-label">Deze week ingevuld</span>
+                <span class="progress-value" id="statDezeWeek">-</span>
+              </div>
+              <div class="progress-item">
+                <span class="progress-label">Totaal logboeken</span>
+                <span class="progress-value" id="statTotaal">-</span>
+              </div>
+              <div class="progress-item">
+                <span class="progress-label">Laatste feedback</span>
+                <span class="progress-value" id="statFeedback">-</span>
+              </div>
             </div>
           </div>
-          <div class="form-group">
-            <label>Uitgevoerde taken</label>
-            <textarea id="logTaken" rows="2" placeholder="Wat heb je vandaag gedaan?"></textarea>
-          </div>
-          <div class="form-group">
-            <label>Reflectie</label>
-            <textarea id="logReflectie" rows="2" placeholder="Wat heb je geleerd of ervaren?"></textarea>
-          </div>
-          <div class="form-group">
-            <label>Problemen en leerpunten</label>
-            <textarea id="logProblemen" rows="2" placeholder="Welke problemen kwam je tegen?"></textarea>
-          </div>
-          <button type="button" class="btn btn--primair" id="toevoegBtn">Logboekdag toevoegen</button>
-          <p id="logFout" style="color:#990018;margin-top:10px;display:none;"></p>
-        </section>
 
-        <!-- Overzicht van de weken en dagen -->
-        <section class="dashboard-card" id="overzicht-card" style="display:none;">
-          <h2>Overzicht per week</h2>
-          <div id="logboek-weken"></div>
-        </section>
+          <div class="logboeken-table-container">
+            <table class="student-logboeken-table">
+              <thead>
+                <tr>
+                  <th>Week</th>
+                  <th>Logboeken</th>
+                  <th>Items</th>
+                  <th>Status</th>
+                  <th>Mentorfeedback</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody id="logboekTableBody">
+                <!-- Rijen worden via JavaScript ingevuld -->
+              </tbody>
+            </table>
+          </div>
 
+          <div class="logboeken-actions">
+            <button class="btn btn--primair">Nieuw logboek invullen</button>
+          </div>
+        </div>
       </main>
     </div>
   </div>
 
-  <script src="../js/logboek.js"></script>
+  <!-- Modal voor nieuwe logboekdag -->
+  <div id="newLogboekModal" class="modal hidden">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Nieuwe logboekdag</h2>
+        <button class="modal-close" id="closeModal">&times;</button>
+      </div>
+      <form id="newLogboekForm">
+        <div class="form-group">
+          <label>Datum</label>
+          <input type="date" id="datumInput" required />
+        </div>
+        <div class="form-group">
+          <label>Uitgevoerde taken</label>
+          <textarea id="takenInput" placeholder="Wat heb je vandaag gedaan?" required></textarea>
+        </div>
+        <div class="form-group">
+          <label>Reflectie</label>
+          <textarea id="reflectieInput" placeholder="Wat heb je geleerd of ervaren?"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Problemen / leerpunten</label>
+          <textarea id="problemenInput" placeholder="Welke problemen kwam je tegen?"></textarea>
+        </div>
+        <p id="modalFout" style="color:#990018; display:none; margin:0 0 10px;"></p>
+        <div class="modal-actions">
+          <button type="button" class="btn btn--secundair" id="cancelModal">Annuleren</button>
+          <button type="submit" class="btn btn--primair">Opslaan</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script src="../js/nav.js"></script>
+  <script>
+    const API_URL = 'http://localhost:3000';
+    const token = localStorage.getItem('token') || '';
+
+    const statusInfo = {
+      open:        { tekst: 'Nog niet ingediend', klasse: 'badge badge--afgekeurd' },
+      ingediend:   { tekst: 'Ingediend',          klasse: 'badge badge--actief' },
+      goedgekeurd: { tekst: 'Goedgekeurd',         klasse: 'badge badge--goedgekeurd' }
+    };
+
+    const tableBody = document.getElementById('logboekTableBody');
+
+    function toonDatum(waarde) {
+      if (!waarde) return '-';
+      return new Date(waarde).toLocaleDateString('nl-BE');
+    }
+    function escape(t) {
+      if (t == null) return '';
+      const d = document.createElement('div');
+      d.textContent = t;
+      return d.innerHTML;
+    }
+
+    async function laadLogboek() {
+      let data;
+      try {
+        const res = await fetch(API_URL + '/api/logboeken/mijn', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (!res.ok) throw new Error('niet ingelogd');
+        data = await res.json();
+      } catch (e) {
+        tableBody.innerHTML = '<tr><td colspan="6">Kon logboek niet laden. Log opnieuw in via de startpagina.</td></tr>';
+        return;
+      }
+
+      if (!data.stage) {
+        tableBody.innerHTML = '<tr><td colspan="6">Je hebt nog geen actieve stage.</td></tr>';
+        document.querySelector('.btn.btn--primair').style.display = 'none';
+        return;
+      }
+
+      const weken = data.weken || [];
+
+      // Statistiek-kaarten
+      let totaalDagen = 0;
+      let laatsteFeedbackWeek = null;
+      weken.forEach(w => {
+        totaalDagen += w.dagen.length;
+        if (w.feedback_mentor) laatsteFeedbackWeek = w.week_nummer;
+      });
+      const laatste = weken[weken.length - 1];
+      document.getElementById('statHuidigeWeek').textContent = 'Week ' + (laatste ? laatste.week_nummer : 0) + ' / 12';
+      document.getElementById('statDezeWeek').textContent = (laatste ? laatste.dagen.length : 0) + ' / 5 dagen';
+      document.getElementById('statTotaal').textContent = totaalDagen + ' / 60';
+      document.getElementById('statFeedback').textContent = laatsteFeedbackWeek ? ('Week ' + laatsteFeedbackWeek) : '-';
+
+      // Tabel
+      tableBody.innerHTML = '';
+      if (weken.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="6">Nog geen logboeken. Klik op "Nieuw logboek invullen".</td></tr>';
+        return;
+      }
+
+      weken.forEach(week => {
+        const info = statusInfo[week.status] || statusInfo.open;
+        const rij = document.createElement('tr');
+        rij.innerHTML = `
+          <td><span class="week-badge">Week ${week.week_nummer}</span></td>
+          <td>${week.dagen.length} / 5</td>
+          <td>${week.dagen.length}</td>
+          <td><span class="${info.klasse}">${info.tekst}</span></td>
+          <td><span class="feedback-text">${escape(week.feedback_mentor) || '-'}</span></td>
+          <td><a class="details-link" href="#" data-week="${week.id}">Bekijken</a></td>`;
+        tableBody.appendChild(rij);
+
+        // Detailrij (verborgen) met de dagen van die week
+        const detail = document.createElement('tr');
+        detail.className = 'week-detail-rij';
+        detail.style.display = 'none';
+        const dagenHtml = week.dagen.length
+          ? week.dagen.map(d => `
+              <div class="dag-detail">
+                <strong>${toonDatum(d.datum)}</strong>
+                <div><em>Taken:</em> ${escape(d.uitgevoerde_taken)}</div>
+                <div><em>Reflectie:</em> ${escape(d.reflectie) || '-'}</div>
+                <div><em>Problemen:</em> ${escape(d.problemen_leerpunten) || '-'}</div>
+              </div>`).join('')
+          : '<p>Geen dagen in deze week.</p>';
+        detail.innerHTML = `<td colspan="6" class="week-detail-cel">${dagenHtml}</td>`;
+        tableBody.appendChild(detail);
+      });
+
+      // Bekijken -> detailrij tonen/verbergen
+      tableBody.querySelectorAll('.details-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const detailRij = link.closest('tr').nextElementSibling;
+          if (detailRij && detailRij.classList.contains('week-detail-rij')) {
+            detailRij.style.display = detailRij.style.display === 'none' ? '' : 'none';
+          }
+        });
+      });
+    }
+
+    // Modal
+    const modal = document.getElementById('newLogboekModal');
+    document.querySelector('.btn.btn--primair').addEventListener('click', () => modal.classList.remove('hidden'));
+    document.getElementById('closeModal').addEventListener('click', () => modal.classList.add('hidden'));
+    document.getElementById('cancelModal').addEventListener('click', () => modal.classList.add('hidden'));
+
+    document.getElementById('newLogboekForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const fout = document.getElementById('modalFout');
+      fout.style.display = 'none';
+
+      const payload = {
+        datum: document.getElementById('datumInput').value,
+        uitgevoerde_taken: document.getElementById('takenInput').value.trim(),
+        reflectie: document.getElementById('reflectieInput').value.trim(),
+        problemen_leerpunten: document.getElementById('problemenInput').value.trim()
+      };
+
+      try {
+        const res = await fetch(API_URL + '/api/logboeken/dag', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json();
+        if (!res.ok) {
+          fout.textContent = data.fout || 'Opslaan mislukt.';
+          fout.style.display = 'block';
+          return;
+        }
+        modal.classList.add('hidden');
+        e.target.reset();
+        laadLogboek();
+      } catch (err) {
+        fout.textContent = 'Kan geen verbinding maken met de server.';
+        fout.style.display = 'block';
+      }
+    });
+
+    laadLogboek();
+  </script>
 
 </body>
-
 </html>

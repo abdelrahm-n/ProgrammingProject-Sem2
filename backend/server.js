@@ -1,5 +1,7 @@
 import express from 'express'
 import cors from 'cors'
+import path from 'path'
+import { fileURLToPath } from 'url'
 import dotenv from 'dotenv'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -44,3 +46,4 @@ app.use('/api/mentor',            mentorRoutes)
 app.listen(PORT, () => {
   console.log(`Server draait op http://localhost:${PORT}`)
 })
+

@@ -218,8 +218,9 @@ stageSelectie.addEventListener('change', function () {
   if (this.value) {
     laadEvaluaties(this.value)
   } else {
-    inhoud.innerHTML = ''
+    localStorage.setItem("zelfEvaluatieEinde", JSON.stringify(evaluatie));
   }
-})
 
-laadStages()
+  alert("Mentorevaluatie opgeslagen.");
+  terugNaarStudenten();
+}
