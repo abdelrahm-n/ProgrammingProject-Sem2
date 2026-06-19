@@ -29,7 +29,10 @@
       <main class="content-area">
 
         <section class="dashboard-welcome">
-          <h1>Gebruikers</h1>
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+            <h1>Gebruikers</h1>
+            <a href="nieuw-account.html" class="btn btn--primair">+ Nieuw account</a>
+          </div>
         </section>
 
         <section class="dashboard-card">
@@ -42,6 +45,50 @@
         </section>
 
       </main>
+    </div>
+  </div>
+
+  <!-- Rol wijzigen modal -->
+  <div id="rolModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;justify-content:center;align-items:center;">
+    <div style="background:white;border-radius:8px;padding:24px;max-width:400px;width:90%;">
+      <h3 style="margin-top:0;">Rol wijzigen</h3>
+      <form id="rolForm" class="formulier" novalidate>
+        <input type="hidden" id="rolModalId" />
+        <div class="form-group">
+          <label for="rolSelect">Nieuwe rol</label>
+          <select id="rolSelect" style="width:100%;padding:8px;border:1px solid #D8D8D8;border-radius:4px;">
+            <option value="student">Student</option>
+            <option value="docent">Docent</option>
+            <option value="stagementor">Stagementor</option>
+            <option value="stagecommissie">Stagecommissie</option>
+            <option value="admin">Administratie</option>
+          </select>
+        </div>
+        <p id="rolMelding" class="melding"></p>
+        <div class="form-acties">
+          <button type="submit" class="btn btn--primair">Opslaan</button>
+          <button type="button" class="btn btn--secundair" onclick="sluitRolModal()">Annuleren</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Wachtwoord wijzigen modal -->
+  <div id="wwModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;justify-content:center;align-items:center;">
+    <div style="background:white;border-radius:8px;padding:24px;max-width:400px;width:90%;">
+      <h3 style="margin-top:0;">Wachtwoord wijzigen</h3>
+      <form id="wwForm" class="formulier" novalidate>
+        <input type="hidden" id="wwModalId" />
+        <div class="form-group">
+          <label for="nieuwWachtwoord">Nieuw wachtwoord</label>
+          <input type="password" id="nieuwWachtwoord" placeholder="Minimaal 6 tekens" required />
+        </div>
+        <p id="wwMelding" class="melding"></p>
+        <div class="form-acties">
+          <button type="submit" class="btn btn--primair">Wachtwoord wijzigen</button>
+          <button type="button" class="btn btn--secundair" onclick="sluitWwModal()">Annuleren</button>
+        </div>
+      </form>
     </div>
   </div>
 

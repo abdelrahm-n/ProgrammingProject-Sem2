@@ -29,17 +29,93 @@
       <main class="content-area">
 
         <section class="dashboard-welcome">
-          <h1>Bedrijven</h1>
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+            <h1>Bedrijven</h1>
+            <button class="btn btn--primair" onclick="openNieuwBedrijf()">+ Nieuw bedrijf</button>
+          </div>
         </section>
 
         <section class="dashboard-card">
-          <h2>Bedrijf</h2>
+          <h2>Alle bedrijven</h2>
           <div id="bedrijven-lijst"></div>
         </section>
 
         <div class="stat-kaarten" id="stat-kaarten"></div>
 
       </main>
+    </div>
+  </div>
+
+  <!-- Nieuw bedrijf modal -->
+  <div id="nieuwBedrijfModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;justify-content:center;align-items:center;">
+    <div style="background:white;border-radius:8px;padding:24px;max-width:480px;width:90%;">
+      <h3 style="margin-top:0;">Nieuw bedrijf</h3>
+      <form id="nieuwBedrijfForm" class="formulier" novalidate>
+        <div class="form-group">
+          <label for="bedrijfNaam">Naam</label>
+          <input type="text" id="bedrijfNaam" placeholder="Bedrijfsnaam" required />
+        </div>
+        <div class="form-group">
+          <label for="bedrijfAdres">Adres</label>
+          <input type="text" id="bedrijfAdres" placeholder="Straat 1, 1000 Brussel" />
+        </div>
+        <div class="form-rij form-rij--2">
+          <div class="form-group">
+            <label for="bedrijfEmail">Email</label>
+            <input type="email" id="bedrijfEmail" placeholder="info@bedrijf.be" />
+          </div>
+          <div class="form-group">
+            <label for="bedrijfTelefoon">Telefoon</label>
+            <input type="text" id="bedrijfTelefoon" placeholder="02 123 45 67" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="bedrijfContact">Contactpersoon</label>
+          <input type="text" id="bedrijfContact" placeholder="Jan Jansen" />
+        </div>
+        <p id="bedrijfMelding" class="melding"></p>
+        <div class="form-acties">
+          <button type="submit" class="btn btn--primair">Aanmaken</button>
+          <button type="button" class="btn btn--secundair" onclick="sluitNieuwBedrijf()">Annuleren</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Bewerk bedrijf modal -->
+  <div id="bewerkBedrijfModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;justify-content:center;align-items:center;">
+    <div style="background:white;border-radius:8px;padding:24px;max-width:480px;width:90%;">
+      <h3 style="margin-top:0;">Bedrijf bewerken</h3>
+      <form id="bewerkBedrijfForm" class="formulier" novalidate>
+        <input type="hidden" id="bewerkBedrijfId" />
+        <div class="form-group">
+          <label for="bewerkBedrijfNaam">Naam</label>
+          <input type="text" id="bewerkBedrijfNaam" required />
+        </div>
+        <div class="form-group">
+          <label for="bewerkBedrijfAdres">Adres</label>
+          <input type="text" id="bewerkBedrijfAdres" />
+        </div>
+        <div class="form-rij form-rij--2">
+          <div class="form-group">
+            <label for="bewerkBedrijfEmail">Email</label>
+            <input type="email" id="bewerkBedrijfEmail" />
+          </div>
+          <div class="form-group">
+            <label for="bewerkBedrijfTelefoon">Telefoon</label>
+            <input type="text" id="bewerkBedrijfTelefoon" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="bewerkBedrijfContact">Contactpersoon</label>
+          <input type="text" id="bewerkBedrijfContact" />
+        </div>
+        <p id="bewerkBedrijfMelding" class="melding"></p>
+        <div class="form-acties">
+          <button type="submit" class="btn btn--primair">Opslaan</button>
+          <button type="button" class="btn btn--secundair" onclick="sluitBewerkBedrijf()">Annuleren</button>
+        </div>
+      </form>
     </div>
   </div>
 
