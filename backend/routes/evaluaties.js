@@ -149,9 +149,9 @@ router.post('/', controleerToken, async (req, res) => {
   }
 })
 
-/* Student vult reflectie in per competentie */
+/* Student vult reflectie + zelfscore in per competentie */
 router.put('/:id/reflectie', controleerToken, async (req, res) => {
-  const { competentie_id, student_reflectie } = req.body
+  const { competentie_id, student_reflectie, student_score } = req.body
 
   if (!competentie_id) {
     return res.status(400).json({ fout: 'Competentie is verplicht' })
@@ -167,9 +167,9 @@ router.put('/:id/reflectie', controleerToken, async (req, res) => {
 
     await db.query(
       `UPDATE competentie_beoordeling
-       SET student_reflectie = ?
+       SET student_reflectie = ?, student_score = ?
        WHERE evaluatie_moment_id = ? AND competentie_id = ?`,
-      [student_reflectie || null, req.params.id, competentie_id]
+      [student_reflectie || null, (student_score ?? null), req.params.id, competentie_id]
     )
     res.json({ bericht: 'Reflectie opgeslagen' })
   } catch (err) {

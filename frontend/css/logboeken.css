@@ -1,0 +1,1018 @@
+/* LOGBOEKEN - Specifieke stijlen voor logboeken pagina's
+   Gebruikt het gedeelde design system uit general.css, layout.css,
+   main.css, components.css en button.css. */
+
+/* === Student logboek overzicht === */
+
+.logboeken-panel {
+  background: var(--color-bg-page);
+  border-radius: var(--radius-sm);
+  padding: var(--sp-5);
+}
+
+.logboeken-header h1 {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--color-text);
+  margin: 0 0 var(--sp-1);
+}
+
+.progress-info {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+  margin-top: var(--sp-3);
+}
+
+.progress-item {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--sp-3) var(--sp-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+}
+
+.progress-label {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.progress-value {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--color-text);
+}
+
+.week-badge {
+  font-weight: bold;
+  color: var(--color-text);
+}
+
+.logboeken-table-container {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin-bottom: var(--sp-4);
+}
+
+.logboeken-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.logboeken-table th,
+.logboeken-table td {
+  text-align: left;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--color-border-light);
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+.logboeken-table th {
+  background: var(--color-bg-table-head);
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--color-text-secondary);
+}
+
+.logboeken-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.logboeken-table tbody tr:hover td {
+  background: #FAFAFA;
+}
+
+.student-logboeken-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.student-logboeken-table th,
+.student-logboeken-table td {
+  text-align: left;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--color-border-light);
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+.student-logboeken-table th {
+  background: var(--color-bg-table-head);
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--color-text-secondary);
+}
+
+.student-logboeken-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.student-logboeken-table tbody tr:hover td {
+  background: #FAFAFA;
+}
+
+.status-pill {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: var(--radius-sm);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status-pill.status-goedgekeurd { background: #D6F5E0; border-color: #b6e5ca; color: #1A6633; }
+.status-pill.status-feedback    { background: #CFE2FF; border-color: #b3d0f7; color: #084298; }
+
+.logboeken-actions {
+  display: flex;
+  justify-content: center;
+}
+
+.details-link {
+  color: var(--rol-accent, var(--color-primary));
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.details-link:hover {
+  text-decoration: underline;
+}
+
+.feedback-text {
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* === Modal === */
+
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--sp-4);
+}
+
+.modal-content {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-4);
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--sp-3);
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--color-text);
+}
+
+.modal-close {
+  border: none;
+  background: none;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--color-text-muted);
+}
+
+.modal-close:hover {
+  color: var(--color-text);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
+}
+
+/* === Week detail uitklappen === */
+
+.week-detail-rij {
+  display: none;
+}
+
+.week-detail-cel {
+  background: var(--color-bg-page);
+  padding: var(--sp-3) var(--sp-4) !important;
+}
+
+.dag-detail {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--sp-3);
+  margin-bottom: var(--sp-2);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.dag-detail:last-child {
+  margin-bottom: 0;
+}
+
+.dag-detail strong {
+  display: block;
+  margin-bottom: var(--sp-1);
+  color: var(--color-text);
+  font-size: 14px;
+}
+
+.dag-detail em {
+  color: var(--color-text-muted);
+  font-style: normal;
+  font-weight: 600;
+}
+
+/* === Monitoring layout (student logboek-detail) === */
+
+.header-monitoring {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--sp-5);
+  background: var(--color-primary);
+  height: 84px;
+  gap: var(--sp-3);
+}
+
+.header-left,
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.header-nav-link {
+  color: var(--color-white);
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.header-divider {
+  width: 1px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.header-center {
+  flex: 1;
+  text-align: center;
+}
+
+.header-title {
+  font-size: 24px;
+  margin: 0;
+  font-weight: bold;
+  color: var(--color-white);
+}
+
+.header-user {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--color-white);
+}
+
+.header-user button {
+  border: none;
+  background: transparent;
+  color: var(--color-white);
+  cursor: pointer;
+  font-weight: 600;
+  text-decoration: underline;
+  padding: 0;
+}
+
+.monitoring-container {
+  display: flex;
+  min-height: calc(100vh - 84px);
+  background: var(--color-bg-page);
+}
+
+.sidebar-monitoring {
+  width: 270px;
+  background: var(--color-bg-sidebar);
+  border-right: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  padding: var(--sp-3) 0;
+  flex-shrink: 0;
+  overflow-y: auto;
+}
+
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  padding: 0 var(--sp-4);
+  height: 72px;
+  text-decoration: none;
+  color: var(--color-text);
+  font-weight: 600;
+  font-size: 14px;
+  border-left: 3px solid transparent;
+  transition: background 0.12s ease;
+}
+
+.sidebar-item:hover {
+  background: var(--color-bg-page);
+}
+
+.sidebar-item.active {
+  background: var(--color-primary);
+  color: var(--color-white);
+  border-left-color: transparent;
+}
+
+.monitoring-content {
+  flex: 1;
+  padding: var(--sp-5);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-5);
+}
+
+/* === Logboek detail pagina (student) === */
+
+.logboek-detail-page {
+  max-width: 920px;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: var(--sp-2);
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+  color: var(--rol-accent, var(--color-primary));
+}
+
+.detail-page-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--color-text);
+  margin: 0 0 var(--sp-4);
+}
+
+.detail-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--sp-4);
+}
+
+.detail-block {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--sp-3);
+  margin-bottom: var(--sp-3);
+}
+
+.detail-block h3 {
+  margin: 0 0 var(--sp-2);
+  font-size: 15px;
+  font-weight: bold;
+  color: var(--color-text);
+}
+
+.block-hint {
+  margin: 0 0 var(--sp-3);
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.detail-meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+}
+
+.meta-pill {
+  background: var(--color-bg-page);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--sp-2) var(--sp-3);
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+.detail-tasks {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.task-block {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--sp-3);
+  background: var(--color-bg-page);
+}
+
+.task-header {
+  font-size: 13px;
+  font-weight: bold;
+  color: var(--color-text-secondary);
+  margin-bottom: var(--sp-2);
+}
+
+.task-title-input,
+.task-input,
+.detail-textarea {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 13px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--color-text);
+  background: var(--color-bg-card);
+}
+
+.task-title-input:focus,
+.task-input:focus,
+.detail-textarea:focus {
+  outline: none;
+  border-color: var(--rol-accent, var(--color-primary));
+  box-shadow: 0 0 0 3px rgba(139, 0, 21, 0.10);
+}
+
+.task-title-input {
+  margin-bottom: var(--sp-2);
+  font-weight: 600;
+}
+
+.task-input,
+.detail-textarea {
+  min-height: 80px;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.task-title-input[readonly],
+.task-input[readonly],
+.detail-textarea[readonly] {
+  background: var(--color-bg-page);
+  color: var(--color-text-secondary);
+}
+
+.detail-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3);
+}
+
+.detail-two-col .detail-block {
+  margin-bottom: 0;
+}
+
+.feedback-panel {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--sp-3);
+  margin-bottom: var(--sp-3);
+}
+
+.feedback-title {
+  font-weight: bold;
+  font-size: 14px;
+  color: var(--color-text);
+  margin-bottom: var(--sp-2);
+}
+
+.detail-actions {
+  display: flex;
+  justify-content: center;
+  gap: var(--sp-3);
+  margin-top: var(--sp-3);
+}
+
+/* === Docent logboeken === */
+
+.header-content h1 {
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--color-text);
+  margin: 0 0 var(--sp-3);
+}
+
+.search-section {
+  margin-bottom: var(--sp-4);
+}
+
+.search-input {
+  padding: 10px 13px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  width: 280px;
+  color: var(--color-text);
+  background: var(--color-bg-card);
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--rol-accent, var(--color-primary));
+  box-shadow: 0 0 0 3px rgba(139, 0, 21, 0.10);
+}
+
+.table-container {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.student-name {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.student-name div {
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.label-jaar {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.logboek-status {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.stats-container {
+  display: flex;
+  gap: var(--sp-4);
+  margin-bottom: var(--sp-4);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stat-item .stat-label {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.stat-item .stat-value {
+  font-size: 22px;
+  font-weight: bold;
+  color: var(--color-text);
+}
+
+/* === Docent logboek detail === */
+
+.logboek-header {
+  margin-bottom: var(--sp-2);
+}
+
+.logboek-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+}
+
+.logboek-section h2,
+.goedkeuring-section h2 {
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--color-text);
+  margin: 0 0 var(--sp-3);
+}
+
+.logboek-entries,
+.goedkeuring-entries {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.logboek-entry {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--sp-3);
+}
+
+.logboek-entry-date {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: var(--sp-2);
+}
+
+.logboek-entry-text {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  margin: 4px 0;
+  line-height: 1.5;
+}
+
+.logboek-entry-text strong {
+  color: var(--color-text);
+}
+
+.goedkeuring-item {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--sp-3);
+}
+
+.goedkeuring-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--sp-2);
+}
+
+.goedkeuring-item-date {
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+/* === Mentor logboeken === */
+
+.logboek-student-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--sp-4);
+}
+
+.logboek-student-card .page-header h2 {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 var(--sp-3);
+}
+
+.mentor-logboeken-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.row-headings {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 100px;
+  padding: var(--sp-2) var(--sp-3);
+  border-bottom: 1px solid var(--color-border);
+  font-size: 12px;
+  font-weight: bold;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+}
+
+.row-item {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr 100px;
+  padding: var(--sp-3);
+  border-bottom: 1px solid var(--color-border-light);
+  font-size: 14px;
+  color: var(--color-text);
+  text-decoration: none;
+  align-items: center;
+}
+
+.row-item:last-child {
+  border-bottom: none;
+}
+
+.row-item.clickable-row {
+  cursor: pointer;
+}
+
+.row-item.clickable-row:hover {
+  background: var(--color-bg-page);
+}
+
+.row-item.status-action .status-text {
+  color: var(--color-warning);
+  font-weight: 600;
+}
+
+.row-item.status-approved .status-text {
+  color: var(--color-success);
+  font-weight: 600;
+}
+
+.row-item.status-unavailable .status-text {
+  color: var(--color-text-muted);
+}
+
+.student-summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--sp-3);
+  background: var(--color-bg-page);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  margin-bottom: var(--sp-3);
+}
+
+.student-summary-name-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.student-summary .student-name {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--color-text);
+}
+
+.student-year {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.student-study {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.week-status-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.week-status-item {
+  display: flex;
+  align-items: center;
+  padding: var(--sp-3) var(--sp-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  color: var(--color-text);
+  background: var(--color-bg-card);
+}
+
+.week-status-item.status-action {
+  border-left: 3px solid var(--color-warning);
+}
+
+.week-status-item.status-approved {
+  border-left: 3px solid var(--color-success);
+}
+
+.week-status-item.status-unavailable {
+  border-left: 3px solid var(--color-text-muted);
+  color: var(--color-text-muted);
+}
+
+.status-link {
+  color: var(--color-text);
+  text-decoration: none;
+  width: 100%;
+}
+
+.status-link:hover {
+  color: var(--rol-accent, var(--color-primary));
+}
+
+/* === Mentor logboek week detail === */
+
+.logboek-detail-main {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: var(--sp-4);
+}
+
+.logboek-days {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.detail-heading-row {
+  margin-bottom: var(--sp-2);
+}
+
+.detail-heading-row h2 {
+  font-size: 16px;
+  font-weight: bold;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 var(--sp-2);
+}
+
+.student-meta-row {
+  display: flex;
+  gap: var(--sp-3);
+  align-items: center;
+  font-size: 14px;
+}
+
+.student-meta-row .student-name {
+  font-weight: bold;
+  color: var(--color-text);
+}
+
+.student-meta-row .student-study,
+.student-meta-row .student-year {
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+.day-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--sp-3);
+}
+
+.day-card {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--sp-3);
+}
+
+.day-card-full {
+  grid-column: 1 / -1;
+}
+
+.day-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--color-text);
+  margin-bottom: var(--sp-2);
+  padding-bottom: var(--sp-2);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.day-text {
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  margin: var(--sp-2) 0;
+}
+
+.day-text strong {
+  color: var(--color-text);
+  font-size: 13px;
+}
+
+.logboek-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.decision-panel {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--sp-4);
+}
+
+.detail-right-panel {
+  position: sticky;
+  top: var(--sp-5);
+}
+
+.decision-status-row {
+  margin-bottom: var(--sp-2);
+}
+
+.decision-status {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+.decision-status input[type="radio"] {
+  margin: 0;
+}
+
+.decision-approve:hover {
+  border-color: var(--color-success);
+  background: #f0faf3;
+}
+
+.decision-decline:hover {
+  border-color: var(--color-warning);
+  background: #fef9ee;
+}
+
+.feedback-box {
+  margin-top: var(--sp-3);
+}
+
+.feedback-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text);
+  margin-bottom: var(--sp-1);
+}
+
+.mentor-feedback {
+  width: 100%;
+  min-height: 100px;
+  padding: 10px 13px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--color-text);
+  background: var(--color-bg-card);
+  resize: vertical;
+}
+
+.mentor-feedback:focus {
+  outline: none;
+  border-color: var(--rol-accent, var(--color-primary));
+  box-shadow: 0 0 0 3px rgba(139, 0, 21, 0.10);
+}
+
+/* === Responsive === */
+
+@media (max-width: 900px) {
+  .progress-info {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .logboek-detail-main {
+    grid-template-columns: 1fr;
+  }
+  .row-headings,
+  .row-item {
+    grid-template-columns: 2fr 1fr 100px;
+  }
+  .row-headings span:nth-child(2),
+  .row-item span:nth-child(2) {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .detail-two-col { grid-template-columns: 1fr; }
+  .day-grid { grid-template-columns: 1fr; }
+  .stats-container { flex-direction: column; gap: var(--sp-2); }
+  .progress-info { grid-template-columns: 1fr 1fr; }
+  .row-headings,
+  .row-item {
+    grid-template-columns: 1fr 100px;
+  }
+  .row-headings span:nth-child(2),
+  .row-item span:nth-child(2),
+  .row-headings span:nth-child(3),
+  .row-item span:nth-child(3) {
+    display: none;
+  }
+}
+
+@media (max-width: 420px) {
+  .progress-info { grid-template-columns: 1fr; }
+}

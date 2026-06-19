@@ -139,6 +139,15 @@ router.put("/commissie/:id/onderteken", controleerToken, async (req, res) => {
     if (check.length === 0) return res.status(404).json({ fout: "Overeenkomst niet gevonden" })
     if (check[0].getekend_door_school) return res.status(400).json({ fout: "Al ondertekend door hogeschool" })
 
+    /* Controleer of bedrijf al heeft getekend (volgorde: student → bedrijf → school) */
+    const [bedrijfCheck] = await db.query(
+      "SELECT getekend_door_bedrijf FROM stageovereenkomst WHERE id = ?",
+      [req.params.id]
+    )
+    if (bedrijfCheck.length > 0 && !bedrijfCheck[0].getekend_door_bedrijf) {
+      return res.status(400).json({ fout: "Mentor moet eerst ondertekenen voordat de hogeschool kan ondertekenen" })
+    }
+
     await db.query("UPDATE stageovereenkomst SET getekend_door_school = TRUE WHERE id = ?", [req.params.id])
 
     const [overeenkomst] = await db.query(

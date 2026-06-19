@@ -13,6 +13,12 @@ var uitlogBtn = document.getElementById('uitlogBtn')
 if (uitlogBtn) {
   uitlogBtn.addEventListener('click', function() {
     localStorage.removeItem('rol')
+    localStorage.removeItem('token')
+    localStorage.removeItem('id')
+    localStorage.removeItem('naam')
+    localStorage.removeItem('email')
+    localStorage.removeItem('studentnummer')
+    localStorage.removeItem('opleiding')
     window.location.href = rootPad
   })
 }
