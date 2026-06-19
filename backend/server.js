@@ -3,8 +3,6 @@ import cors from 'cors'
 import path from 'path'
 import { fileURLToPath } from 'url'
 import dotenv from 'dotenv'
-import path from 'path'
-import { fileURLToPath } from 'url'
 
 import authRoutes              from './routes/auth.js'
 import stagesRoutes            from './routes/stages.js'
