@@ -16,12 +16,16 @@ function isDocent(req, res, next) {
 router.get('/mijn-studenten', controleerToken, isDocent, async (req, res) => {
   try {
     const [rijen] = await db.query(
-      `SELECT s.id AS stage_id, s.startdatum, s.einddatum,
+      `SELECT s.id AS stage_id, st.persoon_id AS student_id, s.startdatum, s.einddatum,
               sp.voornaam, sp.achternaam, sp.email,
               st.studentnummer,
               o.naam AS opleiding,
               b.naam AS bedrijf,
-              mp.voornaam AS mentor_voornaam, mp.achternaam AS mentor_achternaam
+              mp.voornaam AS mentor_voornaam, mp.achternaam AS mentor_achternaam,
+              (SELECT SUM(cb.mentor_score)
+                 FROM competentie_beoordeling cb
+                 JOIN evaluatie_moment em ON cb.evaluatie_moment_id = em.id
+                 WHERE em.stage_id = s.id) AS totaalscore
        FROM stage s
        JOIN student st ON s.student_id = st.persoon_id
        JOIN persoon sp ON st.persoon_id = sp.id
