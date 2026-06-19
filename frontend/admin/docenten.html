@@ -26,10 +26,12 @@
     <div class="app-body">
       <nav class="sidebar">
         <a href="dashboard.html" class="nav-item">Dashboard</a>
-        <a href="studenten.html" class="nav-item">Student</a>
-        <a href="docenten.html" class="nav-item actief">Docent</a>
+        <a href="gebruikers.html" class="nav-item">Gebruikers</a>
+        <a href="studenten.html" class="nav-item">Studenten</a>
+        <a href="docenten.html" class="nav-item actief">Docenten</a>
+        <a href="mentoren.html" class="nav-item">Mentoren</a>
         <a href="bedrijven.html" class="nav-item">Bedrijven</a>
-        <a href="stages.html" class="nav-item">Stage</a>
+        <a href="stages.html" class="nav-item">Stages</a>
         <a href="documenten.html" class="nav-item">Documenten</a>
         <a href="../index.html" class="nav-item" id="uitlogBtn" style="margin-top:auto">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -42,11 +44,14 @@
       <main class="content-area">
 
         <section class="dashboard-welcome">
-          <h1>Docenten</h1>
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+            <h1>Docenten</h1>
+            <a href="nieuw-account.html" class="btn btn--primair">+ Nieuwe docent</a>
+          </div>
         </section>
 
         <section class="dashboard-card">
-          <h2>Docenten</h2>
+          <h2>Alle docenten</h2>
           <div id="docenten-lijst"></div>
         </section>
 
