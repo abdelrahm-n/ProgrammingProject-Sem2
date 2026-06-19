@@ -247,7 +247,7 @@ router.get('/mijn/actief', controleerToken, async (req, res) => {
 
     const [logboekStats] = await db.query(
       `SELECT COUNT(DISTINCT lw.id) AS totaal_weken,
-              SUM(CASE WHEN ls.naam = 'ingevuld' THEN 1 ELSE 0 END) AS ingevulde_weken
+              SUM(CASE WHEN ls.naam = 'goedgekeurd' THEN 1 ELSE 0 END) AS ingevulde_weken
        FROM logboek_week lw
        JOIN logboek_status ls ON lw.status_id = ls.id
        WHERE lw.stage_id = ?`,

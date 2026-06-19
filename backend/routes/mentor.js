@@ -313,6 +313,17 @@ router.put('/overeenkomst/:id/onderteken', controleerToken, isMentor, async (req
       return res.status(400).json({ fout: 'Deze overeenkomst is al ondertekend door het bedrijf' })
     }
 
+    /* Controleer of student al heeft getekend (volgorde: student → bedrijf → school) */
+    const [studentCheck] = await db.query(
+      `SELECT so.getekend_door_student
+       FROM stageovereenkomst so
+       WHERE so.id = ?`,
+      [req.params.id]
+    )
+    if (studentCheck.length > 0 && !studentCheck[0].getekend_door_student) {
+      return res.status(400).json({ fout: 'Student moet eerst ondertekenen voordat het bedrijf kan ondertekenen' })
+    }
+
     await db.query(
       'UPDATE stageovereenkomst SET getekend_door_bedrijf = TRUE WHERE id = ?',
       [req.params.id]

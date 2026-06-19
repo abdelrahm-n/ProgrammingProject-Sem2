@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stageplatform - Stagementor - Evaluatie student</title>
+  <link rel="stylesheet" href="../css/stijl.css" />
+  <link rel="stylesheet" href="../css/mentor.css" />
+  <style>
+    .eval-titel {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      color: #111827;
+      margin: 0 0 24px 0;
+    }
+    .eval-student-naam {
+      font-size: 22px;
+      font-weight: 800;
+      color: #111827;
+    }
+    .eval-student-naam .richting {
+      font-weight: 600;
+      font-size: 18px;
+      margin-left: 10px;
+    }
+    .eval-student-jaar {
+      font-size: 12px;
+      color: #6b7280;
+      font-weight: 700;
+      margin: 2px 0 26px 0;
+    }
+    .eval-knoppen {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      max-width: 460px;
+    }
+    .eval-knop {
+      display: block;
+      padding: 14px 18px;
+      border: 1px solid #d8d8d8;
+      border-radius: 8px;
+      background: #ffffff;
+      color: #111827;
+      text-decoration: none;
+      font-size: 15px;
+      font-weight: 600;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    .eval-knop:hover {
+      border-color: var(--rol-accent);
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.06);
+    }
+  </style>
+</head>
+<body>
+
+  <div id="app">
+    <header class="header">
+      <div class="header-logo">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+        </svg>
+        <span class="header-logo-text">Stageplatform</span>
+      </div>
+      <div class="header-actions">
+        <span class="header-rol-badge">Stagementor</span>
+        <button class="btn-terug" onclick="window.location.href='evaluatie.html'">Terug</button>
+      </div>
+    </header>
+
+    <div class="app-body">
+      <nav class="sidebar"></nav>
+
+      <main class="content-area">
+        <h2 class="eval-titel">Evaluatie</h2>
+
+        <div class="eval-student-naam">
+          <span id="studentNaam">Student</span>
+          <span class="richting" id="studentRichting"></span>
+        </div>
+        <div class="eval-student-jaar">1ste jaar</div>
+
+        <div class="eval-knoppen" id="evalKnoppen">
+          <a href="#" class="eval-knop" data-doel="zelfreflectie" data-type="tussentijds">Tussentijdse zelfreflectie student</a>
+          <a href="#" class="eval-knop" data-doel="zelfreflectie" data-type="eind">Eindevaluatie zelfreflectie student</a>
+          <a href="#" class="eval-knop" data-doel="evaluatie" data-type="tussentijds">Tussentijdse evaluatie</a>
+          <a href="#" class="eval-knop" data-doel="evaluatie" data-type="eind">Eindevaluatie</a>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../js/nav.js"></script>
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const stage = params.get('stage') || '';
+    const naam = params.get('naam') || 'Student';
+    const opleiding = params.get('opleiding') || '';
+    document.getElementById('studentNaam').textContent = naam;
+    document.getElementById('studentRichting').textContent = opleiding;
+
+    // Knoppen: tussentijdse zelfreflectie opent de weergave van de student-zelfreflectie
+    document.querySelectorAll('#evalKnoppen .eval-knop').forEach(knop => {
+      knop.addEventListener('click', (e) => {
+        const doel = knop.dataset.doel;
+        const type = knop.dataset.type;
+        const q = `?stage=${encodeURIComponent(stage)}&naam=${encodeURIComponent(naam)}&opleiding=${encodeURIComponent(opleiding)}&type=${type}`;
+        if (doel === 'zelfreflectie' && type === 'tussentijds') {
+          e.preventDefault();
+          window.location.href = 'evaluatie-zelfreflectie.html' + q;
+        } else if (doel === 'zelfreflectie' && type === 'eind') {
+          e.preventDefault();
+          window.location.href = 'evaluatie-eind.html' + q;
+        } else if (doel === 'evaluatie') {
+          e.preventDefault();
+          window.location.href = 'evaluatie-beoordeling.html' + q;
+        }
+      });
+    });
+  </script>
+</body>
+</html>
