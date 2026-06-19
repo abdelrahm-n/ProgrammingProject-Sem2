@@ -65,6 +65,12 @@ async function haalOvereenkomstOp() {
       document.getElementById('signingSection').style.display = 'none';
       document.getElementById('alreadySigned').style.display = 'block';
     }
+
+    /* Toon waarschuwing als bedrijf nog niet heeft getekend */
+    if (!overeenkomstData.getekend_door_bedrijf) {
+      document.getElementById('signingSection').style.display = 'none';
+      document.getElementById('waitingForMentor').style.display = 'block';
+    }
   } catch (err) {
     console.error('Fout bij ophalen overeenkomst:', err);
   }

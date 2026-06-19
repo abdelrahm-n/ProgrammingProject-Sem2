@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stageplatform - Stagementor - Logboek Week</title>
+  <link rel="stylesheet" href="../css/stijl.css" />
+  <link rel="stylesheet" href="../css/mentor.css" />
+</head>
+<body>
+  <div id="app">
+    <header class="header">
+      <div class="header-logo">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+        </svg>
+        <span class="header-logo-text">Stageplatform</span>
+      </div>
+      <div class="header-actions">
+        <span class="header-rol-badge">Stagementor</span>
+        <button class="btn-terug" onclick="window.location.href='../index.html'">Terug</button>
+      </div>
+    </header>
+
+    <div class="app-body">
+      <nav class="sidebar">
+        <a href="dashboard.html" class="nav-item">Dashboard</a>
+        <a href="stagiairs.html" class="nav-item">Stagiairs</a>
+        <a href="logboeken.html" class="nav-item actief">Logboeken</a>
+        <a href="evaluatie.html" class="nav-item">Evaluatie</a>
+        <a href="../index.html" class="nav-item" id="uitlogBtn" style="margin-top:auto">Uitloggen</a>
+      </nav>
+
+      <main class="content-area">
+        <div class="logboek-detail-main">
+          <section class="logboek-days">
+            <div class="detail-heading-row">
+              <h2 id="weekTitel">LOGBOEK STUDENT</h2>
+              <div class="student-meta-row">
+                <span class="student-name" id="studentName">Student</span>
+                <span class="student-study" id="studentStudy"></span>
+                <span class="student-year" id="studentBedrijf"></span>
+              </div>
+            </div>
+
+            <div class="day-grid" id="dayGrid">
+              <!-- Dagen via JavaScript -->
+            </div>
+          </section>
+
+          <aside class="logboek-sidebar">
+            <div class="decision-panel detail-right-panel">
+              <div class="decision-status-row">
+                <label class="decision-status decision-approve">
+                  <span>Goedgekeurd</span>
+                  <input type="radio" name="mentorDecision" id="approveRadio" value="goedgekeurd">
+                </label>
+              </div>
+              <div class="decision-status-row">
+                <label class="decision-status decision-decline">
+                  <span>Terug naar student</span>
+                  <input type="radio" name="mentorDecision" id="declineRadio" value="open">
+                </label>
+              </div>
+
+              <div class="feedback-box">
+                <label class="feedback-label">Feedback stagementor:</label>
+                <textarea id="mentorFeedback" class="mentor-feedback"></textarea>
+              </div>
+
+              <button id="submitDecision" class="btn btn--primair">indienen</button>
+              <p id="weekFout" style="color:#990018; display:none; margin:10px 0 0;"></p>
+            </div>
+          </aside>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../js/nav.js"></script>
+  <script>
+    const API_URL = 'http://localhost:3000';
+    const token = localStorage.getItem('token') || '';
+    const params = new URLSearchParams(window.location.search);
+    const studentId = params.get('student');
+    const weekId = params.get('week');
+
+    const dayGrid = document.getElementById('dayGrid');
+    const approveRadio = document.getElementById('approveRadio');
+    const declineRadio = document.getElementById('declineRadio');
+    const feedbackEl = document.getElementById('mentorFeedback');
+    const submitBtn = document.getElementById('submitDecision');
+    const foutEl = document.getElementById('weekFout');
+
+    function escape(t){ if(t==null) return '(niet ingevuld)'; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+    function toonDatum(w){ return w ? new Date(w).toLocaleDateString('nl-BE', { weekday:'long', day:'numeric', month:'long' }) : '-'; }
+
+    (async function () {
+      let data;
+      try {
+        const res = await fetch(API_URL + '/api/logboeken/student/' + studentId, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (!res.ok) throw new Error('niet ok');
+        data = await res.json();
+      } catch (e) {
+        dayGrid.innerHTML = '<p class="day-text">Kon logboek niet laden.</p>';
+        return;
+      }
+
+      if (data.student) {
+        document.getElementById('studentName').textContent = data.student.voornaam + ' ' + data.student.achternaam;
+        document.getElementById('studentStudy').textContent = data.student.opleiding || '';
+      }
+      if (data.stage) document.getElementById('studentBedrijf').textContent = data.stage.bedrijf || '';
+
+      const week = (data.weken || []).find(w => String(w.id) === String(weekId));
+      if (!week) {
+        dayGrid.innerHTML = '<p class="day-text">Week niet gevonden.</p>';
+        return;
+      }
+
+      document.getElementById('weekTitel').textContent = 'LOGBOEK WEEK ' + week.week_nummer;
+
+      // Dagen renderen
+      if (!week.dagen.length) {
+        dayGrid.innerHTML = '<p class="day-text">Geen dagen ingevuld in deze week.</p>';
+      } else {
+        week.dagen.forEach((d, i) => {
+          const card = document.createElement('article');
+          card.className = 'day-card' + (i === week.dagen.length - 1 && week.dagen.length % 2 === 1 ? ' day-card-full' : '');
+          const titel = toonDatum(d.datum);
+          card.innerHTML = `
+            <div class="day-title">${titel.charAt(0).toUpperCase() + titel.slice(1)}</div>
+            <p class="day-text"><strong>Beschrijving uitgevoerde taken</strong><br>${escape(d.uitgevoerde_taken)}</p>
+            <p class="day-text"><strong>Reflectie</strong><br>${escape(d.reflectie)}</p>
+            <p class="day-text"><strong>Problemen of leerpunten</strong><br>${escape(d.problemen_leerpunten)}</p>`;
+          dayGrid.appendChild(card);
+        });
+      }
+
+      // Bestaande feedback/status voorinvullen
+      if (week.status === 'goedgekeurd') approveRadio.checked = true;
+      feedbackEl.value = week.feedback_mentor || '';
+
+      submitBtn.addEventListener('click', async () => {
+        foutEl.style.display = 'none';
+        const status = approveRadio.checked ? 'goedgekeurd' : (declineRadio.checked ? 'open' : null);
+        try {
+          const res = await fetch(API_URL + '/api/logboeken/week/' + weekId + '/feedback', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+            body: JSON.stringify({ feedback: feedbackEl.value, status })
+          });
+          const r = await res.json();
+          if (!res.ok) { foutEl.textContent = r.fout || 'Opslaan mislukt.'; foutEl.style.display = 'block'; return; }
+          window.location.href = 'logboek-detail.html?student=' + studentId;
+        } catch (e) {
+          foutEl.textContent = 'Kan geen verbinding maken met de server.';
+          foutEl.style.display = 'block';
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
