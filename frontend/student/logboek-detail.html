@@ -10,75 +10,67 @@
 <body>
 
   <div id="app">
-    <header class="header-monitoring">
-      <div class="header-left">
-        <a href="dashboard.html" class="header-nav-link">Dashboard</a>
-        <div class="header-divider"></div>
+    <header class="header">
+      <div class="header-logo">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+          <path d="M2 17l10 5 10-5"/>
+          <path d="M2 12l10 5 10-5"/>
+        </svg>
+        <span class="header-logo-text">Stageplatform</span>
       </div>
-      <div class="header-center">
-        <h1 class="header-title">STAGE MONITORING TOOL</h1>
-      </div>
-      <div class="header-right">
-        <div class="header-user">
-          <span>Student</span>
-          <button onclick="window.location.href='../index.html'">Profiel/Logout</button>
-        </div>
+      <div class="header-actions">
+        <span class="header-rol-badge">Student</span>
+        <button class="btn-terug" onclick="window.location.href='../index.html'">Terug</button>
       </div>
     </header>
 
-    <div class="monitoring-container">
-      <nav class="sidebar-monitoring">
-        <a href="dashboard.html" class="sidebar-item">DASHBOARD</a>
-        <a href="logboek.html" class="sidebar-item active">LOGBOEKEN</a>
-        <a href="evaluatie.html" class="sidebar-item">EVALUATIE</a>
-        <a href="#" class="sidebar-item">PROFIEL</a>
-      </nav>
+    <div class="app-body">
+      <nav class="sidebar"></nav>
 
-      <main class="monitoring-content">
-        <div class="logboek-detail-page">
-          <a href="logboek.html" class="back-link">← Terug naar logboeken</a>
-          <h2 class="detail-page-title">LOGBOEKEN</h2>
+      <main class="content-area">
+        <a href="logboek.html" style="display:inline-block;margin-bottom:16px;color:var(--primair);text-decoration:none;">&larr; Terug naar logboeken</a>
+        <h2>Logboek Detail</h2>
 
-          <div class="detail-card">
-            <div class="detail-block">
-              <h3>Logboekgegevens</h3>
-              <div class="detail-meta-row">
-                <span class="meta-pill"><strong>Datum:</strong> <span id="logboekDatum"></span></span>
-                <span class="meta-pill"><strong>Week:</strong> <span id="logboekWeek"></span></span>
-                <span class="meta-pill status-pill" id="logboekStatus" style="display:none;"></span>
-              </div>
+        <section class="student-card">
+          <h2>Logboekgegevens</h2>
+          <div class="contract-info">
+            <p><strong>Datum:</strong> <span id="logboekDatum"></span></p>
+            <p><strong>Week:</strong> <span id="logboekWeek"></span></p>
+            <p id="logboekStatusWrap" style="display:none;"><strong>Status:</strong> <span id="logboekStatus"></span></p>
+          </div>
+        </section>
+
+        <section class="student-card">
+          <h2>Uitgevoerde taken</h2>
+          <p style="color:#666;margin-bottom:12px;">Geef per taak een korte titel en een beschrijving van wat je hebt gedaan.</p>
+          <div id="takenContainer"></div>
+          <button type="button" id="addTaskBtn" class="btn-terug" style="margin-top:12px;">+ Taak toevoegen</button>
+        </section>
+
+        <section class="student-card">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+            <div>
+              <h3>Reflectie</h3>
+              <textarea id="reflectieField" rows="5" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;"
+                placeholder="Wat heb je deze week geleerd? Hoe ging het?"></textarea>
             </div>
-
-            <div class="detail-block">
-              <h3>Uitgevoerde taken</h3>
-              <p class="block-hint">Geef per taak een korte titel en een beschrijving van wat je hebt gedaan.</p>
-              <div id="takenContainer" class="detail-tasks"></div>
-              <button type="button" id="addTaskBtn" class="btn btn--secundair">+ Taak toevoegen</button>
-            </div>
-
-            <div class="detail-two-col">
-              <div class="detail-block">
-                <h3>Reflectie</h3>
-                <textarea id="reflectieField" class="detail-textarea"
-                  placeholder="Wat heb je deze week geleerd? Hoe ging het?"></textarea>
-              </div>
-              <div class="detail-block">
-                <h3>Problemen / leerpunten</h3>
-                <textarea id="problemenField" class="detail-textarea"
-                  placeholder="Welke moeilijkheden kwam je tegen? Waar wil je in groeien?"></textarea>
-              </div>
-            </div>
-
-            <div id="feedbackSection" class="feedback-panel" style="display: none;">
-              <div class="feedback-title">Mentorfeedback</div>
-              <div id="feedbackField" class="feedback-text"></div>
-            </div>
-
-            <div class="detail-actions">
-              <button id="saveBtn" class="btn btn--secundair">Opslaan als concept</button>
-              <button id="submitBtn" class="btn btn--primair">Logboek indienen</button>
+            <div>
+              <h3>Problemen / leerpunten</h3>
+              <textarea id="problemenField" rows="5" style="width:100%;padding:8px;border:1px solid #ccc;border-radius:6px;"
+                placeholder="Welke moeilijkheden kwam je tegen? Waar wil je in groeien?"></textarea>
             </div>
           </div>
+        </section>
+
+        <section id="feedbackSection" class="student-card" style="display:none;">
+          <h2>Mentorfeedback</h2>
+          <p id="feedbackField"></p>
+        </section>
+
+        <div style="display:flex;gap:12px;margin-top:16px;">
+          <button id="saveBtn" class="btn-terug">Opslaan als concept</button>
+          <button id="submitBtn" class="btn-terug">Logboek indienen</button>
         </div>
       </main>
     </div>
@@ -89,7 +81,6 @@
     const urlParams = new URLSearchParams(window.location.search);
     const weekParam = parseInt(urlParams.get('week'));
     const isEigen = urlParams.get('eigen') === '1';
-
     const container = document.getElementById('takenContainer');
 
     function getEigenLogboeken() {
@@ -100,17 +91,18 @@
     function maakTaakBlok(index, taak = { title: '', description: '' }, readonly = false) {
       const div = document.createElement('div');
       div.className = 'task-block';
+      div.style.cssText = 'margin-bottom:12px;padding:12px;border:1px solid #ddd;border-radius:6px;';
       const ro = readonly ? 'readonly' : '';
-      div.innerHTML = `
-        <div class="task-header">Taak ${index}</div>
-        <input class="task-title-input" placeholder="Titel van de taak" value="${(taak.title || '').replace(/"/g, '&quot;')}" ${ro}>
-        <textarea class="task-input" placeholder="Beschrijving van de uitgevoerde taak..." ${ro}>${taak.description || ''}</textarea>`;
+      div.innerHTML =
+        '<div style="font-weight:600;margin-bottom:8px;">Taak ' + index + '</div>' +
+        '<input style="width:100%;padding:6px;margin-bottom:6px;border:1px solid #ccc;border-radius:4px;" placeholder="Titel van de taak" value="' + (taak.title || '').replace(/"/g, '&quot;') + '" ' + ro + '>' +
+        '<textarea style="width:100%;padding:6px;border:1px solid #ccc;border-radius:4px;" rows="3" placeholder="Beschrijving van de uitgevoerde taak..." ' + ro + '>' + (taak.description || '') + '</textarea>';
       return div;
     }
 
     function hernummerTaken() {
-      container.querySelectorAll('.task-block .task-header').forEach((h, i) => {
-        h.textContent = 'Taak ' + (i + 1);
+      container.querySelectorAll('.task-block').forEach((h, i) => {
+        h.querySelector('div').textContent = 'Taak ' + (i + 1);
       });
     }
 
@@ -128,7 +120,7 @@
             problemen: 'Ik had wat moeite met de ingewikkelde netwerkconfiguratie, maar na wat onderzoek lukte het me.',
             feedback: 'Je hebt de toegewezen taken correct uitgevoerd. Probeer in het volgende logboek meer initiatief te tonen.',
             tasks: [
-              { title: 'Software geïnstalleerd op nieuwe toestellen', description: 'Nieuwe laptops met Windows 11 voorzien van de nodige software.' },
+              { title: 'Software geinstalleerd op nieuwe toestellen', description: 'Nieuwe laptops met Windows 11 voorzien van de nodige software.' },
               { title: 'Gebruikersaccounts aangemaakt', description: 'Nieuwe gebruikersaccounts aangemaakt en rechten ingesteld.' },
               { title: 'Netwerkproblemen onderzocht', description: 'Verbindingsproblemen op eerste verdieping opgelost.' }
             ]
@@ -154,51 +146,41 @@
         logboek = sampleLogboeken.find(log => log.week === weekParam);
       }
 
-      // Nieuw / leeg logboek -> leeg bewerkbaar formulier met 3 taken
       if (!logboek) {
         logboek = { week: weekParam || '', datum: '', submitted: false, tasks: [{}, {}, {}] };
       }
 
       const readonly = !!logboek.submitted;
 
-      // Gegevens
       if (logboek.datum) {
         const dateObj = new Date(logboek.datum.split('/').reverse().join('-'));
         const tekst = isNaN(dateObj) ? logboek.datum
           : dateObj.toLocaleDateString('nl-NL', { year: 'numeric', month: 'long', day: 'numeric' });
         document.getElementById('logboekDatum').textContent = tekst;
       } else {
-        document.getElementById('logboekDatum').textContent = '—';
+        document.getElementById('logboekDatum').textContent = '\u2014';
       }
-      document.getElementById('logboekWeek').textContent = logboek.week ? ('Week ' + logboek.week) : '—';
+      document.getElementById('logboekWeek').textContent = logboek.week ? ('Week ' + logboek.week) : '\u2014';
 
       if (logboek.submitted && logboek.statusText) {
-        const statusSpan = document.getElementById('logboekStatus');
-        statusSpan.style.display = '';
-        statusSpan.textContent = logboek.statusText;
-        statusSpan.classList.add(logboek.feedback ? 'status-feedback' : 'status-goedgekeurd');
+        document.getElementById('logboekStatusWrap').style.display = '';
+        document.getElementById('logboekStatus').textContent = logboek.statusText;
       }
 
-      // Taken
       const taken = (logboek.tasks && logboek.tasks.length) ? logboek.tasks : [{}, {}, {}];
       container.innerHTML = '';
       taken.forEach((taak, i) => container.appendChild(maakTaakBlok(i + 1, taak, readonly)));
 
-      // Reflectie / problemen
-      const reflectieField = document.getElementById('reflectieField');
-      const problemenField = document.getElementById('problemenField');
-      reflectieField.value = logboek.reflectie || '';
-      problemenField.value = logboek.problemen || '';
-      reflectieField.readOnly = readonly;
-      problemenField.readOnly = readonly;
+      document.getElementById('reflectieField').value = logboek.reflectie || '';
+      document.getElementById('problemenField').value = logboek.problemen || '';
+      document.getElementById('reflectieField').readOnly = readonly;
+      document.getElementById('problemenField').readOnly = readonly;
 
-      // Mentorfeedback
       if (logboek.submitted && logboek.feedback) {
-        document.getElementById('feedbackSection').style.display = 'block';
+        document.getElementById('feedbackSection').style.display = '';
         document.getElementById('feedbackField').textContent = logboek.feedback;
       }
 
-      // Knoppen
       const saveBtn = document.getElementById('saveBtn');
       const submitBtn = document.getElementById('submitBtn');
       const addTaskBtn = document.getElementById('addTaskBtn');
