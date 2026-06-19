@@ -5,7 +5,6 @@ import controleerToken from '../middleware/controleerToken.js'
 
 const router = express.Router()
 
-/* Controleer of de ingelogde gebruiker een admin is */
 function isAdmin(req, res, next) {
   if (req.gebruiker.rol !== 'admin') {
     return res.status(403).json({ fout: 'Geen toegang' })
@@ -13,11 +12,29 @@ function isAdmin(req, res, next) {
   next()
 }
 
+/* Hulpfunctie: stuur een notificatie + log een "e-mail" */
+async function stuurNotificatie(ontvangerId, titel, boodschap) {
+  try {
+    await db.query(
+      'INSERT INTO notificatie (ontvanger_id, titel, boodschap) VALUES (?, ?, ?)',
+      [ontvangerId, titel, boodschap]
+    )
+    console.log(`[EMAIL] Aan gebruiker ${ontvangerId}: ${titel} - ${boodschap}`)
+  } catch (err) {
+    console.error('Notificatie mislukt:', err)
+  }
+}
+
+/* Hulpfunctie: haal gebruiker op via id */
+async function haalGebruikerOp(id) {
+  const [rijen] = await db.query('SELECT id, voornaam, achternaam, email, rol FROM persoon WHERE id = ?', [id])
+  return rijen.length > 0 ? rijen[0] : null
+}
+
 /* ============================================================
-   GEBRUIKERS
+   GEBRUIKERS - Overzicht
    ============================================================ */
 
-/* Haal alle personen op */
 router.get('/gebruikers', controleerToken, isAdmin, async (req, res) => {
   try {
     const [rijen] = await db.query(
@@ -30,9 +47,93 @@ router.get('/gebruikers', controleerToken, isAdmin, async (req, res) => {
   }
 })
 
-/* Bewerk een gebruiker */
+/* ============================================================
+   GEBRUIKERS - Account aanmaken (alle rollen)
+   ============================================================ */
+
+router.post('/gebruiker-aanmaken', controleerToken, isAdmin, async (req, res) => {
+  const { voornaam, achternaam, wachtwoord, rol, extra } = req.body
+
+  if (!voornaam || !achternaam || !wachtwoord || !rol) {
+    return res.status(400).json({ fout: 'Voornaam, achternaam, wachtwoord en rol zijn verplicht' })
+  }
+
+  if (wachtwoord.length < 6) {
+    return res.status(400).json({ fout: 'Wachtwoord moet minstens 6 tekens hebben' })
+  }
+
+  const geldigeRollen = ['student', 'docent', 'stagementor', 'stagecommissie', 'admin']
+  if (!geldigeRollen.includes(rol)) {
+    return res.status(400).json({ fout: 'Ongeldige rol' })
+  }
+
+  const domeinen = {
+    student: 'student.ehb.be',
+    docent: 'docent.ehb.be',
+    stagementor: 'mentor.ehb.be',
+    stagecommissie: 'commissie.ehb.be',
+    admin: 'admin.ehb.be'
+  }
+
+  const schoneVoornaam = voornaam.toLowerCase().replace(/[^a-z]/g, '')
+  const schoneAchternaam = achternaam.toLowerCase().replace(/[^a-z]/g, '')
+  const email = schoneVoornaam + '.' + schoneAchternaam + '@' + domeinen[rol]
+
+  try {
+    const [bestaand] = await db.query('SELECT id FROM persoon WHERE email = ?', [email])
+    if (bestaand.length > 0) {
+      return res.status(409).json({ fout: 'Dit e-mailadres is al in gebruik: ' + email })
+    }
+
+    const hash = await bcrypt.hash(wachtwoord, 10)
+
+    const [resultaat] = await db.query(
+      'INSERT INTO persoon (voornaam, achternaam, email, wachtwoord_hash, rol, actief) VALUES (?, ?, ?, ?, ?, TRUE)',
+      [voornaam, achternaam, email, hash, rol]
+    )
+
+    const nieuweGebruikerId = resultaat.insertId
+
+    if (rol === 'student') {
+      await db.query(
+        'INSERT INTO student (persoon_id, studentnummer, opleiding_id) VALUES (?, ?, ?)',
+        [nieuweGebruikerId, extra?.studentnummer || null, extra?.opleiding_id || 1]
+      )
+    } else if (rol === 'docent') {
+      await db.query(
+        'INSERT INTO docent (persoon_id, vakgroep) VALUES (?, ?)',
+        [nieuweGebruikerId, extra?.vakgroep || null]
+      )
+    } else if (rol === 'stagementor') {
+      await db.query(
+        'INSERT INTO stagementor (persoon_id, functie, bedrijf_id) VALUES (?, ?, ?)',
+        [nieuweGebruikerId, extra?.functie || null, extra?.bedrijf_id || null]
+      )
+    } else if (rol === 'stagecommissie') {
+      await db.query(
+        'INSERT INTO stagecommissielid (persoon_id, commissie_rol) VALUES (?, ?)',
+        [nieuweGebruikerId, extra?.commissie_rol || null]
+      )
+    } else if (rol === 'admin') {
+      await db.query(
+        'INSERT INTO administratie (persoon_id, dienst) VALUES (?, ?)',
+        [nieuweGebruikerId, extra?.dienst || null]
+      )
+    }
+
+    res.status(201).json({ bericht: 'Account aangemaakt', email, id: nieuweGebruikerId })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ fout: 'Serverfout' })
+  }
+})
+
+/* ============================================================
+   GEBRUIKERS - Bewerken
+   ============================================================ */
+
 router.put('/gebruikers/:id', controleerToken, isAdmin, async (req, res) => {
-  const { voornaam, achternaam, email, rol, actief } = req.body
+  const { voornaam, achternaam, email, actief } = req.body
 
   try {
     await db.query(
@@ -47,10 +148,137 @@ router.put('/gebruikers/:id', controleerToken, isAdmin, async (req, res) => {
 })
 
 /* ============================================================
+   GEBRUIKERS - Rol wijzigen
+   ============================================================ */
+
+router.put('/gebruikers/:id/rol', controleerToken, isAdmin, async (req, res) => {
+  const { nieuweRol } = req.body
+  const gebruikerId = req.params.id
+
+  const geldigeRollen = ['student', 'docent', 'stagementor', 'stagecommissie', 'admin']
+  if (!geldigeRollen.includes(nieuweRol)) {
+    return res.status(400).json({ fout: 'Ongeldige rol' })
+  }
+
+  try {
+    const gebruiker = await haalGebruikerOp(gebruikerId)
+    if (!gebruiker) {
+      return res.status(404).json({ fout: 'Gebruiker niet gevonden' })
+    }
+
+    const oudeRol = gebruiker.rol
+    if (oudeRol === nieuweRol) {
+      return res.status(400).json({ fout: 'Gebruiker heeft al deze rol' })
+    }
+
+    /* Verwijder uit huidige role-tabel */
+    if (oudeRol === 'student') {
+      await db.query('DELETE FROM student WHERE persoon_id = ?', [gebruikerId])
+    } else if (oudeRol === 'docent') {
+      await db.query('DELETE FROM docent WHERE persoon_id = ?', [gebruikerId])
+    } else if (oudeRol === 'stagementor') {
+      await db.query('DELETE FROM stagementor WHERE persoon_id = ?', [gebruikerId])
+    } else if (oudeRol === 'stagecommissie') {
+      await db.query('DELETE FROM stagecommissielid WHERE persoon_id = ?', [gebruikerId])
+    } else if (oudeRol === 'admin') {
+      await db.query('DELETE FROM administratie WHERE persoon_id = ?', [gebruikerId])
+    }
+
+    /* Update de rol in persoon */
+    await db.query('UPDATE persoon SET rol = ? WHERE id = ?', [nieuweRol, gebruikerId])
+
+    /* Voeg toe aan nieuwe role-tabel */
+    if (nieuweRol === 'student') {
+      await db.query('INSERT INTO student (persoon_id, studentnummer, opleiding_id) VALUES (?, ?, ?)', [gebruikerId, null, 1])
+    } else if (nieuweRol === 'docent') {
+      await db.query('INSERT INTO docent (persoon_id, vakgroep) VALUES (?, ?)', [gebruikerId, null])
+    } else if (nieuweRol === 'stagementor') {
+      await db.query('INSERT INTO stagementor (persoon_id, functie, bedrijf_id) VALUES (?, ?, ?)', [gebruikerId, null, null])
+    } else if (nieuweRol === 'stagecommissie') {
+      await db.query('INSERT INTO stagecommissielid (persoon_id, commissie_rol) VALUES (?, ?)', [gebruikerId, null])
+    } else if (nieuweRol === 'admin') {
+      await db.query('INSERT INTO administratie (persoon_id, dienst) VALUES (?, ?)', [gebruikerId, null])
+    }
+
+    /* Stuur notificatie naar de gebruiker */
+    const rolLabels = { student: 'Student', docent: 'Docent', stagementor: 'Stagementor', stagecommissie: 'Stagecommissie', admin: 'Administratie' }
+    await stuurNotificatie(
+      gebruikerId,
+      'Rol gewijzigd',
+      `Je rol is gewijzigd van ${rolLabels[oudeRol]} naar ${rolLabels[nieuweRol]}.`
+    )
+
+    res.json({ bericht: 'Rol gewijzigd van ' + oudeRol + ' naar ' + nieuweRol })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ fout: 'Serverfout' })
+  }
+})
+
+/* ============================================================
+   GEBRUIKERS - Wachtwoord wijzigen
+   ============================================================ */
+
+router.put('/gebruikers/:id/wachtwoord', controleerToken, isAdmin, async (req, res) => {
+  const { nieuwWachtwoord } = req.body
+
+  if (!nieuwWachtwoord || nieuwWachtwoord.length < 6) {
+    return res.status(400).json({ fout: 'Wachtwoord moet minstens 6 tekens hebben' })
+  }
+
+  try {
+    const gebruiker = await haalGebruikerOp(req.params.id)
+    if (!gebruiker) {
+      return res.status(404).json({ fout: 'Gebruiker niet gevonden' })
+    }
+
+    const hash = await bcrypt.hash(nieuwWachtwoord, 10)
+    await db.query('UPDATE persoon SET wachtwoord_hash = ? WHERE id = ?', [hash, req.params.id])
+
+    await stuurNotificatie(
+      req.params.id,
+      'Wachtwoord gewijzigd',
+      'Je wachtwoord is gewijzigd door de administrator.'
+    )
+
+    res.json({ bericht: 'Wachtwoord gewijzigd' })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ fout: 'Serverfout' })
+  }
+})
+
+/* ============================================================
+   GEBRUIKERS - Account verwijderen (soft delete)
+   ============================================================ */
+
+router.delete('/gebruikers/:id', controleerToken, isAdmin, async (req, res) => {
+  try {
+    const gebruiker = await haalGebruikerOp(req.params.id)
+    if (!gebruiker) {
+      return res.status(404).json({ fout: 'Gebruiker niet gevonden' })
+    }
+
+    if (gebruiker.rol === 'admin') {
+      const [admins] = await db.query("SELECT COUNT(*) AS aantal FROM persoon WHERE rol = 'admin' AND actief = TRUE")
+      if (admins[0].aantal <= 1) {
+        return res.status(400).json({ fout: 'Kan de laatste admin niet verwijderen' })
+      }
+    }
+
+    await db.query('UPDATE persoon SET actief = FALSE WHERE id = ?', [req.params.id])
+
+    res.json({ bericht: 'Account gedeactiveerd' })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ fout: 'Serverfout' })
+  }
+})
+
+/* ============================================================
    DOCENTEN
    ============================================================ */
 
-/* Haal alle docenten op */
 router.get('/docenten', controleerToken, isAdmin, async (req, res) => {
   try {
     const [rijen] = await db.query(
@@ -66,52 +294,10 @@ router.get('/docenten', controleerToken, isAdmin, async (req, res) => {
   }
 })
 
-/* Maak een nieuwe docent aan */
-router.post('/docent-aanmaken', controleerToken, isAdmin, async (req, res) => {
-  const { voornaam, achternaam, wachtwoord, vakgroep } = req.body
-
-  if (!voornaam || !achternaam || !wachtwoord) {
-    return res.status(400).json({ fout: 'Voornaam, achternaam en wachtwoord zijn verplicht' })
-  }
-
-  if (wachtwoord.length < 6) {
-    return res.status(400).json({ fout: 'Wachtwoord moet minstens 6 tekens hebben' })
-  }
-
-  const schoneVoornaam = voornaam.toLowerCase().replace(/[^a-z]/g, '')
-  const schoneAchternaam = achternaam.toLowerCase().replace(/[^a-z]/g, '')
-  const email = schoneVoornaam + '.' + schoneAchternaam + '@docent.ehb.be'
-
-  try {
-    const [bestaand] = await db.query('SELECT id FROM persoon WHERE email = ?', [email])
-    if (bestaand.length > 0) {
-      return res.status(409).json({ fout: 'Dit e-mailadres is al in gebruik: ' + email })
-    }
-
-    const hash = await bcrypt.hash(wachtwoord, 10)
-
-    const [resultaat] = await db.query(
-      'INSERT INTO persoon (voornaam, achternaam, email, wachtwoord_hash, rol, actief) VALUES (?, ?, ?, ?, ?, TRUE)',
-      [voornaam, achternaam, email, hash, 'docent']
-    )
-
-    await db.query(
-      'INSERT INTO docent (persoon_id, vakgroep) VALUES (?, ?)',
-      [resultaat.insertId, vakgroep || null]
-    )
-
-    res.status(201).json({ bericht: 'Docent aangemaakt', email })
-  } catch (err) {
-    console.error(err)
-    res.status(500).json({ fout: 'Serverfout' })
-  }
-})
-
 /* ============================================================
    STUDENTEN
    ============================================================ */
 
-/* Haal alle studenten op met stage-informatie */
 router.get('/studenten', controleerToken, isAdmin, async (req, res) => {
   try {
     const [rijen] = await db.query(
@@ -120,6 +306,7 @@ router.get('/studenten', controleerToken, isAdmin, async (req, res) => {
               sv.id AS voorstel_id, sv.functie,
               b.naam AS bedrijf_naam,
               dp.voornaam AS docent_voornaam, dp.achternaam AS docent_achternaam,
+              mp.voornaam AS mentor_voornaam, mp.achternaam AS mentor_achternaam,
               svs.naam AS status_stage
        FROM persoon p
        JOIN student st ON p.id = st.persoon_id
@@ -129,6 +316,8 @@ router.get('/studenten', controleerToken, isAdmin, async (req, res) => {
        LEFT JOIN stage s ON s.student_id = p.id
        LEFT JOIN docent d ON s.docent_id = d.persoon_id
        LEFT JOIN persoon dp ON d.persoon_id = dp.id
+       LEFT JOIN stagementor sm ON s.mentor_id = sm.persoon_id
+       LEFT JOIN persoon mp ON sm.persoon_id = mp.id
        LEFT JOIN stagevoorstel_status svs ON sv.status_id = svs.id
        WHERE p.rol = 'student'
        ORDER BY p.achternaam`
@@ -140,52 +329,10 @@ router.get('/studenten', controleerToken, isAdmin, async (req, res) => {
   }
 })
 
-/* Maak een nieuwe student aan */
-router.post('/student-aanmaken', controleerToken, isAdmin, async (req, res) => {
-  const { voornaam, achternaam, wachtwoord, studentnummer, opleiding_id } = req.body
-
-  if (!voornaam || !achternaam || !wachtwoord || !studentnummer) {
-    return res.status(400).json({ fout: 'Voornaam, achternaam, wachtwoord en studentnummer zijn verplicht' })
-  }
-
-  if (wachtwoord.length < 6) {
-    return res.status(400).json({ fout: 'Wachtwoord moet minstens 6 tekens hebben' })
-  }
-
-  const schoneVoornaam = voornaam.toLowerCase().replace(/[^a-z]/g, '')
-  const schoneAchternaam = achternaam.toLowerCase().replace(/[^a-z]/g, '')
-  const email = schoneVoornaam + '.' + schoneAchternaam + '@student.ehb.be'
-
-  try {
-    const [bestaand] = await db.query('SELECT id FROM persoon WHERE email = ?', [email])
-    if (bestaand.length > 0) {
-      return res.status(409).json({ fout: 'Dit e-mailadres is al in gebruik: ' + email })
-    }
-
-    const hash = await bcrypt.hash(wachtwoord, 10)
-
-    const [resultaat] = await db.query(
-      'INSERT INTO persoon (voornaam, achternaam, email, wachtwoord_hash, rol, actief) VALUES (?, ?, ?, ?, ?, TRUE)',
-      [voornaam, achternaam, email, hash, 'student']
-    )
-
-    await db.query(
-      'INSERT INTO student (persoon_id, studentnummer, opleiding_id) VALUES (?, ?, ?)',
-      [resultaat.insertId, studentnummer, opleiding_id || 1]
-    )
-
-    res.status(201).json({ bericht: 'Student aangemaakt', email })
-  } catch (err) {
-    console.error(err)
-    res.status(500).json({ fout: 'Serverfout' })
-  }
-})
-
 /* ============================================================
    BEDRIJVEN
    ============================================================ */
 
-/* Haal alle bedrijven op */
 router.get('/bedrijven', controleerToken, isAdmin, async (req, res) => {
   try {
     const [rijen] = await db.query(
@@ -203,7 +350,6 @@ router.get('/bedrijven', controleerToken, isAdmin, async (req, res) => {
   }
 })
 
-/* Maak een nieuw bedrijf aan */
 router.post('/bedrijven', controleerToken, isAdmin, async (req, res) => {
   const { naam, adres, email, telefoon, contactpersoon } = req.body
 
@@ -229,7 +375,6 @@ router.post('/bedrijven', controleerToken, isAdmin, async (req, res) => {
   }
 })
 
-/* Bewerk een bedrijf */
 router.put('/bedrijven/:id', controleerToken, isAdmin, async (req, res) => {
   const { naam, adres, email, telefoon, contactpersoon, actief } = req.body
 
@@ -249,7 +394,6 @@ router.put('/bedrijven/:id', controleerToken, isAdmin, async (req, res) => {
    MENTOREN
    ============================================================ */
 
-/* Haal alle stagementoren op */
 router.get('/mentoren', controleerToken, isAdmin, async (req, res) => {
   try {
     const [rijen] = await db.query(
@@ -267,48 +411,6 @@ router.get('/mentoren', controleerToken, isAdmin, async (req, res) => {
   }
 })
 
-/* Maak een stagementor aan */
-router.post('/mentor-aanmaken', controleerToken, isAdmin, async (req, res) => {
-  const { voornaam, achternaam, wachtwoord, functie, bedrijf_id } = req.body
-
-  if (!voornaam || !achternaam || !wachtwoord) {
-    return res.status(400).json({ fout: 'Voornaam, achternaam en wachtwoord zijn verplicht' })
-  }
-
-  if (wachtwoord.length < 6) {
-    return res.status(400).json({ fout: 'Wachtwoord moet minstens 6 tekens hebben' })
-  }
-
-  const schoneVoornaam = voornaam.toLowerCase().replace(/[^a-z]/g, '')
-  const schoneAchternaam = achternaam.toLowerCase().replace(/[^a-z]/g, '')
-  const email = schoneVoornaam + '.' + schoneAchternaam + '@mentor.ehb.be'
-
-  try {
-    const [bestaand] = await db.query('SELECT id FROM persoon WHERE email = ?', [email])
-    if (bestaand.length > 0) {
-      return res.status(409).json({ fout: 'Dit e-mailadres is al in gebruik: ' + email })
-    }
-
-    const hash = await bcrypt.hash(wachtwoord, 10)
-
-    const [resultaat] = await db.query(
-      'INSERT INTO persoon (voornaam, achternaam, email, wachtwoord_hash, rol, actief) VALUES (?, ?, ?, ?, ?, TRUE)',
-      [voornaam, achternaam, email, hash, 'stagementor']
-    )
-
-    await db.query(
-      'INSERT INTO stagementor (persoon_id, functie, bedrijf_id) VALUES (?, ?, ?)',
-      [resultaat.insertId, functie || null, bedrijf_id || null]
-    )
-
-    res.status(201).json({ bericht: 'Stagementor aangemaakt', email })
-  } catch (err) {
-    console.error(err)
-    res.status(500).json({ fout: 'Serverfout' })
-  }
-})
-
-/* Bewerk een mentor */
 router.put('/mentoren/:id', controleerToken, isAdmin, async (req, res) => {
   const { functie, bedrijf_id } = req.body
 
@@ -325,10 +427,9 @@ router.put('/mentoren/:id', controleerToken, isAdmin, async (req, res) => {
 })
 
 /* ============================================================
-   STAGES
+   STAGES - Overzicht
    ============================================================ */
 
-/* Overzicht van alle actieve stages */
 router.get('/stages/overzicht', controleerToken, isAdmin, async (req, res) => {
   try {
     const [rijen] = await db.query(
@@ -382,11 +483,11 @@ router.get('/statistieken', controleerToken, isAdmin, async (req, res) => {
    STAGEVOORSTELLEN
    ============================================================ */
 
-/* Haal alle stagevoorstellen op */
 router.get('/stagevoorstellen', controleerToken, isAdmin, async (req, res) => {
   try {
     const [rijen] = await db.query(
       `SELECT sv.id, sv.startdatum, sv.einddatum, sv.functie, sv.aangemaakt_op,
+              sv.student_id, sv.mentor_id, sv.bedrijf_id,
               p.voornaam, p.achternaam,
               b.naam AS bedrijf_naam,
               svs.naam AS status,
@@ -406,17 +507,99 @@ router.get('/stagevoorstellen', controleerToken, isAdmin, async (req, res) => {
 })
 
 /* ============================================================
+   STAGEVOORSTEL - Koppel mentor en docent
+   ============================================================ */
+
+router.put('/stagevoorstellen/:id/koppel', controleerToken, isAdmin, async (req, res) => {
+  const { mentor_id, docent_id } = req.body
+  const voorstelId = req.params.id
+
+  try {
+    const [voorstel] = await db.query('SELECT * FROM stagevoorstel WHERE id = ?', [voorstelId])
+    if (voorstel.length === 0) {
+      return res.status(404).json({ fout: 'Voorstel niet gevonden' })
+    }
+
+    if (mentor_id) {
+      await db.query('UPDATE stagevoorstel SET mentor_id = ? WHERE id = ?', [mentor_id, voorstelId])
+    }
+
+    const studentId = voorstel[0].student_id
+
+    if (docent_id) {
+      /* Zoek of er al een stage is voor dit voorstel */
+      const [bestaandeStage] = await db.query(
+        `SELECT s.id FROM stage s
+         JOIN stageovereenkomst so ON s.stageovereenkomst_id = so.id
+         WHERE so.stagevoorstel_id = ?`,
+        [voorstelId]
+      )
+
+      if (bestaandeStage.length > 0) {
+        await db.query('UPDATE stage SET docent_id = ?, mentor_id = ? WHERE id = ?', [docent_id, mentor_id || voorstel[0].mentor_id, bestaandeStage[0].id])
+      }
+    }
+
+    /* Haal namen op voor notificatie */
+    const student = await haalGebruikerOp(studentId)
+    let mentorNaam = '-'
+    let docentNaam = '-'
+
+    if (mentor_id) {
+      const mentor = await haalGebruikerOp(mentor_id)
+      if (mentor) mentorNaam = mentor.voornaam + ' ' + mentor.achternaam
+    }
+    if (docent_id) {
+      const docent = await haalGebruikerOp(docent_id)
+      if (docent) docentNaam = docent.voornaam + ' ' + docent.achternaam
+    }
+
+    /* Stuur notificatie naar de student */
+    if (student) {
+      await stuurNotificatie(
+        studentId,
+        'Stage toegewezen',
+        `Je stagevoorstel is toegewezen. Mentor: ${mentorNaam}, Docent: ${docentNaam}.`
+      )
+    }
+
+    /* Stuur notificatie naar de mentor */
+    if (mentor_id) {
+      await stuurNotificatie(
+        mentor_id,
+        'Nieuwe stagiair toegewezen',
+        `Je hebt een nieuwe stagiair toegewezen gekregen: ${student ? student.voornaam + ' ' + student.achternaam : 'Onbekend'}.`
+      )
+    }
+
+    /* Stuur notificatie naar de docent */
+    if (docent_id) {
+      await stuurNotificatie(
+        docent_id,
+        'Nieuwe student toegewezen',
+        `Je hebt een nieuwe student toegewezen gekregen: ${student ? student.voornaam + ' ' + student.achternaam : 'Onbekend'}.`
+      )
+    }
+
+    res.json({ bericht: 'Mentor en docent gekoppeld' })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ fout: 'Serverfout' })
+  }
+})
+
+/* ============================================================
    STAGEOVEREENKOMSTEN
    ============================================================ */
 
-/* Haal alle stageovereenkomsten op */
 router.get('/stageovereenkomsten', controleerToken, isAdmin, async (req, res) => {
   try {
     const [rijen] = await db.query(
       `SELECT so.id, so.getekend_door_student, so.getekend_door_bedrijf, so.getekend_door_school,
               os.naam AS status, so.gevalideerd_op,
               p.voornaam, p.achternaam,
-              b.naam AS bedrijf_naam
+              b.naam AS bedrijf_naam,
+              sv.functie
        FROM stageovereenkomst so
        JOIN overeenkomst_status os ON so.status_id = os.id
        JOIN stagevoorstel sv ON so.stagevoorstel_id = sv.id
@@ -432,7 +615,6 @@ router.get('/stageovereenkomsten', controleerToken, isAdmin, async (req, res) =>
   }
 })
 
-/* Valideer een ondertekende stageovereenkomst */
 router.put('/stageovereenkomsten/:id/valideer', controleerToken, isAdmin, async (req, res) => {
   try {
     const [overeenkomst] = await db.query(
@@ -459,6 +641,22 @@ router.put('/stageovereenkomsten/:id/valideer', controleerToken, isAdmin, async 
       [req.gebruiker.id, req.params.id]
     )
 
+    /* Haal student op voor notificatie */
+    const [sv] = await db.query(
+      `SELECT sv.student_id FROM stageovereenkomst so
+       JOIN stagevoorstel sv ON so.stagevoorstel_id = sv.id
+       WHERE so.id = ?`,
+      [req.params.id]
+    )
+
+    if (sv.length > 0) {
+      await stuurNotificatie(
+        sv[0].student_id,
+        'Stageovereenkomst gevalideerd',
+        'Je stageovereenkomst is gevalideerd door de administratie. Je stage kan nu starten.'
+      )
+    }
+
     res.json({ bericht: 'Overeenkomst gevalideerd' })
   } catch (err) {
     console.error(err)
@@ -470,7 +668,6 @@ router.put('/stageovereenkomsten/:id/valideer', controleerToken, isAdmin, async 
    DOCUMENTEN
    ============================================================ */
 
-/* Haal alle documenten op */
 router.get('/documenten', controleerToken, isAdmin, async (req, res) => {
   try {
     const [rijen] = await db.query(
@@ -480,6 +677,34 @@ router.get('/documenten', controleerToken, isAdmin, async (req, res) => {
        JOIN persoon p ON d.uploader_id = p.id
        ORDER BY d.geupload_op DESC`
     )
+    res.json(rijen)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ fout: 'Serverfout' })
+  }
+})
+
+/* ============================================================
+   OPLEIDINGEN (voor dropdowns)
+   ============================================================ */
+
+router.get('/opleidingen', controleerToken, isAdmin, async (req, res) => {
+  try {
+    const [rijen] = await db.query('SELECT id, naam, afkorting FROM opleiding WHERE actief = TRUE ORDER BY naam')
+    res.json(rijen)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ fout: 'Serverfout' })
+  }
+})
+
+/* ============================================================
+   ACADEMIEJAREN (voor dropdowns)
+   ============================================================ */
+
+router.get('/academiejaren', controleerToken, isAdmin, async (req, res) => {
+  try {
+    const [rijen] = await db.query('SELECT id, naam FROM academiejaar WHERE actief = TRUE ORDER BY naam DESC')
     res.json(rijen)
   } catch (err) {
     console.error(err)
