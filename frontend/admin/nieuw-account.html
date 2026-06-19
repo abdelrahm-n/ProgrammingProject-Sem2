@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stageplatform - Admin - Nieuw account</title>
+  <link rel="stylesheet" href="../css/stijl.css" />
+  <link rel="stylesheet" href="../css/admin.css" />
+</head>
+<body>
+
+  <div id="app">
+    <header class="header">
+      <div class="header-logo">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+        </svg>
+        <span class="header-logo-text">Stageplatform</span>
+      </div>
+      <div class="header-actions">
+        <span class="header-rol-badge">Admin</span>
+        <button class="btn-terug" onclick="window.location.href='../index.html'">Terug</button>
+      </div>
+    </header>
+
+    <div class="app-body">
+      <nav class="sidebar">
+        <a href="dashboard.html" class="nav-item">Dashboard</a>
+        <a href="gebruikers.html" class="nav-item actief">Gebruikers</a>
+        <a href="studenten.html" class="nav-item">Studenten</a>
+        <a href="docenten.html" class="nav-item">Docenten</a>
+        <a href="mentoren.html" class="nav-item">Mentoren</a>
+        <a href="bedrijven.html" class="nav-item">Bedrijven</a>
+        <a href="stages.html" class="nav-item">Stages</a>
+        <a href="documenten.html" class="nav-item">Documenten</a>
+        <a href="../index.html" class="nav-item" id="uitlogBtn" style="margin-top:auto">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          Uitloggen
+        </a>
+      </nav>
+
+      <main class="content-area">
+
+        <div class="view-header">
+          <h1 class="view-titel">Nieuw account aanmaken</h1>
+          <p class="view-subtitel">Maak een nieuw account aan voor een gebruiker</p>
+        </div>
+
+        <div class="kaart" style="max-width:520px;">
+          <div class="kaart-titel">Gegevens</div>
+
+          <div class="formulier-kaart">
+            <form id="accountForm" class="formulier" novalidate>
+
+              <div class="form-group">
+                <label for="rol">Rol</label>
+                <select id="rol" required>
+                  <option value="">Kies een rol...</option>
+                  <option value="student">Student</option>
+                  <option value="docent">Docent</option>
+                  <option value="stagementor">Stagementor</option>
+                  <option value="stagecommissie">Stagecommissie</option>
+                  <option value="admin">Administratie</option>
+                </select>
+              </div>
+
+              <div class="form-rij form-rij--2">
+                <div class="form-group">
+                  <label for="voornaam">Voornaam</label>
+                  <input type="text" id="voornaam" placeholder="Jan" required />
+                </div>
+                <div class="form-group">
+                  <label for="achternaam">Achternaam</label>
+                  <input type="text" id="achternaam" placeholder="Jansen" required />
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="wachtwoord">Wachtwoord</label>
+                <input type="password" id="wachtwoord" placeholder="Minimaal 6 tekens" required />
+              </div>
+
+              <!-- Extra velden per rol -->
+              <div id="extraVelden" style="display:none;">
+
+                <!-- Student -->
+                <div id="velden-student" style="display:none;">
+                  <div class="form-rij form-rij--2">
+                    <div class="form-group">
+                      <label for="studentnummer">Studentnummer</label>
+                      <input type="text" id="studentnummer" placeholder="20250001" />
+                    </div>
+                    <div class="form-group">
+                      <label for="opleiding">Opleiding</label>
+                      <select id="opleiding"></select>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Docent -->
+                <div id="velden-docent" style="display:none;">
+                  <div class="form-group">
+                    <label for="vakgroep">Vakgroep</label>
+                    <input type="text" id="vakgroep" placeholder="Programmeren" />
+                  </div>
+                </div>
+
+                <!-- Stagementor -->
+                <div id="velden-stagementor" style="display:none;">
+                  <div class="form-rij form-rij--2">
+                    <div class="form-group">
+                      <label for="functie">Functie</label>
+                      <input type="text" id="functie" placeholder="Software Engineer" />
+                    </div>
+                    <div class="form-group">
+                      <label for="bedrijf">Bedrijf</label>
+                      <select id="bedrijf"></select>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Stagecommissie -->
+                <div id="velden-stagecommissie" style="display:none;">
+                  <div class="form-group">
+                    <label for="commissieRol">Commissie rol</label>
+                    <input type="text" id="commissieRol" placeholder="Voorzitter" />
+                  </div>
+                </div>
+
+                <!-- Admin -->
+                <div id="velden-admin" style="display:none;">
+                  <div class="form-group">
+                    <label for="dienst">Dienst</label>
+                    <input type="text" id="dienst" placeholder="Studentenadmin" />
+                  </div>
+                </div>
+              </div>
+
+              <p id="emailPreview" style="background:#f7f7f7;padding:10px;border-radius:4px;font-size:0.9em;color:#64748b;display:none;">
+                E-mail: <strong id="emailPreviewTekst"></strong>
+              </p>
+
+              <p id="melding" class="melding"></p>
+
+              <div class="form-acties">
+                <button type="submit" class="btn btn--primair">Account aanmaken</button>
+                <a href="gebruikers.html" class="btn btn--secundair">Annuleren</a>
+              </div>
+
+            </form>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="../js/nav.js"></script>
+  <script src="../js/nieuwAccount.js"></script>
+
+</body>
+</html>
