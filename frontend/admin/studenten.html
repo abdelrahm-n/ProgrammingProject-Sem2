@@ -26,10 +26,12 @@
     <div class="app-body">
       <nav class="sidebar">
         <a href="dashboard.html" class="nav-item">Dashboard</a>
-        <a href="studenten.html" class="nav-item actief">Student</a>
-        <a href="docenten.html" class="nav-item">Docent</a>
+        <a href="gebruikers.html" class="nav-item">Gebruikers</a>
+        <a href="studenten.html" class="nav-item actief">Studenten</a>
+        <a href="docenten.html" class="nav-item">Docenten</a>
+        <a href="mentoren.html" class="nav-item">Mentoren</a>
         <a href="bedrijven.html" class="nav-item">Bedrijven</a>
-        <a href="stages.html" class="nav-item">Stage</a>
+        <a href="stages.html" class="nav-item">Stages</a>
         <a href="documenten.html" class="nav-item">Documenten</a>
         <a href="../index.html" class="nav-item" id="uitlogBtn" style="margin-top:auto">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -53,6 +55,30 @@
         <div class="stat-kaarten" id="stat-kaarten"></div>
 
       </main>
+    </div>
+  </div>
+
+  <!-- Koppel mentor/docent modal -->
+  <div id="koppelModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;justify-content:center;align-items:center;">
+    <div style="background:white;border-radius:8px;padding:24px;max-width:480px;width:90%;max-height:90vh;overflow-y:auto;">
+      <h3 style="margin-top:0;">Mentor & Docent toewijzen</h3>
+      <p id="koppelStudentNaam" style="font-weight:600;margin-bottom:16px;"></p>
+      <form id="koppelForm" class="formulier" novalidate>
+        <input type="hidden" id="koppelVoorstelId" />
+        <div class="form-group">
+          <label for="koppelMentor">Mentor</label>
+          <select id="koppelMentor"></select>
+        </div>
+        <div class="form-group">
+          <label for="koppelDocent">Docent</label>
+          <select id="koppelDocent"></select>
+        </div>
+        <p id="koppelMelding" class="melding"></p>
+        <div class="form-acties">
+          <button type="submit" class="btn btn--primair">Koppelen</button>
+          <button type="button" class="btn btn--secundair" onclick="sluitKoppelModal()">Annuleren</button>
+        </div>
+      </form>
     </div>
   </div>
 
