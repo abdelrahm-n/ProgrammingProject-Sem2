@@ -13,7 +13,7 @@ const stageSelectie = document.getElementById('stageSelectie')
 /* Laad de stages die de mentor begeleidt */
 async function laadStages() {
   try {
-    const antwoord = await fetch(API_URL + '/api/stages/mijn', {
+    const antwoord = await fetch(API_URL + '/api/mentor/mijn-stagiairs', {
       headers: { 'Authorization': 'Bearer ' + token }
     })
 
@@ -113,12 +113,12 @@ async function laadBeoordelingen(evaluatieId) {
 
         <div class="form-rij form-rij--2">
           <div class="form-group">
-            <label>Score (1-10)</label>
+            <label>Score (0-5)</label>
             <input
-              type="number" min="1" max="10"
+              type="number" min="0" max="5"
               id="score-${evaluatieId}-${b.competentie_id}"
               value="${b.mentor_score !== null ? b.mentor_score : ''}"
-              placeholder="1 t/m 10"
+              placeholder="0 t/m 5"
             />
           </div>
           <div class="form-group">
@@ -180,8 +180,8 @@ async function slaScoreOp(evaluatieId, competentieId) {
   const score    = document.getElementById('score-' + evaluatieId + '-' + competentieId).value
   const feedback = document.getElementById('feedback-' + evaluatieId + '-' + competentieId).value
 
-  if (!score || score < 1 || score > 10) {
-    alert('Voer een score in tussen 1 en 10.')
+  if (!score || score < 0 || score > 5) {
+    alert('Voer een score in tussen 0 en 5.')
     return
   }
 
@@ -218,9 +218,6 @@ stageSelectie.addEventListener('change', function () {
   if (this.value) {
     laadEvaluaties(this.value)
   } else {
-    localStorage.setItem("zelfEvaluatieEinde", JSON.stringify(evaluatie));
+    inhoud.innerHTML = ''
   }
-
-  alert("Mentorevaluatie opgeslagen.");
-  terugNaarStudenten();
-}
+})

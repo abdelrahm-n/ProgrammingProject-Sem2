@@ -384,6 +384,10 @@ CREATE TABLE competentie (
     beschrijving TEXT,
     gewicht INT,
 
+    rubric_volledig TEXT NULL,
+    rubric_goed TEXT NULL,
+    rubric_onvoldoende TEXT NULL,
+
     actief BOOLEAN DEFAULT TRUE,
 
     FOREIGN KEY (opleiding_id)

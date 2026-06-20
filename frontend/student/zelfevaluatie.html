@@ -63,12 +63,6 @@
     const melding = document.getElementById('evalMelding');
     const indienenBtn = document.getElementById('indienenBtn');
 
-    const scoreOpties = [
-      { punten: 5, label: 'Sterk',        tekst: 'Ik voer deze competentie sterk uit en neem initiatief.' },
-      { punten: 3, label: 'Goed',         tekst: 'Ik kan dit meestal zelfstandig toepassen.' },
-      { punten: 1, label: 'Onvoldoende',  tekst: 'Ik ontwikkel deze competentie nog onvoldoende.' }
-    ];
-
     let evaluatieId = null;
     let beoordelingen = [];
 
@@ -85,14 +79,25 @@
       beoordelingen.forEach((b, i) => {
         const card = document.createElement('div');
         card.className = 'competentie-card';
-        const optiesHtml = scoreOpties.map(o => `
-          <label class="score-optie">
-            <input type="radio" name="score-${i}" value="${o.punten}"
-              ${Number(b.student_score) === o.punten ? 'checked' : ''}
-              onchange="document.getElementById('resultaat-${i}').textContent='${o.punten}/5'">
-            <strong>${o.punten} punt${o.punten > 1 ? 'en' : ''} - ${o.label}</strong><br>
-            <span>${o.tekst}</span>
-          </label>`).join('');
+
+        // Rubric teksten komen uit de database via de API
+        const opties = [
+          { punten: 5, label: 'Sterk',        tekst: b.rubric_volledig || 'Ik voer deze competentie sterk uit.' },
+          { punten: 3, label: 'Goed',         tekst: b.rubric_goed || 'Ik kan dit meestal zelfstandig toepassen.' },
+          { punten: 1, label: 'Onvoldoende',  tekst: b.rubric_onvoldoende || 'Ik ontwikkel deze competentie nog onvoldoende.' }
+        ];
+
+        var optiesHtml = '';
+        for (var j = 0; j < opties.length; j++) {
+          var o = opties[j];
+          var checked = Number(b.student_score) === o.punten ? ' checked' : '';
+          optiesHtml += '<label class="score-optie">' +
+            '<input type="radio" name="score-' + i + '" value="' + o.punten + '"' + checked +
+            ' onchange="document.getElementById(\'resultaat-' + i + '\').textContent=\'' + o.punten + '/5\'">' +
+            '<strong>' + o.punten + ' punt' + (o.punten > 1 ? 'en' : '') + ' - ' + o.label + '</strong><br>' +
+            '<span>' + escape(o.tekst) + '</span>' +
+            '</label>';
+        }
 
         card.innerHTML = `
           <div class="competentie-header">

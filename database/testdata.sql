@@ -1,34 +1,5 @@
 USE stage_monitoring;
 
-SET FOREIGN_KEY_CHECKS = 0;
-TRUNCATE TABLE competentie_beoordeling;
-TRUNCATE TABLE evaluatie_moment;
-TRUNCATE TABLE logboek_feedback;
-TRUNCATE TABLE logboek_dag_item;
-TRUNCATE TABLE logboek_week;
-TRUNCATE TABLE document;
-TRUNCATE TABLE stage;
-TRUNCATE TABLE stageovereenkomst;
-TRUNCATE TABLE commissie_beoordeling;
-TRUNCATE TABLE stagevoorstel;
-TRUNCATE TABLE notificatie;
-TRUNCATE TABLE competentie;
-TRUNCATE TABLE evaluatie_type;
-TRUNCATE TABLE logboek_status;
-TRUNCATE TABLE overeenkomst_status;
-TRUNCATE TABLE beslissing;
-TRUNCATE TABLE stagevoorstel_status;
-TRUNCATE TABLE administratie;
-TRUNCATE TABLE stagecommissielid;
-TRUNCATE TABLE stagementor;
-TRUNCATE TABLE docent;
-TRUNCATE TABLE student;
-TRUNCATE TABLE bedrijf;
-TRUNCATE TABLE academiejaar;
-TRUNCATE TABLE opleiding;
-TRUNCATE TABLE persoon;
-SET FOREIGN_KEY_CHECKS = 1;
-
 INSERT INTO stagevoorstel_status (id, naam, beschrijving) VALUES
 (1, 'ingediend',          'De aanvraag is ingediend en wacht op behandeling'),
 (2, 'in_behandeling',     'De stagecommissie bekijkt de aanvraag'),
@@ -108,11 +79,84 @@ INSERT INTO stagecommissielid (persoon_id, commissie_rol) VALUES
 INSERT INTO administratie (persoon_id, dienst) VALUES
 (13, 'Stagedienst');
 
-INSERT INTO competentie (id, opleiding_id, naam, beschrijving, gewicht, actief) VALUES
-(1, 1, 'Technische vaardigheden',    'Beheerst de gebruikte technologieen en tools', 3, TRUE),
-(2, 1, 'Communicatie',               'Communiceert helder met team en klant',        2, TRUE),
-(3, 1, 'Zelfstandigheid',            'Werkt zelfstandig en neemt initiatief',        2, TRUE),
-(4, 1, 'Probleemoplossend vermogen', 'Analyseert en lost problemen doeltreffend op', 3, TRUE);
+INSERT IGNORE INTO competentie (id, opleiding_id, naam, beschrijving, gewicht, rubric_volledig, rubric_goed, rubric_onvoldoende, actief) VALUES
+(1,  1, 'LO1 - Beheersing van het planningsproces',
+       'De lerende professional beheerst het volledige planningsproces.',
+       10,
+       'De student beheerst het volledige planningsproces en maakt realistische planningen.',
+       'De student kan een planning opstellen maar mist soms structuur.',
+       'De student heeft moeite met plannen en maakt onrealistische planningen.',
+       TRUE),
+(2,  1, 'LO2 - Ontwerpen van IT-oplossingen',
+       'De lerende professional ontwerpt IT-oplossingen volgens de industriestandaarden.',
+       10,
+       'De student ontwerpt volledige IT-oplossingen die voldoen aan industriestandaarden.',
+       'De student kan een ontwerp maken maar volgt niet altijd alle standaarden.',
+       'De student heeft moeite met het ontwerpen van IT-oplossingen.',
+       TRUE),
+(3,  1, 'LO3 - Implementatie van digitale producten',
+       'De lerende professional implementeert digitale producten in een professionele omgeving.',
+       10,
+       'De student implementeert digitale producten zelfstandig en kwaliteitsvol.',
+       'De student kan implementeren maar heeft soms begeleiding nodig.',
+       'De student heeft significante moeite met implementatie.',
+       TRUE),
+(4,  1, 'LO4 - Integratie van technologie en infrastructuur',
+       'De lerende professional integreert technologie en infrastructuur binnen een professionele omgeving.',
+       10,
+       'De student integreert technologie en infrastructuur foutloos en doordacht.',
+       'De student kan technologie integreren maar ondervindt soms problemen.',
+       'De student heeft moeite met het integreren van technologie.',
+       TRUE),
+(5,  1, 'LO5 - Onderzoekende houding',
+       'De lerende professional hanteert een onderzoekende houding om tot innovatieve oplossingen te komen.',
+       10,
+       'De student hanteert een sterke onderzoekende houding en analyseert kritisch.',
+       'De student onderzoekt mogelijke oplossingen maar de analyse kan verdiept worden.',
+       'Er is weinig tot geen onderzoek uitgevoerd.',
+       TRUE),
+(6,  1, 'LO6 - Helder en transparant communiceren',
+       'De lerende professional communiceert helder en transparant in een professionele omgeving.',
+       10,
+       'De student communiceert helder, professioneel en transparant.',
+       'De communicatie is meestal duidelijk maar soms onvolledig.',
+       'Communicatie ontbreekt of is onduidelijk.',
+       TRUE),
+(7,  1, 'LO7 - Probleemoplossend vermogen',
+       'De lerende professional denkt kritisch na om problemen efficiënt en effectief op te lossen.',
+       10,
+       'De student analyseert problemen kritisch en werkt efficiënte oplossingen uit.',
+       'De student lost problemen op maar de analyse kan verbeterd worden.',
+       'Problemen worden niet of onvoldoende geanalyseerd.',
+       TRUE),
+(8,  1, 'LO8 - Persoonlijke ontwikkeling',
+       'De lerende professional ziet persoonlijke ontwikkeling als de basis voor professionele groei.',
+       10,
+       'De student reflecteert actief over zijn eigen functioneren en gebruikt feedback.',
+       'De student toont bereidheid om te leren maar verwerkt feedback gedeeltelijk.',
+       'De student reflecteert niet over het eigen functioneren.',
+       TRUE),
+(9,  1, 'LO9 - Professionele attitude',
+       'De lerende professional ontwikkelt een professionele attitude en handelt kwaliteitsvol.',
+       10,
+       'De student handelt steeds professioneel en respecteert afspraken.',
+       'De student toont meestal een professionele houding maar is niet altijd consequent.',
+       'De student toont onvoldoende professionele houding.',
+       TRUE),
+(10, 1, 'LO10 - Ondernemend handelen',
+       'De lerende professional demonstreert ondernemend handelen in functie van waardecreatie.',
+       10,
+       'De student demonstreert sterk ondernemend handelen en creëert waarde.',
+       'De student toont ondernemend handelen maar dit kan consistenter.',
+       'De student toont weinig ondernemend handelen.',
+       TRUE),
+(11, 1, 'LO11 - Ethisch en deontologisch handelen',
+       'De lerende professional handelt ethisch en deontologisch.',
+       10,
+       'De student handelt steeds ethisch en deontologisch correct.',
+       'De student handelt meestal ethisch maar sommige situaties verdienen aandacht.',
+       'De student toont onvoldoende ethisch en deontologisch handelen.',
+       TRUE);
 
 INSERT INTO stagevoorstel
   (id, student_id, bedrijf_id, mentor_id, academiejaar_id, omschrijving_opdracht, functie, startdatum, einddatum, status_id, aangemaakt_op)
@@ -176,13 +220,13 @@ VALUES
 
 -- De student heeft zijn reflectie ingevuld; de mentor en docent hebben nog
 -- niets beoordeeld (mentor_score / mentor_feedback / docent_feedback blijven leeg).
-INSERT INTO competentie_beoordeling
-  (evaluatie_moment_id, competentie_id, student_reflectie, mentor_score, mentor_feedback, docent_feedback)
+INSERT IGNORE INTO competentie_beoordeling
+  (evaluatie_moment_id, competentie_id, student_reflectie, student_score, mentor_score, mentor_feedback, docent_feedback)
 VALUES
-  (1, 1, 'Ik werk elke dag met React en Node.js en voel me steeds zekerder.', NULL, NULL, NULL),
-  (1, 2, 'Ik stel meer vragen tijdens de stand-ups en durf input te geven.', NULL, NULL, NULL),
-  (1, 3, 'Ik pak taken zelfstandig op en vraag pas bij blokkering om hulp.', NULL, NULL, NULL),
-  (1, 4, 'Ik debug stap voor stap en gebruik log files om problemen te vinden.', NULL, NULL, NULL);
+  (1, 1, 'Ik plan elke dag mijn taken en gebruik Jira.', 3, NULL, NULL, NULL),
+  (1, 2, 'Ik heb een dashboard ontworpen met React.', 5, NULL, NULL, NULL),
+  (1, 3, 'Ik implementeer functionaliteiten in onze app.', 3, NULL, NULL, NULL),
+  (1, 4, 'Ik heb Docker en Node.js opgezet voor het project.', 1, NULL, NULL, NULL);
 
 INSERT INTO notificatie (ontvanger_id, titel, boodschap, gelezen) VALUES
 (1, 'Stagevoorstel goedgekeurd',    'Je stagevoorstel bij iO Belgium werd goedgekeurd.', FALSE),
