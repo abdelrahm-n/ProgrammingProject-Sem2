@@ -145,10 +145,12 @@ INSERT INTO stage
 VALUES
   (1, 1, 1, 1, 8, 6, '2026-02-03', '2026-06-26', TRUE, '2026-01-15 11:10:00');
 
+-- De student heeft zijn weken ingediend; de mentor heeft nog niets goedgekeurd
+-- (status 2 = 'ingediend', geen mentor-feedback of afcheck-datum).
 INSERT INTO logboek_week
   (id, stage_id, week_nummer, week_start, week_einde, status_id, feedback_mentor, afgecheckt_op)
 VALUES
-  (1, 1, 1, '2026-02-02', '2026-02-08', 3, 'Uitstekende start, heeft het team snel leren kennen.', '2026-02-09 09:00:00'),
+  (1, 1, 1, '2026-02-02', '2026-02-08', 2, NULL, NULL),
   (2, 1, 2, '2026-02-09', '2026-02-15', 2, NULL, NULL);
 
 INSERT INTO logboek_dag_item
@@ -170,15 +172,17 @@ VALUES
 INSERT INTO evaluatie_moment
   (id, stage_id, docent_id, mentor_id, type_id, datum, eindresultaat_score, algemene_feedback)
 VALUES
-  (1, 1, 6, 8, 1, '2026-04-15', 14.75, 'Amira toont sterke technische groei en werkt goed samen met het team.');
+  (1, 1, 6, 8, 1, '2026-04-15', NULL, NULL);
 
+-- De student heeft zijn reflectie ingevuld; de mentor en docent hebben nog
+-- niets beoordeeld (mentor_score / mentor_feedback / docent_feedback blijven leeg).
 INSERT INTO competentie_beoordeling
   (evaluatie_moment_id, competentie_id, student_reflectie, mentor_score, mentor_feedback, docent_feedback)
 VALUES
-  (1, 1, 'Ik werk elke dag met React en Node.js en voel me steeds zekerder.', 15, 'Technisch sterk voor beginnersniveau.', 'Goede vooruitgang.'),
-  (1, 2, 'Ik stel meer vragen tijdens de stand-ups en durf input te geven.', 14, 'Communiceert helder.', 'Blijf zo actief participeren.'),
-  (1, 3, 'Ik pak taken zelfstandig op en vraag pas bij blokkering om hulp.', 14, 'Zelfstandig, maar mag soms sneller escaleren.', 'Goed evenwicht.'),
-  (1, 4, 'Ik debug stap voor stap en gebruik log files om problemen te vinden.', 15, 'Analytisch sterk.', 'Mooie debug-aanpak.');
+  (1, 1, 'Ik werk elke dag met React en Node.js en voel me steeds zekerder.', NULL, NULL, NULL),
+  (1, 2, 'Ik stel meer vragen tijdens de stand-ups en durf input te geven.', NULL, NULL, NULL),
+  (1, 3, 'Ik pak taken zelfstandig op en vraag pas bij blokkering om hulp.', NULL, NULL, NULL),
+  (1, 4, 'Ik debug stap voor stap en gebruik log files om problemen te vinden.', NULL, NULL, NULL);
 
 INSERT INTO notificatie (ontvanger_id, titel, boodschap, gelezen) VALUES
 (1, 'Stagevoorstel goedgekeurd',    'Je stagevoorstel bij iO Belgium werd goedgekeurd.', FALSE),

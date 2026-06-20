@@ -94,6 +94,24 @@ function valideerAlleVelden() {
     }
   }
 
+  /* Controleer of startdatum een weekdag is */
+  if (startDatum) {
+    var startDag = new Date(startDatum).getDay();
+    if (startDag === 0 || startDag === 6) {
+      geldig = false;
+      toonFout(document.getElementById("startDatum"), "Startdatum mag geen weekenddag zijn");
+    }
+  }
+
+  /* Controleer of einddatum een weekdag is */
+  if (eindDatum) {
+    var eindDag = new Date(eindDatum).getDay();
+    if (eindDag === 0 || eindDag === 6) {
+      geldig = false;
+      toonFout(document.getElementById("eindDatum"), "Einddatum mag geen weekenddag zijn");
+    }
+  }
+
   return geldig;
 }
 
@@ -106,6 +124,21 @@ for (const veld of verplichteVelden) {
     }
   });
 }
+
+/* Blokkeer weekenddagen (za=6, zo=0) bij start- en einddatum */
+function blokkeerWeekend(inputId) {
+  const input = document.getElementById(inputId);
+  input.addEventListener("change", function () {
+    if (!this.value) return;
+    var dag = new Date(this.value).getDay();
+    if (dag === 0 || dag === 6) {
+      this.value = "";
+      toonFout(this, "Weekenddagen (za-zo) zijn niet toegestaan. Kies een werkdag.");
+    }
+  });
+}
+blokkeerWeekend("startDatum");
+blokkeerWeekend("eindDatum");
 
 /* Stagevoorstel indienen */
 async function stagevoorstelIndienen() {

@@ -6,6 +6,7 @@
   <title>Stageplatform - Docent - Studenten</title>
   <link rel="stylesheet" href="../css/stijl.css" />
   <link rel="stylesheet" href="../css/docent.css" />
+  <link rel="stylesheet" href="../css/logboeken.css" />
 </head>
 <body>
 
@@ -19,7 +20,7 @@
       </div>
       <div class="header-actions">
         <span class="header-rol-badge">Docent</span>
-        <button class="btn-terug" onclick="window.location.href='../index.html'">Terug</button>
+        <button class="btn-terug" onclick="window.location.href='dashboard.html'">Terug</button>
       </div>
     </header>
 
@@ -27,12 +28,70 @@
       <nav class="sidebar"></nav>
 
       <main class="content-area">
-        <!-- inhoud komt hier -->
+        <div class="logboeken-panel">
+          <div class="logboeken-header">
+            <h1>Studenten</h1>
+          </div>
+
+          <div class="logboeken-table-container">
+            <table class="student-logboeken-table">
+              <thead>
+                <tr>
+                  <th>Naam</th>
+                  <th>Score</th>
+                  <th>Actie</th>
+                </tr>
+              </thead>
+              <tbody id="studentenBody">
+                <tr><td colspan="3">Laden...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </main>
     </div>
   </div>
 
   <script src="../js/nav.js"></script>
+  <script>
+    const API_URL = 'http://localhost:3000';
+    const token = localStorage.getItem('token') || '';
+    const body = document.getElementById('studentenBody');
 
+    function escape(t){ if(t==null) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+
+    async function laad() {
+      let studenten;
+      try {
+        const res = await fetch(API_URL + '/api/docent/mijn-studenten', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (!res.ok) throw new Error('niet ok');
+        studenten = await res.json();
+      } catch (e) {
+        body.innerHTML = '<tr><td colspan="3">Kon studenten niet laden. Log opnieuw in als docent.</td></tr>';
+        return;
+      }
+
+      if (!studenten.length) {
+        body.innerHTML = '<tr><td colspan="3">Geen toegewezen studenten.</td></tr>';
+        return;
+      }
+
+      body.innerHTML = '';
+      studenten.forEach(s => {
+        const naam = escape(s.voornaam + ' ' + s.achternaam);
+        const score = (s.totaalscore != null) ? s.totaalscore : '-';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${naam}<br><small style="color:#9ca3af;">${escape(s.opleiding) || '-'}</small></td>
+          <td>${score}</td>
+          <td><a class="details-link" href="studentenfiche.html?stage=${s.stage_id}">Bekijken</a></td>`;
+        body.appendChild(tr);
+      });
+    }
+
+    laad();
+  </script>
 </body>
 </html>
