@@ -16,9 +16,7 @@ const feedbackUitleg = document.getElementById("feedback-uitleg");
 const feedbackTekst = document.getElementById("feedback-tekst");
 const feedbackFout = document.getElementById("feedback-fout");
 
-/* De aanvraag die op dit moment open staat */
 let huidigeAanvraagId = null;
-/* De beslissing die in de popup verwerkt wordt (afgekeurd / aanpassing_vereist) */
 let openstaandeBeslissing = null;
 
 const statusLabels = {
@@ -39,6 +37,21 @@ function escape(tekst) {
   const div = document.createElement("div");
   div.textContent = tekst;
   return div.innerHTML;
+}
+
+/* ---------- VIEW TOGGLE ---------- */
+
+function toonDetail() {
+  lijstCard.style.display = "none";
+  detailCard.style.display = "block";
+  window.scrollTo(0, 0);
+}
+
+function toonLijst() {
+  detailCard.style.display = "none";
+  lijstCard.style.display = "block";
+  huidigeAanvraagId = null;
+  laadLijst();
 }
 
 /* ---------- LIJST ---------- */
@@ -68,11 +81,11 @@ async function laadLijst() {
       item.className = "aanvraag-lijst-item";
       item.addEventListener("click", () => openDetail(a.id));
       item.innerHTML =
-        "<div>" +
-          "<strong>" + escape(a.voornaam + " " + a.achternaam) + "</strong>" +
-          '<div style="color:#64748b;font-size:0.9em;">' +
+        '<div class="lijst-info">' +
+          '<span class="lijst-naam">' + escape(a.voornaam + " " + a.achternaam) + "</span>" +
+          '<span class="lijst-meta">' +
             escape(a.bedrijf) + " &middot; ingediend op " + toonDatum(a.aangemaakt_op) +
-          "</div>" +
+          "</span>" +
         "</div>" +
         '<span class="status-badge status-' + a.status + '">' + label + "</span>";
       aanvraagLijst.appendChild(item);
@@ -84,19 +97,33 @@ async function laadLijst() {
 
 /* ---------- DETAIL ---------- */
 
-function rij(label, waarde) {
-  return "<tr><td>" + label + "</td><td>" + escape(waarde || "-") + "</td></tr>";
+function rij(label, waarde, extraClass) {
+  const cls = extraClass ? ' class="' + extraClass + '"' : "";
+  return "<tr" + cls + "><td>" + label + "</td><td>" + escape(waarde || "-") + "</td></tr>";
 }
 
 async function openDetail(id) {
+  huidigeAanvraagId = id;
+
+  tabelBody.innerHTML = '<tr><td colspan="2" style="text-align:center;padding:24px;color:var(--color-text-muted);">Laden...</td></tr>';
+  bestaandeFeedback.style.display = "none";
+  detailTitel.textContent = "";
+  statusBadge.textContent = "";
+  statusBadge.className = "status-badge";
+
+  toonDetail();
+
   try {
     const antwoord = await fetch(API_URL + "/api/stages/" + id, {
       headers: { "Authorization": "Bearer " + token }
     });
-    if (!antwoord.ok) return;
+
+    if (!antwoord.ok) {
+      tabelBody.innerHTML = '<tr><td colspan="2" style="text-align:center;padding:24px;color:var(--color-error);">Kon de aanvraag niet laden.</td></tr>';
+      return;
+    }
 
     const a = await antwoord.json();
-    huidigeAanvraagId = id;
 
     detailTitel.textContent = a.voornaam + " " + a.achternaam;
 
@@ -117,28 +144,17 @@ async function openDetail(id) {
       rij("Startdatum", toonDatum(a.startdatum)) +
       rij("Einddatum", toonDatum(a.einddatum)) +
       rij("Functie", a.functie) +
-      rij("Omschrijving opdracht", a.omschrijving_opdracht);
+      rij("Omschrijving opdracht", a.omschrijving_opdracht, "rij-omschrijving");
 
-    /* Toon eerdere feedback indien aanwezig */
     if (a.commissie_feedback) {
       bestaandeFeedback.style.display = "block";
       bestaandeFeedbackTekst.textContent = a.commissie_feedback;
     } else {
       bestaandeFeedback.style.display = "none";
     }
-
-    lijstCard.style.display = "none";
-    detailCard.style.display = "block";
-    window.scrollTo(0, 0);
   } catch (fout) {
-    console.error("Detail laden mislukt:", fout);
+    tabelBody.innerHTML = '<tr><td colspan="2" style="text-align:center;padding:24px;color:var(--color-error);">Kan geen verbinding maken met de server.</td></tr>';
   }
-}
-
-function terugNaarLijst() {
-  detailCard.style.display = "none";
-  lijstCard.style.display = "block";
-  huidigeAanvraagId = null;
 }
 
 /* ---------- BESLISSING VERSTUREN ---------- */
@@ -161,8 +177,22 @@ async function verstuurBeslissing(beslissing, feedback) {
     }
 
     sluitPopup();
-    terugNaarLijst();
-    laadLijst();
+    toonLijst();
+const urlParams = new URLSearchParams(window.location.search);
+const svId = urlParams.get("sv_id");
+
+if (svId) {
+  openDetail(svId);
+} else {
+const urlParams = new URLSearchParams(window.location.search);
+const svId = urlParams.get("sv_id");
+
+if (svId) {
+  openDetail(svId);
+} else {
+  laadLijst();
+}
+}
   } catch (fout) {
     alert("Kan geen verbinding maken met de server.");
   }
@@ -193,7 +223,7 @@ function sluitPopup() {
 
 /* ---------- EVENTS ---------- */
 
-document.getElementById("terugNaarLijst").addEventListener("click", terugNaarLijst);
+document.getElementById("terugNaarLijst").addEventListener("click", toonLijst);
 
 document.getElementById("btnGoedkeuren").addEventListener("click", function () {
   if (confirm("Deze aanvraag goedkeuren?")) {
@@ -220,4 +250,11 @@ document.getElementById("feedback-verstuur").addEventListener("click", function 
   verstuurBeslissing(openstaandeBeslissing, tekst);
 });
 
-laadLijst();
+const urlParams = new URLSearchParams(window.location.search);
+const svId = urlParams.get("sv_id");
+
+if (svId) {
+  openDetail(svId);
+} else {
+  laadLijst();
+}

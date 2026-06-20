@@ -1,6 +1,189 @@
-/* stagecommissie - accentkleur paars */
+/* STAGECOMMISSIE - Accentkleur paars + detail-weergave */
+
 :root {
   --rol-accent: #7C3AED;
   --rol-accent-hover: #6d28d9;
   --rol-accent-licht: #F5F3FF;
+}
+
+/* === Lijst-item === */
+
+.aanvraag-lijst-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 14px 18px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  margin-bottom: 10px;
+  background: var(--color-bg-card);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+
+.aanvraag-lijst-item:hover {
+  background: var(--rol-accent-licht);
+  border-color: var(--rol-accent);
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.10);
+}
+
+.aanvraag-lijst-item .lijst-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.aanvraag-lijst-item .lijst-naam {
+  font-weight: 600;
+  color: var(--color-text);
+  font-size: 15px;
+}
+
+.aanvraag-lijst-item .lijst-meta {
+  color: var(--color-text-muted);
+  font-size: 13px;
+}
+
+/* === Detail tabel === */
+
+.aanvraag-tabel {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 16px 0;
+}
+
+.aanvraag-tabel tr {
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.aanvraag-tabel tr:last-child {
+  border-bottom: none;
+}
+
+.aanvraag-tabel td {
+  padding: 12px 16px;
+  vertical-align: top;
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.aanvraag-tabel td:first-child {
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  width: 220px;
+  white-space: nowrap;
+}
+
+.aanvraag-tabel td:last-child {
+  color: var(--color-text);
+}
+
+.aanvraag-tabel tr:hover td {
+  background: #FAFAFA;
+}
+
+/* Omschrijving-opdracht rij: laat de waarde volledige breedte gebruiken */
+.aanvraag-tabel .rij-omschrijving td {
+  white-space: normal;
+  line-height: 1.6;
+}
+
+/* === Feedback melding (eerdere feedback) === */
+
+.bestande-feedback-box {
+  background: #FFF7ED;
+  border: 1px solid #FED7AA;
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  margin-bottom: 16px;
+}
+
+.bestande-feedback-box strong {
+  color: var(--color-text);
+}
+
+.bestande-feedback-box span {
+  color: var(--color-text-secondary);
+}
+
+/* === Button varianten === */
+
+.btn--succes {
+  background: var(--color-success);
+  color: var(--color-white);
+  border-color: var(--color-success);
+}
+
+.btn--succes:hover {
+  background: #237a3a;
+}
+
+.btn--warning {
+  background: var(--color-warning);
+  color: var(--color-white);
+  border-color: var(--color-warning);
+}
+
+.btn--warning:hover {
+  background: #c97410;
+}
+
+/* === Modal (feedback popup) === */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--sp-4);
+}
+
+.modal-venster {
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--sp-4);
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+}
+
+.modal-venster h2 {
+  margin: 0 0 var(--sp-2);
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--color-text);
+}
+
+.modal-venster p {
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  margin-bottom: var(--sp-3);
+}
+
+.modal-venster textarea {
+  width: 100%;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 13px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--color-text);
+  background: var(--color-bg-card);
+  resize: vertical;
+}
+
+.modal-venster textarea:focus {
+  outline: none;
+  border-color: var(--rol-accent, var(--color-primary));
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.10);
+}
+
+.modal-knoppen {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--sp-2);
+  margin-top: var(--sp-3);
 }
