@@ -91,6 +91,10 @@ function vulContractIn(data) {
 
 /* Bepaal welke stap getoond moet worden */
 function toonJuisteStap(data) {
+  if (data.overeenkomst_status === "gevalideerd") {
+    window.location.href = "dashboard.html";
+    return;
+  }
   if (data.getekend_door_student) {
     zet("studentCheck", "Ondertekend");
     toonActivatie();
@@ -102,10 +106,10 @@ function toonJuisteStap(data) {
 
 /* Vul de activatie-pagina dynamisch in op basis van ondertekenstatus */
 function vulActivatieIn(data) {
-  var statusBox = document.querySelector("#stapActivatie .status-box");
-  var studentSpan = document.querySelector("#stapActivatie .signature-overview p:nth-child(1) span");
-  var bedrijfSpan = document.querySelector("#stapActivatie .signature-overview p:nth-child(2) span");
-  var schoolSpan = document.querySelector("#stapActivatie .signature-overview p:nth-child(3) span");
+  var statusBox = document.getElementById("activatieStatusBox");
+  var studentSpan = document.getElementById("activatieStudentCheck");
+  var bedrijfSpan = document.getElementById("activatieBedrijfCheck");
+  var schoolSpan = document.getElementById("activatieSchoolCheck");
 
   if (studentSpan) { studentSpan.textContent = "Ondertekend"; studentSpan.className = "status-ok"; }
 
@@ -122,12 +126,24 @@ function vulActivatieIn(data) {
   }
 
   if (data.getekend_door_bedrijf && data.getekend_door_school) {
-    if (statusBox) statusBox.textContent = "Status: Alle handtekeningen ontvangen";
+    if (statusBox) statusBox.textContent = "Alle handtekeningen ontvangen";
   } else if (data.getekend_door_bedrijf) {
-    if (statusBox) statusBox.textContent = "Status: Wacht op hogeschool";
+    if (statusBox) statusBox.textContent = "Wacht op hogeschool";
   } else {
-    if (statusBox) statusBox.textContent = "Status: Wacht op bedrijf";
+    if (statusBox) statusBox.textContent = "Wacht op bedrijf";
   }
+
+  /* Startdatum dynamisch invullen */
+  var startdatumEl = document.getElementById("startdatumStage");
+  if (startdatumEl) {
+    startdatumEl.textContent = formatDatum(data.startdatum);
+  }
+}
+
+/* Formateer datum als "15 maart 2026" */
+function formatDatum(datum) {
+  if (!datum) return "-";
+  return new Date(datum).toLocaleDateString("nl-BE", { day: "numeric", month: "long", year: "numeric" });
 }
 
 /* Onderteken als student via de backend */
