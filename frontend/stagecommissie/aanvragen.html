@@ -46,16 +46,16 @@
 
         <!-- DETAIL van één aanvraag (tabel met alle gegevens) -->
         <section class="dashboard-card stage-aanvraag" id="detail-card" style="display:none;">
-          <button class="btn-terug" id="terugNaarLijst" style="margin-bottom:16px;">&larr; Terug naar lijst</button>
+          <button class="btn btn--secundair" id="terugNaarLijst" style="margin-bottom:16px;">&larr; Terug naar lijst</button>
 
           <h2>Aanvraag van <span id="detailTitel"></span></h2>
           <div id="aanvraagStatus" class="status-badge"></div>
 
-          <table class="aanvraag-tabel" style="width:100%;border-collapse:collapse;margin:16px 0;">
+          <table class="aanvraag-tabel">
             <tbody id="aanvraag-tabel-body"></tbody>
           </table>
 
-          <div id="bestaande-feedback" style="display:none;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px 16px;margin-bottom:16px;">
+          <div id="bestaande-feedback" class="bestande-feedback-box" style="display:none;">
             <strong>Eerdere feedback:</strong> <span id="bestaande-feedback-tekst"></span>
           </div>
 

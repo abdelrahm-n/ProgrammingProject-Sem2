@@ -6,6 +6,7 @@
   <title>Stageplatform - Docent - Logboeken</title>
   <link rel="stylesheet" href="../css/stijl.css" />
   <link rel="stylesheet" href="../css/docent.css" />
+  <link rel="stylesheet" href="../css/logboeken.css" />
 </head>
 <body>
 
@@ -19,7 +20,7 @@
       </div>
       <div class="header-actions">
         <span class="header-rol-badge">Docent</span>
-        <button class="btn-terug" onclick="window.location.href='../index.html'">Terug</button>
+        <button class="btn-terug" onclick="window.location.href='dashboard.html'">Terug</button>
       </div>
     </header>
 
@@ -27,43 +28,26 @@
       <nav class="sidebar"></nav>
 
       <main class="content-area">
-        <!-- Header Section -->
-        <div class="page-header">
-          <div class="header-content">
-            <h1>Naam docent</h1>
-            <div class="stats-container">
-              <div class="stat-item">
-                <span class="stat-label">aantal studenten</span>
-                <span class="stat-value">52</span>
-              </div>
-              <div class="stat-item">
-                <span class="stat-label">ingevulde logboeken</span>
-                <span class="stat-value">343</span>
-              </div>
-            </div>
+        <div class="logboeken-panel">
+          <div class="logboeken-header">
+            <h1>Logboek overzicht</h1>
           </div>
-        </div>
 
-        <!-- Search and Navigation -->
-        <div class="search-section">
-          <input type="text" class="search-input" placeholder="Zoeken..." />
-        </div>
-
-        <!-- Logboeken Table -->
-        <div class="table-container">
-          <table class="logboeken-table">
-            <thead>
-              <tr>
-                <th>Naam</th>
-                <th>Richting</th>
-                <th>Logboek</th>
-                <th>Zie Logboek</th>
-              </tr>
-            </thead>
-            <tbody id="studentenBody">
-              <!-- Rijen via JavaScript -->
-            </tbody>
-          </table>
+          <div class="logboeken-table-container">
+            <table class="student-logboeken-table">
+              <thead>
+                <tr>
+                  <th>Naam</th>
+                  <th>Richting</th>
+                  <th>Logboek</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody id="studentenBody">
+                <tr><td colspan="4">Laden...</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </main>
     </div>
@@ -77,7 +61,7 @@
 
     function escape(t){ if(t==null) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
 
-    async function laadStudenten() {
+    (async function () {
       let studenten;
       try {
         const res = await fetch(API_URL + '/api/logboeken/studenten', {
@@ -86,57 +70,32 @@
         if (!res.ok) throw new Error('niet ok');
         studenten = await res.json();
       } catch (e) {
-        body.innerHTML = '<tr><td colspan="4">Kon studenten niet laden. Log opnieuw in via de startpagina.</td></tr>';
+        body.innerHTML = '<tr><td colspan="4">Kon studenten niet laden. Log opnieuw in als docent.</td></tr>';
         return;
       }
 
       if (!studenten.length) {
-        body.innerHTML = '<tr><td colspan="4">Geen toegewezen studenten.</td></tr>';
+        body.innerHTML = '<tr><td colspan="4">Je hebt nog geen toegewezen studenten.</td></tr>';
         return;
       }
-
-      // Statistiek bovenaan
-      const totaalWeken = studenten.reduce((s, x) => s + Number(x.aantal_weken || 0), 0);
-      const statEls = document.querySelectorAll('.stat-value');
-      if (statEls[0]) statEls[0].textContent = studenten.length;
-      if (statEls[1]) statEls[1].textContent = totaalWeken;
 
       body.innerHTML = '';
       studenten.forEach(s => {
         const naam = escape(s.voornaam + ' ' + s.achternaam);
-        const rij = document.createElement('tr');
-        rij.innerHTML = `
-          <td>
-            <div class="student-name">
-              <div>${naam}</div>
-              <span class="label-jaar">${escape(s.bedrijf) || ''}</span>
-            </div>
-          </td>
+        const ingevuld = Math.ceil(Number(s.aantal_dagen_ingevuld || 0) / 5);
+        const totaal = Number(s.totaal_weken || 0);
+        const isVolledig = ingevuld >= totaal && totaal > 0;
+        const klasse = 'badge badge--actief';
+        const tekst = isVolledig ? 'Volledig' : ingevuld + '/' + totaal + ' weken';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${naam}</td>
           <td>${escape(s.opleiding) || '-'}</td>
-          <td><span class="logboek-status">${s.aantal_weken} week/weken</span></td>
-           <td><button class="btn btn--secundair btn--sm" data-id="${s.student_id}">Open</button></td>`;
-        body.appendChild(rij);
+          <td><span class="${klasse}">${tekst}</span></td>
+          <td><a class="details-link" href="logboeken-detail.html?student=${s.student_id}">Bekijken</a></td>`;
+        body.appendChild(tr);
       });
-
-      document.querySelectorAll('.btn[data-id]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          window.location.href = 'logboeken-detail.html?student=' + btn.dataset.id;
-        });
-      });
-    }
-
-    // Zoekfunctionaliteit
-    document.querySelector('.search-input').addEventListener('input', (e) => {
-      const term = e.target.value.toLowerCase();
-      document.querySelectorAll('#studentenBody tr').forEach(row => {
-        const naam = row.querySelector('.student-name div')?.textContent.toLowerCase() || '';
-        const richting = row.querySelector('td:nth-child(2)')?.textContent.toLowerCase() || '';
-        row.style.display = (naam.includes(term) || richting.includes(term)) ? '' : 'none';
-      });
-    });
-
-    laadStudenten();
+    })();
   </script>
-
 </body>
 </html>

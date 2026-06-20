@@ -641,6 +641,31 @@ router.put('/stageovereenkomsten/:id/valideer', controleerToken, isAdmin, async 
       [req.gebruiker.id, req.params.id]
     )
 
+    /* Maak stage record aan als het nog niet bestaat */
+    const [bestaandeStage] = await db.query(
+      'SELECT id FROM stage WHERE stageovereenkomst_id = ?',
+      [ow.id]
+    )
+
+    if (bestaandeStage.length === 0) {
+      const [sv] = await db.query(
+        'SELECT student_id, bedrijf_id, mentor_id, startdatum, einddatum FROM stagevoorstel WHERE id = ?',
+        [ow.stagevoorstel_id]
+      )
+
+      if (sv.length > 0) {
+        const s = sv[0]
+        const [docent] = await db.query('SELECT persoon_id FROM docent LIMIT 1')
+        const docentId = docent.length > 0 ? docent[0].persoon_id : null
+
+        await db.query(
+          `INSERT INTO stage (stageovereenkomst_id, student_id, bedrijf_id, mentor_id, docent_id, startdatum, einddatum, actief)
+           VALUES (?, ?, ?, ?, ?, ?, ?, TRUE)`,
+          [ow.id, s.student_id, s.bedrijf_id, s.mentor_id, docentId, s.startdatum, s.einddatum]
+        )
+      }
+    }
+
     /* Haal student op voor notificatie */
     const [sv] = await db.query(
       `SELECT sv.student_id FROM stageovereenkomst so
@@ -653,7 +678,7 @@ router.put('/stageovereenkomsten/:id/valideer', controleerToken, isAdmin, async 
       await stuurNotificatie(
         sv[0].student_id,
         'Stageovereenkomst gevalideerd',
-        'Je stageovereenkomst is gevalideerd door de administratie. Je stage kan nu starten.'
+        'Je stageovereenkomst is gevalideerd door de administratie. Je stage is nu actief.'
       )
     }
 

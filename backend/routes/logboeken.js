@@ -19,16 +19,32 @@ async function haalStageVanStudent(studentId) {
   return rijen.length > 0 ? rijen[0] : null
 }
 
-/* Bereken maandag en zondag van de week waarin een datum valt */
+/* Bereken maandag en vrijdag van de week waarin een datum valt (ma-vr = 5 dagen) */
 function weekGrenzen(datumString) {
   const datum = new Date(datumString)
   const dag = datum.getDay() === 0 ? 7 : datum.getDay() /* zondag = 7 */
   const maandag = new Date(datum)
   maandag.setDate(datum.getDate() - (dag - 1))
-  const zondag = new Date(maandag)
-  zondag.setDate(maandag.getDate() + 6)
+  const vrijdag = new Date(maandag)
+  vrijdag.setDate(maandag.getDate() + 4)
   const naarSql = (d) => d.toISOString().slice(0, 10)
-  return { start: naarSql(maandag), einde: naarSql(zondag) }
+  return { start: naarSql(maandag), einde: naarSql(vrijdag) }
+}
+
+/* Bereken de eerste maandag op of na een gegeven datum */
+function eersteMaandagNa(datumString) {
+  const datum = new Date(datumString)
+  const dag = datum.getDay()
+  if (dag === 1) return datum /* maandag */
+  if (dag === 0) { datum.setDate(datum.getDate() + 1); return datum }
+  datum.setDate(datum.getDate() + (8 - dag))
+  return datum
+}
+
+/* Bereken het weeknummer op basis van de eerste maandag van de stage */
+function berekenWeekNummer(weekStart, eersteMaandag) {
+  const ws = new Date(weekStart)
+  return Math.round((ws - eersteMaandag) / (1000 * 60 * 60 * 24 * 7)) + 1
 }
 
 /* GET /api/logboeken/mijn - logboek van de ingelogde student (alleen eigen stage) */
@@ -91,6 +107,19 @@ router.post('/dag', controleerToken, async (req, res) => {
       return res.status(400).json({ fout: 'Je hebt nog geen actieve stage om in te loggen' })
     }
 
+    /* Valideer dat de datum binnen de stageperiode valt (string-vergelijking op YYYY-MM-DD) */
+    if (datum < stage.startdatum || datum > stage.einddatum) {
+      return res.status(400).json({
+        fout: `De datum valt buiten je stageperiode (${stage.startdatum} t.e.m. ${stage.einddatum})`
+      })
+    }
+
+    /* Valideer dat de datum een weekdag is (ma-vr) */
+    const dagVanDeWeek = new Date(datum).getDay()
+    if (dagVanDeWeek === 0 || dagVanDeWeek === 6) {
+      return res.status(400).json({ fout: 'Je kunt alleen doordeweeks (ma-vr) logboekitems invullen.' })
+    }
+
     /* Zoek de week waarin deze datum valt */
     const grenzen = weekGrenzen(datum)
 
@@ -103,12 +132,9 @@ router.post('/dag', controleerToken, async (req, res) => {
     if (bestaand.length > 0) {
       weekId = bestaand[0].id
     } else {
-      /* Bepaal het volgende weeknummer voor deze stage */
-      const [telling] = await db.query(
-        'SELECT COUNT(*) AS aantal FROM logboek_week WHERE stage_id = ?',
-        [stage.id]
-      )
-      const weekNummer = telling[0].aantal + 1
+      /* Bereken weeknummer op basis van eerste maandag van de stage */
+      const eersteMaandag = eersteMaandagNa(stage.startdatum)
+      const weekNummer = berekenWeekNummer(grenzen.start, eersteMaandag)
 
       const [open] = await db.query("SELECT id FROM logboek_status WHERE naam = 'open'")
       const statusId = open.length > 0 ? open[0].id : null
@@ -230,10 +256,10 @@ router.get('/studenten', controleerToken, async (req, res) => {
     const [rijen] = await db.query(
       `SELECT p.id AS student_id, p.voornaam, p.achternaam,
               o.naam AS opleiding, b.naam AS bedrijf, s.id AS stage_id,
-              (SELECT COUNT(*) FROM logboek_week lw WHERE lw.stage_id = s.id) AS aantal_weken,
-              (SELECT COUNT(*) FROM logboek_week lw
-                 JOIN logboek_status ls ON lw.status_id = ls.id
-                 WHERE lw.stage_id = s.id AND ls.naam = 'ingediend') AS aantal_ingediend
+              s.startdatum, s.einddatum,
+              (SELECT COUNT(DISTINCT ldi.datum) FROM logboek_dag_item ldi
+                 JOIN logboek_week lw ON ldi.logboek_week_id = lw.id
+                 WHERE lw.stage_id = s.id) AS aantal_dagen_ingevuld
        FROM stage s
        JOIN persoon p ON s.student_id = p.id
        LEFT JOIN student st ON st.persoon_id = p.id
@@ -243,6 +269,21 @@ router.get('/studenten', controleerToken, async (req, res) => {
        ORDER BY p.achternaam, p.voornaam`,
       params
     )
+
+    for (const rij of rijen) {
+      const start = new Date(rij.startdatum)
+      const eind = new Date(rij.einddatum)
+      let werkdagen = 0
+      const d = new Date(start)
+      while (d <= eind) {
+        const dag = d.getDay()
+        if (dag >= 1 && dag <= 5) werkdagen++
+        d.setDate(d.getDate() + 1)
+      }
+      rij.totaal_weken = Math.max(1, Math.round(werkdagen / 5))
+      delete rij.startdatum
+      delete rij.einddatum
+    }
     res.json(rijen)
   } catch (err) {
     console.error(err)
