@@ -256,10 +256,10 @@ router.get('/studenten', controleerToken, async (req, res) => {
     const [rijen] = await db.query(
       `SELECT p.id AS student_id, p.voornaam, p.achternaam,
               o.naam AS opleiding, b.naam AS bedrijf, s.id AS stage_id,
-              (SELECT COUNT(*) FROM logboek_week lw WHERE lw.stage_id = s.id) AS aantal_weken,
-              (SELECT COUNT(*) FROM logboek_week lw
-                 JOIN logboek_status ls ON lw.status_id = ls.id
-                 WHERE lw.stage_id = s.id AND ls.naam IN ('ingediend', 'goedgekeurd')) AS aantal_ingediend
+              s.startdatum, s.einddatum,
+              (SELECT COUNT(DISTINCT ldi.datum) FROM logboek_dag_item ldi
+                 JOIN logboek_week lw ON ldi.logboek_week_id = lw.id
+                 WHERE lw.stage_id = s.id) AS aantal_dagen_ingevuld
        FROM stage s
        JOIN persoon p ON s.student_id = p.id
        LEFT JOIN student st ON st.persoon_id = p.id
@@ -269,6 +269,21 @@ router.get('/studenten', controleerToken, async (req, res) => {
        ORDER BY p.achternaam, p.voornaam`,
       params
     )
+
+    for (const rij of rijen) {
+      const start = new Date(rij.startdatum)
+      const eind = new Date(rij.einddatum)
+      let werkdagen = 0
+      const d = new Date(start)
+      while (d <= eind) {
+        const dag = d.getDay()
+        if (dag >= 1 && dag <= 5) werkdagen++
+        d.setDate(d.getDate() + 1)
+      }
+      rij.totaal_weken = Math.max(1, Math.round(werkdagen / 5))
+      delete rij.startdatum
+      delete rij.einddatum
+    }
     res.json(rijen)
   } catch (err) {
     console.error(err)
