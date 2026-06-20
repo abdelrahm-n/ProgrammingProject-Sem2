@@ -6,6 +6,7 @@
   <title>Stageplatform - Student - Logboek</title>
   <link rel="stylesheet" href="../css/stijl.css" />
   <link rel="stylesheet" href="../css/student.css" />
+  <link rel="stylesheet" href="../css/logboeken.css" />
 </head>
 <body>
 
@@ -19,7 +20,7 @@
       </div>
       <div class="header-actions">
         <span class="header-rol-badge">Student</span>
-        <button class="btn-terug" onclick="window.location.href='../index.html'">Terug</button>
+        <button class="btn-terug" onclick="window.location.href='dashboard.html'">Terug</button>
       </div>
     </header>
 
@@ -120,6 +121,8 @@
       goedgekeurd: { tekst: 'Goedgekeurd',         klasse: 'badge badge--goedgekeurd' }
     };
 
+    let stagedata = null;
+
     const tableBody = document.getElementById('logboekTableBody');
 
     function toonDatum(waarde) {
@@ -152,20 +155,67 @@
         return;
       }
 
+      stagedata = data.stage;
+
+      /* Datum-input beperken tot stageperiode + weekends blokkeren */
+      var datumInput = document.getElementById('datumInput');
+      if (datumInput && data.stage.startdatum && data.stage.einddatum) {
+        datumInput.min = data.stage.startdatum;
+        datumInput.max = data.stage.einddatum;
+
+        datumInput.addEventListener('change', function() {
+          var geselecteerd = new Date(this.value);
+          var dag = geselecteerd.getDay();
+          if (dag === 0 || dag === 6) {
+            this.value = '';
+            var foutEl = document.getElementById('modalFout');
+            foutEl.textContent = 'Weekenden (za-zo) zijn niet toegestaan. Kies een datum tussen maandag en vrijdag.';
+            foutEl.style.display = 'block';
+          }
+        });
+      }
+
       const weken = data.weken || [];
+
+      // Bereken totaal weken uit stage-datum (zelfde logica als backend)
+      var dagenPerWeek = 5;
+      var totaalWeken = 0;
+      if (data.stage && data.stage.startdatum && data.stage.einddatum) {
+        var start = new Date(data.stage.startdatum);
+        var eind = new Date(data.stage.einddatum);
+
+        // Eerste maandag op of na startdatum
+        var startDag = start.getDay();
+        var eersteMaandagOffset = startDag === 0 ? 1 : startDag === 1 ? 0 : (8 - startDag);
+        var eersteMaandag = new Date(start);
+        eersteMaandag.setDate(start.getDate() + eersteMaandagOffset);
+
+        // Laatste maandag op of vóór einddatum
+        var eindDag = eind.getDay();
+        var laatsteMaandagOffset = eindDag === 0 ? -6 : eindDag === 1 ? 0 : -(eindDag - 1);
+        var laatsteMaandag = new Date(eind);
+        laatsteMaandag.setDate(eind.getDate() + laatsteMaandagOffset);
+
+        totaalWeken = Math.max(1, Math.round((laatsteMaandag - eersteMaandag) / (1000 * 60 * 60 * 24 * 7)) + 1);
+      }
 
       // Statistiek-kaarten
       let totaalDagen = 0;
       let laatsteFeedbackWeek = null;
       weken.forEach(w => {
-        totaalDagen += w.dagen.length;
+        var uniekeDagen = [...new Set(w.dagen.map(d => d.datum))].length;
+        totaalDagen += uniekeDagen;
         if (w.feedback_mentor) laatsteFeedbackWeek = w.week_nummer;
       });
       const laatste = weken[weken.length - 1];
-      document.getElementById('statHuidigeWeek').textContent = 'Week ' + (laatste ? laatste.week_nummer : 0) + ' / 12';
-      document.getElementById('statDezeWeek').textContent = (laatste ? laatste.dagen.length : 0) + ' / 5 dagen';
-      document.getElementById('statTotaal').textContent = totaalDagen + ' / 60';
+      var uniekeLaatste = laatste ? [...new Set(laatste.dagen.map(d => d.datum))].length : 0;
+      document.getElementById('statHuidigeWeek').textContent = 'Week ' + (laatste ? laatste.week_nummer : 0) + ' / ' + totaalWeken;
+      document.getElementById('statDezeWeek').textContent = uniekeLaatste + ' / ' + dagenPerWeek + ' dagen';
+      document.getElementById('statTotaal').textContent = totaalDagen + ' / ' + (totaalWeken * dagenPerWeek);
       document.getElementById('statFeedback').textContent = laatsteFeedbackWeek ? ('Week ' + laatsteFeedbackWeek) : '-';
+
+      // Huidige week bovenaan
+      weken.reverse();
 
       // Tabel
       tableBody.innerHTML = '';
@@ -176,10 +226,11 @@
 
       weken.forEach(week => {
         const info = statusInfo[week.status] || statusInfo.open;
+        const weekUniek = [...new Set(week.dagen.map(d => d.datum))].length;
         const rij = document.createElement('tr');
         rij.innerHTML = `
           <td><span class="week-badge">Week ${week.week_nummer}</span></td>
-          <td>${week.dagen.length} / 5</td>
+          <td>${weekUniek} / ${dagenPerWeek}</td>
           <td>${week.dagen.length}</td>
           <td><span class="${info.klasse}">${info.tekst}</span></td>
           <td><span class="feedback-text">${escape(week.feedback_mentor) || '-'}</span></td>
@@ -189,7 +240,6 @@
         // Detailrij (verborgen) met de dagen van die week
         const detail = document.createElement('tr');
         detail.className = 'week-detail-rij';
-        detail.style.display = 'none';
         const dagenHtml = week.dagen.length
           ? week.dagen.map(d => `
               <div class="dag-detail">
@@ -199,7 +249,15 @@
                 <div><em>Problemen:</em> ${escape(d.problemen_leerpunten) || '-'}</div>
               </div>`).join('')
           : '<p>Geen dagen in deze week.</p>';
-        detail.innerHTML = `<td colspan="6" class="week-detail-cel">${dagenHtml}</td>`;
+
+        const feedbackHtml = week.feedback_mentor
+          ? `<div class="dag-detail dag-detail--feedback">
+               <strong>Mentorfeedback</strong>
+               <div>${escape(week.feedback_mentor)}</div>
+             </div>`
+          : '';
+
+        detail.innerHTML = `<td colspan="6" class="week-detail-cel">${dagenHtml}${feedbackHtml}</td>`;
         tableBody.appendChild(detail);
       });
 
@@ -209,7 +267,7 @@
           e.preventDefault();
           const detailRij = link.closest('tr').nextElementSibling;
           if (detailRij && detailRij.classList.contains('week-detail-rij')) {
-            detailRij.style.display = detailRij.style.display === 'none' ? '' : 'none';
+            detailRij.classList.toggle('open');
           }
         });
       });
@@ -226,8 +284,28 @@
       const fout = document.getElementById('modalFout');
       fout.style.display = 'none';
 
+      const datumValue = document.getElementById('datumInput').value;
+      if (!datumValue) {
+        fout.textContent = 'Kies een geldige datum.';
+        fout.style.display = 'block';
+        return;
+      }
+
+      if (datumValue < stagedata.startdatum || datumValue > stagedata.einddatum) {
+        fout.textContent = 'De datum valt buiten je stageperiode (' + stagedata.startdatum + ' t.e.m. ' + stagedata.einddatum + ').';
+        fout.style.display = 'block';
+        return;
+      }
+
+      var dagVanDeWeek = new Date(datumValue).getDay();
+      if (dagVanDeWeek === 0 || dagVanDeWeek === 6) {
+        fout.textContent = 'Je kunt alleen doordeweeks (ma-vr) logboekitems invullen.';
+        fout.style.display = 'block';
+        return;
+      }
+
       const payload = {
-        datum: document.getElementById('datumInput').value,
+        datum: datumValue,
         uitgevoerde_taken: document.getElementById('takenInput').value.trim(),
         reflectie: document.getElementById('reflectieInput').value.trim(),
         problemen_leerpunten: document.getElementById('problemenInput').value.trim()

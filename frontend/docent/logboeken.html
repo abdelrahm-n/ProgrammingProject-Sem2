@@ -30,15 +30,15 @@
         <!-- Header Section -->
         <div class="page-header">
           <div class="header-content">
-            <h1>Naam docent</h1>
+            <h1>Docent</h1>
             <div class="stats-container">
               <div class="stat-item">
                 <span class="stat-label">aantal studenten</span>
-                <span class="stat-value">52</span>
+                <span class="stat-value">-</span>
               </div>
               <div class="stat-item">
                 <span class="stat-label">ingevulde logboeken</span>
-                <span class="stat-value">343</span>
+                <span class="stat-value">-</span>
               </div>
             </div>
           </div>
@@ -96,6 +96,8 @@
       }
 
       // Statistiek bovenaan
+      var naamDocent = localStorage.getItem('naam') || 'Docent';
+      document.querySelector('.header-content h1').textContent = naamDocent;
       const totaalWeken = studenten.reduce((s, x) => s + Number(x.aantal_weken || 0), 0);
       const statEls = document.querySelectorAll('.stat-value');
       if (statEls[0]) statEls[0].textContent = studenten.length;
