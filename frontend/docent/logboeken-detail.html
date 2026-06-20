@@ -30,7 +30,7 @@
         <!-- Terug en Student Name -->
         <div class="logboek-header">
           <button class="btn btn--secundair btn--sm" onclick="window.history.back()">← Terug</button>
-          <h1 id="studentName">Ryan Machiels</h1>
+          <h1 id="studentName">Student</h1>
         </div>
 
         <!-- Logboek Content -->
@@ -70,8 +70,8 @@
 
     const statusBadge = {
       goedgekeurd: { klasse: 'status-badge status-goedgekeurd', tekst: 'Goedgekeurd', icon: '✓' },
-      ingediend:   { klasse: 'status-badge status-afgekeurd',  tekst: 'Ingediend',   icon: '•' },
-      open:        { klasse: 'status-badge status-afgekeurd',  tekst: 'In bewerking', icon: '…' }
+      ingediend:   { klasse: 'status-badge status-ingediend',   tekst: 'Ingediend',   icon: '•' },
+      open:        { klasse: 'status-badge status-open',        tekst: 'In bewerking', icon: '…' }
     };
 
     (async function () {
