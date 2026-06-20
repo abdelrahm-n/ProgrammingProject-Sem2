@@ -6,6 +6,34 @@
   <title>Stageplatform - Docent - Logboeken</title>
   <link rel="stylesheet" href="../css/stijl.css" />
   <link rel="stylesheet" href="../css/docent.css" />
+  <style>
+    .lb-head { display:flex; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap; margin-bottom:22px; }
+    .lb-head h1 { margin:0; font-size:26px; font-weight:800; color:#1E1E1E; }
+    .lb-stats { display:flex; gap:14px; }
+    .lb-stat { background:#fff; border:1px solid #ececec; border-radius:10px; padding:12px 18px; min-width:120px; box-shadow:0 3px 10px rgba(15,23,42,.04); }
+    .lb-stat .label { display:block; font-size:12px; color:#6b7280; }
+    .lb-stat .value { display:block; font-size:22px; font-weight:800; color:var(--rol-accent,#8B0015); }
+
+    .lb-zoek { position:relative; max-width:420px; margin-bottom:18px; }
+    .lb-zoek input { width:100%; padding:11px 14px 11px 38px; border:1px solid #d8d8d8; border-radius:10px; font-size:14px; }
+    .lb-zoek svg { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#9ca3af; }
+
+    .lb-card { background:#fff; border:1px solid #ececec; border-radius:14px; box-shadow:0 4px 14px rgba(15,23,42,.05); overflow:hidden; }
+    .lb-tabel { width:100%; border-collapse:collapse; }
+    .lb-tabel th { text-align:left; font-size:12px; font-weight:700; color:#6b7280; padding:14px 20px; background:#fafafa; border-bottom:1px solid #ececec; }
+    .lb-tabel td { padding:16px 20px; border-bottom:1px solid #f1f1f1; font-size:15px; color:#1E1E1E; vertical-align:middle; }
+    .lb-tabel tr:last-child td { border-bottom:none; }
+    .lb-tabel tbody tr { transition:background .12s ease; }
+    .lb-tabel tbody tr:hover { background:#faf7f7; }
+    .lb-naam { font-weight:700; }
+    .lb-jaar { display:block; font-size:12px; color:#9ca3af; margin-top:2px; }
+    .lb-status { font-weight:600; color:#374151; }
+    .btn-open {
+      background:var(--rol-accent,#8B0015); color:#fff; border:none; padding:8px 20px;
+      border-radius:999px; font-size:13px; font-weight:600; cursor:pointer;
+    }
+    .btn-open:hover { background:var(--rol-accent-hover,#750012); }
+  </style>
 </head>
 <body>
 
@@ -19,7 +47,7 @@
       </div>
       <div class="header-actions">
         <span class="header-rol-badge">Docent</span>
-        <button class="btn-terug" onclick="window.location.href='../index.html'">Terug</button>
+        <button class="btn-terug" onclick="window.location.href='dashboard.html'">Terug</button>
       </div>
     </header>
 
@@ -44,24 +72,23 @@
           </div>
         </div>
 
-        <!-- Search and Navigation -->
-        <div class="search-section">
-          <input type="text" class="search-input" placeholder="Zoeken..." />
+        <div class="lb-zoek">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="text" id="zoek" placeholder="Zoeken op naam of richting..." />
         </div>
 
-        <!-- Logboeken Table -->
-        <div class="table-container">
-          <table class="logboeken-table">
+        <div class="lb-card">
+          <table class="lb-tabel">
             <thead>
               <tr>
-                <th>Naam</th>
-                <th>Richting</th>
-                <th>Logboek</th>
-                <th>Zie Logboek</th>
+                <th style="width:28%">Naam</th>
+                <th style="width:32%">Richting</th>
+                <th style="width:22%">Logboek</th>
+                <th style="width:18%">Zie logboek</th>
               </tr>
             </thead>
             <tbody id="studentenBody">
-              <!-- Rijen via JavaScript -->
+              <tr><td colspan="4">Laden...</td></tr>
             </tbody>
           </table>
         </div>
@@ -74,10 +101,14 @@
     const API_URL = 'http://localhost:3000';
     const token = localStorage.getItem('token') || '';
     const body = document.getElementById('studentenBody');
+    const TOTAAL_WEKEN = 16;
+
+    const naam = localStorage.getItem('naam');
+    if (naam) document.getElementById('docentNaam').textContent = naam;
 
     function escape(t){ if(t==null) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
 
-    async function laadStudenten() {
+    async function laad() {
       let studenten;
       try {
         const res = await fetch(API_URL + '/api/logboeken/studenten', {
@@ -86,7 +117,7 @@
         if (!res.ok) throw new Error('niet ok');
         studenten = await res.json();
       } catch (e) {
-        body.innerHTML = '<tr><td colspan="4">Kon studenten niet laden. Log opnieuw in via de startpagina.</td></tr>';
+        body.innerHTML = '<tr><td colspan="4">Kon studenten niet laden. Log opnieuw in als docent.</td></tr>';
         return;
       }
 
@@ -105,40 +136,33 @@
 
       body.innerHTML = '';
       studenten.forEach(s => {
-        const naam = escape(s.voornaam + ' ' + s.achternaam);
-        const rij = document.createElement('tr');
-        rij.innerHTML = `
-          <td>
-            <div class="student-name">
-              <div>${naam}</div>
-              <span class="label-jaar">${escape(s.bedrijf) || ''}</span>
-            </div>
-          </td>
+        const naam = s.voornaam + ' ' + s.achternaam;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><span class="lb-naam">${escape(naam)}</span><span class="lb-jaar">1ste jaar</span></td>
           <td>${escape(s.opleiding) || '-'}</td>
-          <td><span class="logboek-status">${s.aantal_weken} week/weken</span></td>
-           <td><button class="btn btn--secundair btn--sm" data-id="${s.student_id}">Open</button></td>`;
-        body.appendChild(rij);
+          <td><span class="lb-status">${s.aantal_ingediend}/${TOTAAL_WEKEN} ingediend</span></td>
+          <td><button class="btn-open" data-id="${s.student_id}">Open</button></td>`;
+        body.appendChild(tr);
       });
 
-      document.querySelectorAll('.btn[data-id]').forEach(btn => {
+      document.querySelectorAll('.btn-open').forEach(btn => {
         btn.addEventListener('click', () => {
           window.location.href = 'logboeken-detail.html?student=' + btn.dataset.id;
         });
       });
     }
 
-    // Zoekfunctionaliteit
-    document.querySelector('.search-input').addEventListener('input', (e) => {
+    document.getElementById('zoek').addEventListener('input', (e) => {
       const term = e.target.value.toLowerCase();
       document.querySelectorAll('#studentenBody tr').forEach(row => {
-        const naam = row.querySelector('.student-name div')?.textContent.toLowerCase() || '';
-        const richting = row.querySelector('td:nth-child(2)')?.textContent.toLowerCase() || '';
-        row.style.display = (naam.includes(term) || richting.includes(term)) ? '' : 'none';
+        const n = row.querySelector('.lb-naam')?.textContent.toLowerCase() || '';
+        const r = row.querySelector('td:nth-child(2)')?.textContent.toLowerCase() || '';
+        row.style.display = (n.includes(term) || r.includes(term)) ? '' : 'none';
       });
     });
 
-    laadStudenten();
+    laad();
   </script>
-
 </body>
 </html>
