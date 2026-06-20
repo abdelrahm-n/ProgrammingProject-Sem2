@@ -298,8 +298,8 @@ router.get('/mijn/actief', controleerToken, async (req, res) => {
       `SELECT COUNT(DISTINCT ldi.datum) AS dagen
        FROM logboek_dag_item ldi
        JOIN logboek_week lw ON ldi.logboek_week_id = lw.id
-       WHERE lw.stage_id = ? AND CURDATE() BETWEEN lw.week_start AND lw.week_einde`,
-      [stage.stage_id]
+       WHERE lw.stage_id = ? AND lw.week_nummer = ?`,
+      [stage.stage_id, huidigWeek]
     )
 
     const [evaluaties] = await db.query(
