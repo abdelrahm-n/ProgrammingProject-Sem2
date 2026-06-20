@@ -6,25 +6,7 @@
   <title>Stageplatform - Docent - Studenten</title>
   <link rel="stylesheet" href="../css/stijl.css" />
   <link rel="stylesheet" href="../css/docent.css" />
-  <style>
-    .st-head { display:flex; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap; margin-bottom:20px; }
-    .st-head h1 { margin:0; font-size:26px; font-weight:800; color:#1E1E1E; }
-    .st-zoek { position:relative; max-width:420px; margin-bottom:18px; }
-    .st-zoek input { width:100%; padding:11px 14px 11px 38px; border:1px solid #d8d8d8; border-radius:10px; font-size:14px; }
-    .st-zoek svg { position:absolute; left:12px; top:50%; transform:translateY(-50%); color:#9ca3af; }
-
-    .st-card { background:#fff; border:1px solid #ececec; border-radius:14px; box-shadow:0 4px 14px rgba(15,23,42,.05); overflow:hidden; }
-    .st-tabel { width:100%; border-collapse:collapse; }
-    .st-tabel th { text-align:left; font-size:12px; font-weight:700; color:#6b7280; padding:14px 20px; background:#fafafa; border-bottom:1px solid #ececec; }
-    .st-tabel td { padding:16px 20px; border-bottom:1px solid #f1f1f1; font-size:15px; color:#1E1E1E; vertical-align:middle; }
-    .st-tabel tr:last-child td { border-bottom:none; }
-    .st-tabel tbody tr:hover { background:#faf7f7; }
-    .st-naam { font-weight:700; }
-    .st-jaar { display:block; font-size:12px; color:#9ca3af; margin-top:2px; }
-    .st-score { font-size:20px; font-weight:800; color:#1E1E1E; }
-    .st-fiche { color:var(--rol-accent,#8B0015); font-weight:700; text-decoration:none; }
-    .st-fiche:hover { text-decoration:underline; }
-  </style>
+  <link rel="stylesheet" href="../css/logboeken.css" />
 </head>
 <body>
 
@@ -46,28 +28,25 @@
       <nav class="sidebar"></nav>
 
       <main class="content-area">
-        <div class="st-head">
-          <h1 id="docentNaam">Studenten</h1>
-        </div>
+        <div class="logboeken-panel">
+          <div class="logboeken-header">
+            <h1>Studenten</h1>
+          </div>
 
-        <div class="st-zoek">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-          <input type="text" id="zoek" placeholder="Zoeken op naam..." />
-        </div>
-
-        <div class="st-card">
-          <table class="st-tabel">
-            <thead>
-              <tr>
-                <th style="width:45%">Naam</th>
-                <th style="width:30%">Totaalscore</th>
-                <th style="width:25%">Actie</th>
-              </tr>
-            </thead>
-            <tbody id="studentenBody">
-              <tr><td colspan="3">Laden...</td></tr>
-            </tbody>
-          </table>
+          <div class="logboeken-table-container">
+            <table class="student-logboeken-table">
+              <thead>
+                <tr>
+                  <th>Naam</th>
+                  <th>Score</th>
+                  <th>Actie</th>
+                </tr>
+              </thead>
+              <tbody id="studentenBody">
+                <tr><td colspan="3">Laden...</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </main>
     </div>
@@ -78,10 +57,6 @@
     const API_URL = 'http://localhost:3000';
     const token = localStorage.getItem('token') || '';
     const body = document.getElementById('studentenBody');
-    const MAX_SCORE = 80;
-
-    const dnaam = localStorage.getItem('naam');
-    if (dnaam) document.getElementById('docentNaam').textContent = dnaam;
 
     function escape(t){ if(t==null) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
 
@@ -105,24 +80,16 @@
 
       body.innerHTML = '';
       studenten.forEach(s => {
-        const naam = s.voornaam + ' ' + s.achternaam;
-        const score = (s.totaalscore != null) ? `${s.totaalscore}/${MAX_SCORE}` : `-/${MAX_SCORE}`;
+        const naam = escape(s.voornaam + ' ' + s.achternaam);
+        const score = (s.totaalscore != null) ? s.totaalscore : '-';
         const tr = document.createElement('tr');
         tr.innerHTML = `
-          <td><span class="st-naam">${escape(naam)}</span><span class="st-jaar">1ste jaar</span></td>
-          <td><span class="st-score">${score}</span></td>
-          <td><a class="st-fiche" href="studentenfiche.html?stage=${s.stage_id}">Studentenfiche</a></td>`;
+          <td>${naam}<br><small style="color:#9ca3af;">${escape(s.opleiding) || '-'}</small></td>
+          <td>${score}</td>
+          <td><a class="details-link" href="studentenfiche.html?stage=${s.stage_id}">Bekijken</a></td>`;
         body.appendChild(tr);
       });
     }
-
-    document.getElementById('zoek').addEventListener('input', (e) => {
-      const term = e.target.value.toLowerCase();
-      document.querySelectorAll('#studentenBody tr').forEach(row => {
-        const n = row.querySelector('.st-naam')?.textContent.toLowerCase() || '';
-        row.style.display = n.includes(term) ? '' : 'none';
-      });
-    });
 
     laad();
   </script>
