@@ -119,6 +119,11 @@
         if (!resp.ok) return;
         var data = await resp.json();
 
+        if (data.overeenkomst_status === "gevalideerd") {
+          window.location.href = "dashboard.html";
+          return;
+        }
+
         var statusBox = document.querySelector(".status-box");
         var sigs = document.querySelectorAll(".signature-overview p span");
 

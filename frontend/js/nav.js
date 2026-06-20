@@ -8,8 +8,21 @@ var rootPad = (window.location.pathname.indexOf('/student/') !== -1 ||
                window.location.pathname.indexOf('/admin/') !== -1) ? '../index.html' : 'index.html'
 
 // --- Blokkeer toegang als niet ingelogd ---
-if (!localStorage.getItem('rol')) {
+if (!localStorage.getItem('token')) {
+  localStorage.removeItem('rol')
   window.location.href = rootPad
+}
+
+// --- Globale 401/403 handler: vang gefaalde API-aanroepen op ---
+var origineleFetch = window.fetch
+window.fetch = function () {
+  return origineleFetch.apply(this, arguments).then(function (antwoord) {
+    if (antwoord && (antwoord.status === 401 || antwoord.status === 403)) {
+      localStorage.clear()
+      window.location.href = rootPad
+    }
+    return antwoord
+  })
 }
 
 // --- Dynamische sidebar ---
