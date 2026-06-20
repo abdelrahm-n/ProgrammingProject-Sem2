@@ -1,6 +1,6 @@
-/* docent - accentkleur groen */
+/* docent - accentkleur oranje */
 :root {
-  --rol-accent: #059669;
-  --rol-accent-hover: #047857;
-  --rol-accent-licht: #ECFDF5;
+  --rol-accent: #D97706;
+  --rol-accent-hover: #b45309;
+  --rol-accent-licht: #FFFBEB;
 }

@@ -96,7 +96,7 @@
       kaart.innerHTML =
         rij('Voornaam', escape(s.voornaam)) +
         rij('Achternaam', escape(s.achternaam)) +
-        rij('Richting', '1ste jaar ' + escape(s.opleiding || '')) +
+        rij('Richting', escape(s.opleiding || '')) +
         rij('Bedrijf', escape(s.bedrijf)) +
         rij('E-mail', s.email ? `<a href="mailto:${escape(s.email)}">${escape(s.email)}</a>` : '-') +
         rij('Studentnummer', escape(s.studentnummer)) +
