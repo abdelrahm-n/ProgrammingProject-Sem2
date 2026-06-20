@@ -95,7 +95,8 @@ router.get('/:id/beoordelingen', controleerToken, async (req, res) => {
     if (!evaluatie) return
 
     const [rijen] = await db.query(
-      `SELECT cb.*, c.naam AS competentie_naam, c.gewicht
+      `SELECT cb.*, c.naam AS competentie_naam, c.gewicht,
+              c.rubric_volledig, c.rubric_goed, c.rubric_onvoldoende
        FROM competentie_beoordeling cb
        JOIN competentie c ON cb.competentie_id = c.id
        WHERE cb.evaluatie_moment_id = ?
@@ -131,8 +132,21 @@ router.post('/', controleerToken, async (req, res) => {
       [stage_id, docent_id, mentor_id, type_id, datum]
     )
 
+    const [studentRij] = await db.query(
+      `SELECT st.opleiding_id FROM stage s
+       JOIN student st ON s.student_id = st.persoon_id
+       WHERE s.id = ?`, [stage_id]
+    )
+
+    if (studentRij.length === 0) {
+      return res.status(404).json({ fout: 'Student niet gevonden' })
+    }
+
+    const opleidingId = studentRij[0].opleiding_id
+
     const [competenties] = await db.query(
-      'SELECT id FROM competentie WHERE actief = TRUE'
+      'SELECT id FROM competentie WHERE opleiding_id = ? AND actief = TRUE',
+      [opleidingId]
     )
 
     for (const c of competenties) {
