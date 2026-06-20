@@ -6,6 +6,7 @@
   <title>Stageplatform - Stagementor - Logboek Detail</title>
   <link rel="stylesheet" href="../css/stijl.css" />
   <link rel="stylesheet" href="../css/mentor.css" />
+  <link rel="stylesheet" href="../css/logboeken.css" />
 </head>
 <body>
   <div id="app">
@@ -18,7 +19,7 @@
       </div>
       <div class="header-actions">
         <span class="header-rol-badge">Stagementor</span>
-        <button class="btn-terug" onclick="window.location.href='../index.html'">Terug</button>
+        <button class="btn-terug" onclick="window.location.href='logboeken.html'">Terug</button>
       </div>
     </header>
 
@@ -26,21 +27,36 @@
       <nav class="sidebar"></nav>
 
       <main class="content-area">
-        <div class="logboek-student-card">
-          <div class="page-header">
-            <h2>LOGBOEK STUDENT</h2>
-          </div>
-
-          <div class="student-summary">
-            <div class="student-summary-name-block">
-              <div class="student-name" id="studentName">Student</div>
-              <div class="student-year" id="studentBedrijf"></div>
+        <div class="logboeken-panel">
+          <div class="logboeken-header">
+            <h1 id="studentName">Student</h1>
+            <div class="progress-info">
+              <div class="progress-item">
+                <span class="progress-label">Richting</span>
+                <span class="progress-value" id="studentStudy">-</span>
+              </div>
+              <div class="progress-item">
+                <span class="progress-label">Bedrijf</span>
+                <span class="progress-value" id="studentBedrijf">-</span>
+              </div>
             </div>
-            <div class="student-study" id="studentStudy"></div>
           </div>
 
-          <div class="week-status-list" id="weekStatusList">
-            <!-- Weken via JavaScript -->
+          <div class="logboeken-table-container">
+            <table class="student-logboeken-table">
+              <thead>
+                <tr>
+                  <th>Week</th>
+                  <th>Logboeken</th>
+                  <th>Status</th>
+                  <th>Mentorfeedback</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody id="weekBody">
+                <tr><td colspan="5">Laden...</td></tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </main>
@@ -53,15 +69,14 @@
     const token = localStorage.getItem('token') || '';
     const params = new URLSearchParams(window.location.search);
     const studentId = params.get('student');
-    const lijst = document.getElementById('weekStatusList');
+    const body = document.getElementById('weekBody');
 
     function escape(t){ if(t==null) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
 
-    // status uit db -> weergave
     const statusInfo = {
-      goedgekeurd: { klasse: 'status-approved',    tekst: 'goedgekeurd' },
-      ingediend:   { klasse: 'status-action',      tekst: 'actie vereist' },
-      open:        { klasse: 'status-unavailable', tekst: 'in bewerking' }
+      goedgekeurd: { klasse: 'badge badge--goedgekeurd', tekst: 'Goedgekeurd' },
+      ingediend:   { klasse: 'badge badge--actief',      tekst: 'Ingediend' },
+      open:        { klasse: 'badge badge--actief',      tekst: 'Ingediend' }
     };
 
     (async function () {
@@ -73,30 +88,38 @@
         if (!res.ok) throw new Error('niet ok');
         data = await res.json();
       } catch (e) {
-        lijst.innerHTML = '<div class="week-status-item status-action">Kon logboek niet laden.</div>';
+        body.innerHTML = '<tr><td colspan="5">Kon logboek niet laden.</td></tr>';
         return;
       }
 
       if (data.student) {
         document.getElementById('studentName').textContent = data.student.voornaam + ' ' + data.student.achternaam;
-        document.getElementById('studentStudy').textContent = data.student.opleiding || '';
+        document.getElementById('studentStudy').textContent = data.student.opleiding || '-';
       }
       if (data.stage) {
-        document.getElementById('studentBedrijf').textContent = data.stage.bedrijf || '';
+        document.getElementById('studentBedrijf').textContent = data.stage.bedrijf || '-';
       }
 
       const weken = data.weken || [];
       if (!weken.length) {
-        lijst.innerHTML = '<div class="week-status-item status-unavailable">Nog geen logboeken ingevuld.</div>';
+        body.innerHTML = '<tr><td colspan="5">Nog geen logboeken ingevuld.</td></tr>';
         return;
       }
 
-      weken.forEach(w => {
-        const info = statusInfo[w.status] || statusInfo.open;
-        const item = document.createElement('div');
-        item.className = 'week-status-item ' + info.klasse;
-        item.innerHTML = `<a href="logboek-week.html?student=${studentId}&week=${w.id}" class="status-link">logboek week ${w.week_nummer} - <span class="status-text">${info.tekst}</span></a>`;
-        lijst.appendChild(item);
+      const dagenPerWeek = 5;
+      weken.reverse();
+      body.innerHTML = '';
+      weken.forEach(week => {
+        const info = statusInfo[week.status] || statusInfo.open;
+        const weekUniek = week.dagen ? [...new Set(week.dagen.map(d => d.datum))].length : 0;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><span class="week-badge">Week ${week.week_nummer}</span></td>
+          <td>${weekUniek} / ${dagenPerWeek}</td>
+          <td><span class="${info.klasse}">${info.tekst}</span></td>
+          <td><span class="feedback-text">${escape(week.feedback_mentor) || '-'}</span></td>
+          <td><a class="details-link" href="logboek-week.html?student=${studentId}&week=${week.id}">Bekijken</a></td>`;
+        body.appendChild(tr);
       });
     })();
   </script>

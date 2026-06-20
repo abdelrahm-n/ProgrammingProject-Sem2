@@ -6,6 +6,7 @@
   <title>Stageplatform - Docent - Logboek Detail</title>
   <link rel="stylesheet" href="../css/stijl.css" />
   <link rel="stylesheet" href="../css/docent.css" />
+  <link rel="stylesheet" href="../css/logboeken.css" />
 </head>
 <body>
 
@@ -19,7 +20,7 @@
       </div>
       <div class="header-actions">
         <span class="header-rol-badge">Docent</span>
-        <button class="btn-terug" onclick="window.location.href='../index.html'">Terug</button>
+        <button class="btn-terug" onclick="window.location.href='logboeken.html'">Terug</button>
       </div>
     </header>
 
@@ -27,28 +28,37 @@
       <nav class="sidebar"></nav>
 
       <main class="content-area">
-        <!-- Terug en Student Name -->
-        <div class="logboek-header">
-          <button class="btn btn--secundair btn--sm" onclick="window.history.back()">← Terug</button>
-          <h1 id="studentName">Student</h1>
-        </div>
-
-        <!-- Logboek Content -->
-        <div class="logboek-content">
-          <!-- Logboek Leerling Section -->
-          <div class="logboek-section">
-            <h2>Logboek Inzendingen</h2>
-            <div id="logboekEntries" class="logboek-entries">
-              <!-- Entries worden hier ingevoegd via JavaScript -->
+        <div class="logboeken-panel">
+          <div class="logboeken-header">
+            <h1 id="studentName">Student</h1>
+            <div class="progress-info">
+              <div class="progress-item">
+                <span class="progress-label">Richting</span>
+                <span class="progress-value" id="studentStudy">-</span>
+              </div>
+              <div class="progress-item">
+                <span class="progress-label">Bedrijf</span>
+                <span class="progress-value" id="studentBedrijf">-</span>
+              </div>
             </div>
           </div>
 
-          <!-- Stagementor Goedkeuring Section -->
-          <div class="goedkeuring-section">
-            <h2>Goedkeuring</h2>
-            <div id="goedkeuringEntries" class="goedkeuring-entries">
-              <!-- Approval statuses worden hier ingevoegd via JavaScript -->
-            </div>
+          <div class="logboeken-table-container">
+            <table class="student-logboeken-table">
+              <thead>
+                <tr>
+                  <th>Week</th>
+                  <th>Logboeken</th>
+                  <th>Items</th>
+                  <th>Status</th>
+                  <th>Mentorfeedback</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody id="logboekTableBody">
+                <tr><td colspan="6">Laden...</td></tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </main>
@@ -61,17 +71,15 @@
     const token = localStorage.getItem('token') || '';
     const params = new URLSearchParams(window.location.search);
     const studentId = params.get('student');
-
-    const logboekContainer = document.getElementById('logboekEntries');
-    const goedkeuringContainer = document.getElementById('goedkeuringEntries');
+    const tableBody = document.getElementById('logboekTableBody');
 
     function escape(t){ if(t==null) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
     function toonDatum(w){ return w ? new Date(w).toLocaleDateString('nl-BE') : '-'; }
 
-    const statusBadge = {
-      goedgekeurd: { klasse: 'status-badge status-goedgekeurd', tekst: 'Goedgekeurd', icon: '✓' },
-      ingediend:   { klasse: 'status-badge status-ingediend',   tekst: 'Ingediend',   icon: '•' },
-      open:        { klasse: 'status-badge status-open',        tekst: 'In bewerking', icon: '…' }
+    const statusInfo = {
+      goedgekeurd: { klasse: 'badge badge--goedgekeurd', tekst: 'Goedgekeurd' },
+      ingediend:   { klasse: 'badge badge--actief',      tekst: 'Ingediend' },
+      open:        { klasse: 'badge badge--actief',      tekst: 'Ingediend' }
     };
 
     (async function () {
@@ -83,55 +91,74 @@
         if (!res.ok) throw new Error('niet ok');
         data = await res.json();
       } catch (e) {
-        logboekContainer.innerHTML = '<p style="color:#999;">Kon logboek niet laden. Log opnieuw in via de startpagina.</p>';
+        tableBody.innerHTML = '<tr><td colspan="6">Kon logboek niet laden. Log opnieuw in als docent.</td></tr>';
         return;
       }
 
       if (data.student) {
         document.getElementById('studentName').textContent = data.student.voornaam + ' ' + data.student.achternaam;
+        document.getElementById('studentStudy').textContent = data.student.opleiding || '-';
+      }
+      if (data.stage) {
+        document.getElementById('studentBedrijf').textContent = data.stage.bedrijf || '-';
       }
 
       const weken = data.weken || [];
+      const dagenPerWeek = 5;
+      weken.reverse();
       if (!weken.length) {
-        logboekContainer.innerHTML = '<p style="color:#999;">Nog geen logboeken ingediend.</p>';
-        goedkeuringContainer.innerHTML = '<p style="color:#999;">Wachten op inzending.</p>';
+        tableBody.innerHTML = '<tr><td colspan="6">Nog geen logboeken ingevuld.</td></tr>';
         return;
       }
 
-      // Inzendingen per week (alleen lezen)
-      logboekContainer.innerHTML = '';
-      goedkeuringContainer.innerHTML = '';
+      tableBody.innerHTML = '';
+      weken.forEach(week => {
+        const info = statusInfo[week.status] || statusInfo.open;
+        const weekUniek = week.dagen ? [...new Set(week.dagen.map(d => d.datum))].length : 0;
 
-      weken.forEach((week, index) => {
-        const dagenHtml = week.dagen.length
+        const rij = document.createElement('tr');
+        rij.innerHTML = `
+          <td><span class="week-badge">Week ${week.week_nummer}</span></td>
+          <td>${weekUniek} / ${dagenPerWeek}</td>
+          <td>${week.dagen ? week.dagen.length : 0}</td>
+          <td><span class="${info.klasse}">${info.tekst}</span></td>
+          <td><span class="feedback-text">${escape(week.feedback_mentor) || '-'}</span></td>
+          <td><a class="details-link" href="#" data-week="${week.id}">Bekijken</a></td>`;
+        tableBody.appendChild(rij);
+
+        const detail = document.createElement('tr');
+        detail.className = 'week-detail-rij';
+        const dagenHtml = week.dagen && week.dagen.length
           ? week.dagen.map(d => `
-              <div class="logboek-entry" style="animation-delay:${index * 0.05}s">
-                <div class="logboek-entry-date">📅 ${toonDatum(d.datum)}</div>
-                <p class="logboek-entry-text"><strong>Taken:</strong> ${escape(d.uitgevoerde_taken)}</p>
-                <p class="logboek-entry-text"><strong>Reflectie:</strong> ${escape(d.reflectie) || '-'}</p>
-                <p class="logboek-entry-text"><strong>Problemen:</strong> ${escape(d.problemen_leerpunten) || '-'}</p>
+              <div class="dag-detail">
+                <strong>${toonDatum(d.datum)}</strong>
+                <div><em>Taken:</em> ${escape(d.uitgevoerde_taken)}</div>
+                <div><em>Reflectie:</em> ${escape(d.reflectie) || '-'}</div>
+                <div><em>Problemen:</em> ${escape(d.problemen_leerpunten) || '-'}</div>
               </div>`).join('')
-          : '<p style="color:#999; font-size:13px;">Geen dagen ingevuld.</p>';
+          : '<p>Geen dagen ingevuld.</p>';
 
-        logboekContainer.insertAdjacentHTML('beforeend',
-          `<h3 style="margin:18px 0 8px;">Week ${week.week_nummer}</h3>${dagenHtml}`);
-
-        // Goedkeuring per week
-        const b = statusBadge[week.status] || statusBadge.open;
-        const fb = week.feedback_mentor
-          ? `<p class="logboek-entry-text" style="margin-top:6px;"><strong>Feedback mentor:</strong> ${escape(week.feedback_mentor)}</p>`
+        const feedbackHtml = week.feedback_mentor
+          ? `<div class="dag-detail dag-detail--feedback">
+               <strong>Mentorfeedback</strong>
+               <div>${escape(week.feedback_mentor)}</div>
+             </div>`
           : '';
-        goedkeuringContainer.insertAdjacentHTML('beforeend', `
-          <div class="goedkeuring-item">
-            <div class="goedkeuring-item-header">
-              <span class="goedkeuring-item-date">Week ${week.week_nummer}</span>
-              <span class="status-badge ${b.klasse}">${b.icon} ${b.tekst}</span>
-            </div>
-            ${fb}
-          </div>`);
+
+        detail.innerHTML = `<td colspan="6" class="week-detail-cel">${dagenHtml}${feedbackHtml}</td>`;
+        tableBody.appendChild(detail);
+      });
+
+      tableBody.querySelectorAll('.details-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          const detailRij = link.closest('tr').nextElementSibling;
+          if (detailRij && detailRij.classList.contains('week-detail-rij')) {
+            detailRij.classList.toggle('open');
+          }
+        });
       });
     })();
   </script>
-
 </body>
 </html>
