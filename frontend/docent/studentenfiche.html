@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stageplatform - Docent - Studentenfiche</title>
+  <link rel="stylesheet" href="../css/stijl.css" />
+  <link rel="stylesheet" href="../css/docent.css" />
+  <style>
+    .fiche-terug { display:inline-flex; align-items:center; gap:6px; color:#555; text-decoration:none; font-size:14px; margin-bottom:18px; }
+    .fiche-terug:hover { text-decoration:underline; }
+    .fiche-card { background:#fff; border:1px solid #ececec; border-radius:14px; box-shadow:0 4px 14px rgba(15,23,42,.05); padding:8px 28px; max-width:760px; }
+    .fiche-rij { display:grid; grid-template-columns:200px 1fr; gap:16px; align-items:center; padding:18px 0; border-bottom:1px solid #f1f1f1; }
+    .fiche-rij:last-child { border-bottom:none; }
+    .fiche-label { font-size:14px; font-weight:700; color:#374151; }
+    .fiche-waarde { font-size:15px; color:#1E1E1E; }
+    .fiche-waarde a { color:var(--rol-accent,#8B0015); }
+    .fiche-titel { font-size:22px; font-weight:800; margin:0 0 18px 0; color:#1E1E1E; }
+  </style>
+</head>
+<body>
+
+  <div id="app">
+    <header class="header">
+      <div class="header-logo">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+        </svg>
+        <span class="header-logo-text">Stageplatform</span>
+      </div>
+      <div class="header-actions">
+        <span class="header-rol-badge">Docent</span>
+        <button class="btn-terug" onclick="window.location.href='dashboard.html'">Terug</button>
+      </div>
+    </header>
+
+    <div class="app-body">
+      <nav class="sidebar">
+        <a href="dashboard.html" class="nav-item">Dashboard</a>
+        <a href="studenten.html" class="nav-item actief">Studenten</a>
+        <a href="logboeken.html" class="nav-item">Logboeken</a>
+        <a href="evaluatie.html" class="nav-item">Evaluatie</a>
+        <a href="../index.html" class="nav-item" id="uitlogBtn" style="margin-top:auto">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+            <polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+          </svg>
+          Uitloggen
+        </a>
+      </nav>
+
+      <main class="content-area">
+        <a href="studenten.html" class="fiche-terug">← Terug</a>
+        <h2 class="fiche-titel" id="ficheTitel">Studentenfiche</h2>
+        <div class="fiche-card" id="ficheKaart">
+          <p style="padding:18px 0; color:#6b7280;">Laden...</p>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="../js/nav.js"></script>
+  <script>
+    const API_URL = 'http://localhost:3000';
+    const token = localStorage.getItem('token') || '';
+    const params = new URLSearchParams(window.location.search);
+    const stage = params.get('stage');
+    const kaart = document.getElementById('ficheKaart');
+
+    function escape(t){ if(t==null) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+    function rij(label, waarde){ return `<div class="fiche-rij"><span class="fiche-label">${label}</span><span class="fiche-waarde">${waarde || '-'}</span></div>`; }
+
+    (async function () {
+      let studenten;
+      try {
+        const res = await fetch(API_URL + '/api/docent/mijn-studenten', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (!res.ok) throw new Error('niet ok');
+        studenten = await res.json();
+      } catch (e) {
+        kaart.innerHTML = '<p style="padding:18px 0; color:#990018;">Kon de gegevens niet laden. Log opnieuw in als docent.</p>';
+        return;
+      }
+
+      const s = studenten.find(x => String(x.stage_id) === String(stage));
+      if (!s) {
+        kaart.innerHTML = '<p style="padding:18px 0; color:#6b7280;">Student niet gevonden.</p>';
+        return;
+      }
+
+      document.getElementById('ficheTitel').textContent = s.voornaam + ' ' + s.achternaam;
+      const mentor = (s.mentor_voornaam || s.mentor_achternaam)
+        ? `${s.mentor_voornaam || ''} ${s.mentor_achternaam || ''}`.trim() : '-';
+
+      kaart.innerHTML =
+        rij('Voornaam', escape(s.voornaam)) +
+        rij('Achternaam', escape(s.achternaam)) +
+        rij('Richting', escape(s.opleiding || '')) +
+        rij('Bedrijf', escape(s.bedrijf)) +
+        rij('E-mail', s.email ? `<a href="mailto:${escape(s.email)}">${escape(s.email)}</a>` : '-') +
+        rij('Studentnummer', escape(s.studentnummer)) +
+        rij('Stagebegeleider', escape(mentor));
+    })();
+  </script>
+</body>
+</html>

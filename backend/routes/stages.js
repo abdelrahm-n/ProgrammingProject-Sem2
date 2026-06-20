@@ -59,6 +59,21 @@ router.post('/', controleerToken, async (req, res) => {
     return res.status(400).json({ fout: 'Bedrijf, data en opdracht zijn verplicht' })
   }
 
+  /* Valideer dat start- en einddatum geen weekend zijn */
+  const startDag = new Date(a.startDatum).getDay()
+  const eindDag = new Date(a.eindDatum).getDay()
+  if (startDag === 0 || startDag === 6) {
+    return res.status(400).json({ fout: 'Startdatum mag geen weekenddag zijn' })
+  }
+  if (eindDag === 0 || eindDag === 6) {
+    return res.status(400).json({ fout: 'Einddatum mag geen weekenddag zijn' })
+  }
+
+  /* Valideer dat einddatum na startdatum ligt */
+  if (new Date(a.eindDatum) <= new Date(a.startDatum)) {
+    return res.status(400).json({ fout: 'Einddatum moet na de startdatum liggen' })
+  }
+
   try {
     const [bedrijf] = await db.query(
       'INSERT INTO bedrijf (naam, adres, email, telefoon) VALUES (?, ?, ?, ?)',
@@ -240,10 +255,41 @@ router.get('/mijn/actief', controleerToken, async (req, res) => {
     const vandaag = new Date()
     const startdatum = new Date(stage.startdatum)
     const einddatum = new Date(stage.einddatum)
-    const totaalDagen = (einddatum - startdatum) / (1000 * 60 * 60 * 24)
-    const totaalWeken = Math.ceil(totaalDagen / 7)
-    const verlopenDagen = Math.max(0, (vandaag - startdatum) / (1000 * 60 * 60 * 24))
-    const huidigWeek = Math.min(Math.ceil(verlopenDagen / 7), totaalWeken)
+
+    /* Eerste maandag op of na startdatum */
+    const startDag = startdatum.getDay()
+    const eersteMaandagOffset = startDag === 0 ? 1 : startDag === 1 ? 0 : (8 - startDag)
+    const eersteMaandag = new Date(startdatum)
+    eersteMaandag.setDate(startdatum.getDate() + eersteMaandagOffset)
+
+    /* Laatste maandag op of vóór einddatum */
+    const eindDag = einddatum.getDay()
+    const laatsteMaandagOffset = eindDag === 0 ? -6 : eindDag === 1 ? 0 : -(eindDag - 1)
+    const laatsteMaandag = new Date(einddatum)
+    laatsteMaandag.setDate(einddatum.getDate() + laatsteMaandagOffset)
+
+    const totaalWeken = Math.max(1, Math.round((laatsteMaandag - eersteMaandag) / (1000 * 60 * 60 * 24 * 7)) + 1)
+
+    /* Huidig week nummer — gebaseerd op de laatste logboek_week in de DB */
+    const [laatsteLogboekWeek] = await db.query(
+      `SELECT lw.week_nummer, ls.naam AS status
+       FROM logboek_week lw
+       JOIN logboek_status ls ON lw.status_id = ls.id
+       WHERE lw.stage_id = ?
+       ORDER BY lw.week_nummer DESC
+       LIMIT 1`,
+      [stage.stage_id]
+    )
+
+    let huidigWeek = 1
+    if (laatsteLogboekWeek.length > 0) {
+      const laatsteWeek = laatsteLogboekWeek[0]
+      if (laatsteWeek.status === 'goedgekeurd') {
+        huidigWeek = Math.min(laatsteWeek.week_nummer + 1, totaalWeken)
+      } else {
+        huidigWeek = laatsteWeek.week_nummer
+      }
+    }
 
     const [logboekStats] = await db.query(
       `SELECT COUNT(DISTINCT lw.id) AS totaal_weken,
@@ -255,11 +301,19 @@ router.get('/mijn/actief', controleerToken, async (req, res) => {
     )
 
     const [dagItems] = await db.query(
-      `SELECT COUNT(ldi.id) AS totaal_dagen
+      `SELECT COUNT(DISTINCT ldi.datum) AS totaal_dagen
        FROM logboek_dag_item ldi
        JOIN logboek_week lw ON ldi.logboek_week_id = lw.id
        WHERE lw.stage_id = ?`,
       [stage.stage_id]
+    )
+
+    const [dagenDezeWeek] = await db.query(
+      `SELECT COUNT(DISTINCT ldi.datum) AS dagen
+       FROM logboek_dag_item ldi
+       JOIN logboek_week lw ON ldi.logboek_week_id = lw.id
+       WHERE lw.stage_id = ? AND lw.week_nummer = ?`,
+      [stage.stage_id, huidigWeek]
     )
 
     const [evaluaties] = await db.query(
@@ -270,6 +324,47 @@ router.get('/mijn/actief', controleerToken, async (req, res) => {
        ORDER BY em.datum`,
       [stage.stage_id]
     )
+
+    const [feedbackWeken] = await db.query(
+      `SELECT lw.week_nummer, lw.feedback_mentor
+       FROM logboek_week lw
+       WHERE lw.stage_id = ? AND lw.feedback_mentor IS NOT NULL AND lw.feedback_mentor != ''
+       ORDER BY lw.week_nummer`,
+      [stage.stage_id]
+    )
+
+    const [zelfreflectieIngediend] = await db.query(
+      `SELECT COUNT(*) AS aantal
+       FROM evaluatie_moment em
+       JOIN evaluatie_type et ON em.type_id = et.id
+       JOIN competentie_beoordeling cb ON cb.evaluatie_moment_id = em.id
+       WHERE em.stage_id = ? AND et.naam = 'zelfevaluatie' AND cb.student_score IS NOT NULL AND cb.student_reflectie IS NOT NULL`,
+      [stage.stage_id]
+    )
+
+    const [tussenEval] = await db.query(
+      `SELECT em.datum
+       FROM evaluatie_moment em
+       JOIN evaluatie_type et ON em.type_id = et.id
+       WHERE em.stage_id = ? AND et.naam = 'tussentijdse_evaluatie'
+       LIMIT 1`,
+      [stage.stage_id]
+    )
+
+    var zelfevalDatum = null
+    if (tussenEval.length > 0 && tussenEval[0].datum) {
+      zelfevalDatum = tussenEval[0].datum
+    } else {
+      var startD = new Date(stage.startdatum)
+      var eindD = new Date(stage.einddatum)
+      var mD = new Date(startD.getTime() + (eindD.getTime() - startD.getTime()) / 2)
+      var dag = mD.getDate()
+      var maand = mD.getMonth() + 1
+      var jaar = mD.getFullYear()
+      zelfevalDatum = jaar + '-' + String(maand).padStart(2, '0') + '-' + String(dag).padStart(2, '0')
+    }
+    var zelfevalDatumObj = new Date(zelfevalDatum)
+    var zelfevaluatieBeschikbaar = vandaag >= zelfevalDatumObj && !zelfreflectieIngediend[0]?.aantal
 
     res.json({
       stage: {
@@ -299,12 +394,21 @@ router.get('/mijn/actief', controleerToken, async (req, res) => {
       },
       logboeken: {
         ingevulde_weken: logboekStats[0]?.ingevulde_weken || 0,
-        totaal_dagen: dagItems[0]?.totaal_dagen || 0
+        totaal_dagen: dagItems[0]?.totaal_dagen || 0,
+        dagen_deze_week: dagenDezeWeek[0]?.dagen || 0
       },
       evaluaties: evaluaties.map(e => ({
         type: e.type_naam,
         datum: e.datum
       })),
+      feedback_weken: feedbackWeken.map(fw => ({
+        week_nummer: fw.week_nummer,
+        feedback: fw.feedback_mentor
+      })),
+      zelfevaluatie: {
+        beschikbaar: !!zelfevaluatieBeschikbaar,
+        deadline: zelfevalDatum
+      },
       overeenkomst: {
         getekend_door_student: stage.getekend_door_student,
         getekend_door_bedrijf: stage.getekend_door_bedrijf,

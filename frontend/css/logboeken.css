@@ -213,6 +213,9 @@
 .week-detail-rij {
   display: none;
 }
+.week-detail-rij.open {
+  display: table-row;
+}
 
 .week-detail-cel {
   background: var(--color-bg-page);
@@ -231,6 +234,11 @@
 
 .dag-detail:last-child {
   margin-bottom: 0;
+}
+
+.dag-detail--feedback {
+  border-left: 3px solid var(--color-primary, #3b82f6);
+  background: #f0f7ff;
 }
 
 .dag-detail strong {

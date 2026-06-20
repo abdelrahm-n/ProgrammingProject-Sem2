@@ -416,3 +416,40 @@
 .btn-eval-invullen:hover {
   background: #4b5563;
 }
+
+/* === Logboek voortgang === */
+.logboek-rij {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--sp-1);
+}
+
+.logboek-label {
+  font-size: 14px;
+  color: var(--color-text);
+}
+
+.logboek-aantal {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.progress-balk-wrapper--sm {
+  height: 8px;
+  margin-bottom: var(--sp-3);
+}
+
+/* === Status badge info === */
+.status-badge--info {
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-size: 12px;
+}
+
+.status-badge--success {
+  background: #d1fae5;
+  color: #065f46;
+  font-size: 12px;
+}

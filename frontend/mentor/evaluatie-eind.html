@@ -90,6 +90,7 @@
     const naam = params.get('naam') || 'Student';
     const opleiding = params.get('opleiding') || '';
     const voornaam = naam.split(' ')[0];
+    const evaluatieId = params.get('evaluatie') || '';
 
     document.getElementById('evTitel').textContent = 'Eindevaluatie ' + voornaam.toUpperCase() + ' (zelfevaluatie)';
     document.getElementById('evTerug').href =
@@ -102,7 +103,7 @@
         p5: 'De student hanteert een sterke onderzoekende houding. Informatie wordt kritisch geanalyseerd en verschillende oplossingen worden onderzocht en onderbouwd om tot een innovatieve oplossing te komen.',
         p3: 'De student onderzoekt mogelijke oplossingen en verzamelt relevante informatie, maar de analyse of onderbouwing kan verder worden verdiept.',
         p0: 'Er is weinig tot geen onderzoek uitgevoerd. Oplossingen worden niet onderbouwd of kritisch geëvalueerd.',
-        score: '3/5'
+        score: '-'
       },
       {
         titel: 'LO6: Helder en transparant communiceren',
@@ -110,7 +111,7 @@
         p5: 'De student communiceert helder, professioneel en transparant met alle betrokkenen. Informatie wordt correct gedeeld en afspraken worden duidelijk gecommuniceerd.',
         p3: 'De communicatie is meestal duidelijk en professioneel, maar sommige boodschappen of afspraken zijn onvolledig of minder duidelijk.',
         p0: 'Communicatie ontbreekt of is onduidelijk, waardoor samenwerking en informatie-uitwisseling bemoeilijkt worden.',
-        score: '3/5'
+        score: '-'
       },
       {
         titel: 'LO7: Probleemoplossend vermogen',
@@ -118,7 +119,7 @@
         p5: 'De student analyseert problemen kritisch, identificeert de oorzaak en werkt efficiënte en doordachte oplossingen uit.',
         p3: 'De student lost problemen op, maar de analyse of gekozen oplossing kan verder worden verbeterd.',
         p0: 'Problemen worden niet of onvoldoende geanalyseerd en er worden geen geschikte oplossingen voorgesteld.',
-        score: '3/5'
+        score: '-'
       },
       {
         titel: 'LO8: Persoonlijke ontwikkeling',
@@ -126,7 +127,7 @@
         p5: 'De student reflecteert actief over zijn eigen functioneren, staat open voor feedback en gebruikt deze om zich professioneel verder te ontwikkelen.',
         p3: 'De student toont bereidheid om te leren en verwerkt feedback gedeeltelijk in zijn ontwikkeling.',
         p0: 'De student reflecteert niet over het eigen functioneren en toont weinig bereidheid om zich verder te ontwikkelen.',
-        score: '3/5'
+        score: '-'
       },
       {
         titel: 'LO9: Professionele attitude',
@@ -134,7 +135,7 @@
         p5: 'De student handelt steeds professioneel, neemt verantwoordelijkheid op, werkt kwaliteitsgericht en respecteert afspraken en deadlines.',
         p3: 'De student toont meestal een professionele houding, maar is niet altijd consequent in verantwoordelijkheid, kwaliteit of afspraken.',
         p0: 'De student toont onvoldoende professionele houding en respecteert afspraken, verantwoordelijkheden of kwaliteitsnormen niet.',
-        score: '3/5'
+        score: '-'
       }
     ];
 
@@ -149,8 +150,29 @@
         <td class="col-score">${escape(c.score)}</td>
       </tr>`).join('');
 
+    if (evaluatieId && token) {
+      fetch(API_URL + '/api/evaluaties/' + evaluatieId + '/beoordelingen', {
+        headers: { 'Authorization': 'Bearer ' + token }
+      })
+      .then(r => r.json())
+      .then(beoordelingen => {
+        if (beoordelingen.length === 0) return;
+        var tabelRijen = document.querySelectorAll('#evTabelBody tr');
+        beoordelingen.forEach((b, i) => {
+          if (tabelRijen[i] && b.student_score != null) {
+            var scoreCel = tabelRijen[i].querySelector('.col-score');
+            if (scoreCel) scoreCel.textContent = b.student_score + '/5';
+          }
+        });
+        var beschrijving = document.querySelector('.ev-beschrijving');
+        if (beschrijving && beoordelingen[0] && beoordelingen[0].student_reflectie) {
+          beschrijving.value = beoordelingen[0].student_reflectie;
+        }
+      })
+      .catch(() => {});
+    }
+
     document.getElementById('evVolgende').addEventListener('click', () => {
-      // Volgende stap volgt later
       alert('Volgende stap van de eindevaluatie volgt nog.');
     });
   </script>
