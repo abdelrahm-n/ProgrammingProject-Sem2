@@ -38,24 +38,24 @@
       <section class="student-card">
         <h2>Ondertekeningsoverzicht</h2>
 
-        <div class="status-box">
-          Status: Alle handtekeningen ontvangen
+        <div class="status-box" id="statusBox">
+          -
         </div>
 
         <div class="signature-overview">
           <p>
             <strong>Handtekening student</strong>
-            <span class="status-ok">Ondertekend</span>
+            <span id="studentCheck" class="status-wait">-</span>
           </p>
 
           <p>
             <strong>Handtekening bedrijf</strong>
-            <span class="status-ok">Ondertekend</span>
+            <span id="bedrijfCheck" class="status-wait">-</span>
           </p>
 
           <p>
             <strong>Handtekening stagecommissie</strong>
-            <span class="status-ok">Ondertekend</span>
+            <span id="schoolCheck" class="status-wait">-</span>
           </p>
         </div>
 
@@ -71,5 +71,40 @@
 </div>
 
 <script src="../js/nav.js"></script>
+<script>
+  var API = 'http://localhost:3000';
+  var token = localStorage.getItem('token');
+  var params = new URLSearchParams(window.location.search);
+  var id = params.get('id');
+
+  function zetStatus(id, tekst, cls) {
+    var el = document.getElementById(id);
+    if (el) { el.textContent = tekst; el.className = cls; }
+  }
+
+  if (token && id) {
+    fetch(API + '/api/stageovereenkomst/commissie/' + id, {
+      headers: { 'Authorization': 'Bearer ' + token }
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      var box = document.getElementById('statusBox');
+      if (d.getekend_door_student && d.getekend_door_bedrijf && d.getekend_door_school) {
+        if (box) box.textContent = 'Alle handtekeningen ontvangen';
+      } else if (d.getekend_door_school) {
+        if (box) box.textContent = 'Volledig getekend';
+      } else if (d.getekend_door_bedrijf) {
+        if (box) box.textContent = 'Wacht op hogeschool';
+      } else {
+        if (box) box.textContent = 'Wacht op bedrijf';
+      }
+
+      zetStatus('studentCheck', d.getekend_door_student ? 'Ondertekend' : 'Nog niet ondertekend', d.getekend_door_student ? 'status-ok' : 'status-wait');
+      zetStatus('bedrijfCheck', d.getekend_door_bedrijf ? 'Ondertekend' : 'Nog niet ondertekend', d.getekend_door_bedrijf ? 'status-ok' : 'status-wait');
+      zetStatus('schoolCheck', d.getekend_door_school ? 'Ondertekend' : 'Nog niet ondertekend', d.getekend_door_school ? 'status-ok' : 'status-wait');
+    })
+    .catch(function() {});
+  }
+</script>
 </body>
 </html>
