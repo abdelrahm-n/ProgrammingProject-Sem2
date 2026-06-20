@@ -6,6 +6,7 @@
   <title>Stageplatform - Stagementor - Logboeken</title>
   <link rel="stylesheet" href="../css/stijl.css" />
   <link rel="stylesheet" href="../css/mentor.css" />
+  <link rel="stylesheet" href="../css/logboeken.css" />
 </head>
 <body>
 
@@ -27,19 +28,25 @@
       <nav class="sidebar"></nav>
 
       <main class="content-area">
-        <div class="logboek-student-card">
-          <div class="page-header">
-            <h2>LOGBOEK STUDENT</h2>
+        <div class="logboeken-panel">
+          <div class="logboeken-header">
+            <h1>Logboek overzicht</h1>
           </div>
 
-          <div class="mentor-logboeken-list" id="studentenLijst">
-            <div class="row-headings">
-              <span>Naam</span>
-              <span>Richting</span>
-              <span>Status</span>
-              <span></span>
-            </div>
-            <!-- Rijen via JavaScript -->
+          <div class="logboeken-table-container">
+            <table class="student-logboeken-table">
+              <thead>
+                <tr>
+                  <th>Naam</th>
+                  <th>Richting</th>
+                  <th>Logboek</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody id="studentenBody">
+                <tr><td colspan="4">Laden...</td></tr>
+              </tbody>
+            </table>
           </div>
         </div>
       </main>
@@ -50,9 +57,15 @@
   <script>
     const API_URL = 'http://localhost:3000';
     const token = localStorage.getItem('token') || '';
-    const lijst = document.getElementById('studentenLijst');
+    const body = document.getElementById('studentenBody');
 
     function escape(t){ if(t==null) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+
+    const statusInfo = {
+      goedgekeurd: { klasse: 'badge badge--goedgekeurd', tekst: 'Goedgekeurd' },
+      ingediend:   { klasse: 'badge badge--actief',      tekst: 'Ingediend' },
+      open:        { klasse: 'badge badge--actief',      tekst: 'Ingediend' }
+    };
 
     (async function () {
       let studenten;
@@ -63,31 +76,30 @@
         if (!res.ok) throw new Error('niet ok');
         studenten = await res.json();
       } catch (e) {
-        lijst.insertAdjacentHTML('beforeend',
-          '<div class="week-status-item status-action">Kon studenten niet laden. Log opnieuw in via de startpagina.</div>');
+        body.innerHTML = '<tr><td colspan="4">Kon studenten niet laden. Log opnieuw in als stagementor.</td></tr>';
         return;
       }
 
       if (!studenten.length) {
-        lijst.insertAdjacentHTML('beforeend',
-          '<div class="week-status-item">Je hebt nog geen toegewezen stagiairs.</div>');
+        body.innerHTML = '<tr><td colspan="4">Je hebt nog geen toegewezen stagiairs.</td></tr>';
         return;
       }
 
+      body.innerHTML = '';
       studenten.forEach(s => {
-        const actie = Number(s.aantal_ingediend) > 0;
-        const klasse = actie ? 'status-action' : 'status-approved';
-        const tekst = actie ? 'Actie vereist' : 'Goedgekeurd';
         const naam = escape(s.voornaam + ' ' + s.achternaam);
-        const rij = document.createElement('a');
-        rij.href = 'logboek-detail.html?student=' + s.student_id;
-        rij.className = 'row-item ' + klasse + ' clickable-row';
-        rij.innerHTML = `
-          <span>${naam}</span>
-          <span>${escape(s.opleiding) || '-'}</span>
-          <span class="status-text">${tekst}</span>
-          <span class="details-link">Bekijken</span>`;
-        lijst.appendChild(rij);
+        const ingevuld = Math.ceil(Number(s.aantal_dagen_ingevuld || 0) / 5);
+        const totaal = Number(s.totaal_weken || 0);
+        const isVolledig = ingevuld >= totaal && totaal > 0;
+        const klasse = 'badge badge--actief';
+        const tekst = isVolledig ? 'Volledig' : ingevuld + '/' + totaal + ' weken';
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${naam}</td>
+          <td>${escape(s.opleiding) || '-'}</td>
+          <td><span class="${klasse}">${tekst}</span></td>
+          <td><a class="details-link" href="logboek-detail.html?student=${s.student_id}">Bekijken</a></td>`;
+        body.appendChild(tr);
       });
     })();
   </script>
