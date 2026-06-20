@@ -68,9 +68,17 @@ function vulDashboardIn(data) {
   if (dagenDezeWeek > 0 && dagenDezeWeek < 5) {
     acties.push("Week " + huidigWeek + " verder aanvullen");
   }
-  if (huidigWeek > 1) {
-    acties.push("Feedback op week " + (huidigWeek - 1) + " bekijken");
+
+  if (data.feedback_weken && data.feedback_weken.length > 0) {
+    data.feedback_weken.forEach(function(fw) {
+      acties.push("Feedback op week " + fw.week_nummer + " bekijken");
+    });
   }
+
+  if (data.zelfevaluatie && data.zelfevaluatie.beschikbaar) {
+    acties.push("Zelfevaluatie invullen");
+  }
+
   if (!data.overeenkomst || data.overeenkomst.status !== "gevalideerd") {
     acties.push("Stageovereenkomst ondertekenen");
   }
@@ -122,10 +130,27 @@ function vulDashboardIn(data) {
   var eind = new Date(data.stage.einddatum);
   var midden = new Date((start.getTime() + eind.getTime()) / 2);
 
+  var tussenDatum = "-";
+  var eindeDatum = "-";
+  if (data.evaluaties && data.evaluaties.length > 0) {
+    var tussen = data.evaluaties.find(function(e) { return e.type === "tussentijdse_evaluatie"; });
+    var einde = data.evaluaties.find(function(e) { return e.type === "eindevaluatie"; });
+    if (tussen) tussenDatum = formatDate(tussen.datum);
+    if (einde) eindeDatum = formatDate(einde.datum);
+  } else {
+    tussenDatum = formatDate(midden);
+    eindeDatum = formatDate(eind);
+  }
+
+  var zelfEvalTekst = "Nog niet beschikbaar";
+  if (data.zelfevaluatie && data.zelfevaluatie.deadline) {
+    zelfEvalTekst = formatDate(data.zelfevaluatie.deadline);
+  }
+
   var evalRijen = [
-    { label: "Tussentijdse evaluatie", datum: formatDate(midden) },
-    { label: "Zelfevaluatie", datum: "Nog niet beschikbaar" },
-    { label: "Eindevaluatie", datum: formatDate(eind) }
+    { label: "Tussentijdse evaluatie", datum: tussenDatum },
+    { label: "Zelfevaluatie", datum: zelfEvalTekst },
+    { label: "Eindevaluatie", datum: eindeDatum }
   ];
 
   evalRijen.forEach(function(ev) {

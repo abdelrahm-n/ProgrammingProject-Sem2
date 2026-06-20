@@ -270,12 +270,26 @@ router.get('/mijn/actief', controleerToken, async (req, res) => {
 
     const totaalWeken = Math.max(1, Math.round((laatsteMaandag - eersteMaandag) / (1000 * 60 * 60 * 24 * 7)) + 1)
 
-    /* Huidig week nummer */
-    const dagVandaag = vandaag.getDay()
-    const maandagVandaag = new Date(vandaag)
-    maandagVandaag.setDate(vandaag.getDate() - (dagVandaag === 0 ? 6 : dagVandaag - 1))
-    let huidigWeek = Math.round((maandagVandaag - eersteMaandag) / (1000 * 60 * 60 * 24 * 7)) + 1
-    huidigWeek = Math.max(1, Math.min(huidigWeek, totaalWeken))
+    /* Huidig week nummer — gebaseerd op de laatste logboek_week in de DB */
+    const [laatsteLogboekWeek] = await db.query(
+      `SELECT lw.week_nummer, ls.naam AS status
+       FROM logboek_week lw
+       JOIN logboek_status ls ON lw.status_id = ls.id
+       WHERE lw.stage_id = ?
+       ORDER BY lw.week_nummer DESC
+       LIMIT 1`,
+      [stage.stage_id]
+    )
+
+    let huidigWeek = 1
+    if (laatsteLogboekWeek.length > 0) {
+      const laatsteWeek = laatsteLogboekWeek[0]
+      if (laatsteWeek.status === 'goedgekeurd') {
+        huidigWeek = Math.min(laatsteWeek.week_nummer + 1, totaalWeken)
+      } else {
+        huidigWeek = laatsteWeek.week_nummer
+      }
+    }
 
     const [logboekStats] = await db.query(
       `SELECT COUNT(DISTINCT lw.id) AS totaal_weken,
@@ -310,6 +324,47 @@ router.get('/mijn/actief', controleerToken, async (req, res) => {
        ORDER BY em.datum`,
       [stage.stage_id]
     )
+
+    const [feedbackWeken] = await db.query(
+      `SELECT lw.week_nummer, lw.feedback_mentor
+       FROM logboek_week lw
+       WHERE lw.stage_id = ? AND lw.feedback_mentor IS NOT NULL AND lw.feedback_mentor != ''
+       ORDER BY lw.week_nummer`,
+      [stage.stage_id]
+    )
+
+    const [zelfreflectieIngediend] = await db.query(
+      `SELECT COUNT(*) AS aantal
+       FROM evaluatie_moment em
+       JOIN evaluatie_type et ON em.type_id = et.id
+       JOIN competentie_beoordeling cb ON cb.evaluatie_moment_id = em.id
+       WHERE em.stage_id = ? AND et.naam = 'zelfevaluatie' AND cb.student_score IS NOT NULL AND cb.student_reflectie IS NOT NULL`,
+      [stage.stage_id]
+    )
+
+    const [tussenEval] = await db.query(
+      `SELECT em.datum
+       FROM evaluatie_moment em
+       JOIN evaluatie_type et ON em.type_id = et.id
+       WHERE em.stage_id = ? AND et.naam = 'tussentijdse_evaluatie'
+       LIMIT 1`,
+      [stage.stage_id]
+    )
+
+    var zelfevalDatum = null
+    if (tussenEval.length > 0 && tussenEval[0].datum) {
+      zelfevalDatum = tussenEval[0].datum
+    } else {
+      var startD = new Date(stage.startdatum)
+      var eindD = new Date(stage.einddatum)
+      var mD = new Date(startD.getTime() + (eindD.getTime() - startD.getTime()) / 2)
+      var dag = mD.getDate()
+      var maand = mD.getMonth() + 1
+      var jaar = mD.getFullYear()
+      zelfevalDatum = jaar + '-' + String(maand).padStart(2, '0') + '-' + String(dag).padStart(2, '0')
+    }
+    var zelfevalDatumObj = new Date(zelfevalDatum)
+    var zelfevaluatieBeschikbaar = vandaag >= zelfevalDatumObj && !zelfreflectieIngediend[0]?.aantal
 
     res.json({
       stage: {
@@ -346,6 +401,14 @@ router.get('/mijn/actief', controleerToken, async (req, res) => {
         type: e.type_naam,
         datum: e.datum
       })),
+      feedback_weken: feedbackWeken.map(fw => ({
+        week_nummer: fw.week_nummer,
+        feedback: fw.feedback_mentor
+      })),
+      zelfevaluatie: {
+        beschikbaar: !!zelfevaluatieBeschikbaar,
+        deadline: zelfevalDatum
+      },
       overeenkomst: {
         getekend_door_student: stage.getekend_door_student,
         getekend_door_bedrijf: stage.getekend_door_bedrijf,
