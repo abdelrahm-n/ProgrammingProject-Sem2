@@ -49,12 +49,11 @@
 
             <div class="dashboard-card">
               <h2>Stagevoortgang</h2>
-              <p>Huidig weeknummer</p>
+              <p>Huidige stageweek</p>
               <div class="groot-nummer" id="info-week">Week 0 / 0</div>
               <div class="progress-balk-wrapper">
                 <div class="progress-balk" id="info-progress-balk" style="width:0%"></div>
               </div>
-              <p class="tekst-muted">Verloop stage</p>
             </div>
 
             <div class="dashboard-card">
@@ -67,10 +66,22 @@
 
             <div class="dashboard-card">
               <h2>Logboeken</h2>
-              <div class="info-rij">Vandaag ingevuld: <strong id="log-vandaag">0</strong></div>
-              <div class="info-rij">Deze week: <strong id="log-week">0 / 5</strong></div>
-              <div class="info-rij">Totaal ingevuld: <strong id="log-totaal">0 / 0</strong></div>
-              <a href="logboek.html" class="btn btn--primair" style="margin-top:var(--sp-3);">Eerste logboek invullen</a>
+              <div class="logboek-rij">
+                <span class="logboek-label">Deze week</span>
+                <span class="logboek-aantal" id="log-week">0 / 5</span>
+              </div>
+              <div class="progress-balk-wrapper progress-balk-wrapper--sm">
+                <div class="progress-balk" id="log-week-balk" style="width:0%"></div>
+              </div>
+              <div class="logboek-rij">
+                <span class="logboek-label">Totaal ingevuld</span>
+                <span class="logboek-aantal" id="log-totaal">0 / 0</span>
+              </div>
+              <div class="progress-balk-wrapper progress-balk-wrapper--sm">
+                <div class="progress-balk" id="log-totaal-balk" style="width:0%"></div>
+              </div>
+              <span class="status-badge status-badge--info" id="log-status-badge" style="display:none;"></span>
+              <a href="logboek.html" class="btn btn--primair" style="margin-top:var(--sp-3);">Logboek invullen</a>
             </div>
 
             <div class="dashboard-card dashboard-card--wide">
