@@ -180,9 +180,9 @@ router.post('/registreren', async (req, res) => {
     return res.status(400).json({ fout: 'Wachtwoord moet minstens 6 tekens lang zijn' })
   }
 
-  const schoneVoornaam = voornaam.toLowerCase().replace(/[^a-z]/g, '')
-  const schoneAchternaam = achternaam.toLowerCase().replace(/[^a-z]/g, '')
-  const email = schoneVoornaam + '.' + schoneAchternaam + '@mentor.ehb.be'
+  /* Spaties in een naam (bv. "Abdelkarim Kantine") worden een punt in de e-mail */
+  const schoonNaamdeel = (tekst) => tekst.trim().toLowerCase().replace(/\s+/g, '.').replace(/[^a-z.]/g, '')
+  const email = schoonNaamdeel(voornaam) + '.' + schoonNaamdeel(achternaam) + '@mentor.ehb.be'
 
   try {
     const [bestaand] = await db.query(
@@ -208,6 +208,74 @@ router.post('/registreren', async (req, res) => {
 
     res.status(201).json({ bericht: 'Account aangemaakt', email })
 
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ fout: 'Serverfout' })
+  }
+})
+
+/* POST /api/auth/wachtwoord-vergeten - stuur een reset-link naar de gebruiker */
+router.post('/wachtwoord-vergeten', async (req, res) => {
+  const { email } = req.body
+  if (!email) {
+    return res.status(400).json({ fout: 'E-mail is verplicht' })
+  }
+
+  try {
+    const [rijen] = await db.query('SELECT id FROM persoon WHERE email = ? AND actief = TRUE', [email])
+
+    if (rijen.length > 0) {
+      /* Korte JWT als reset-token (geen opslag nodig) */
+      const resetToken = jwt.sign(
+        { id: rijen[0].id, doel: 'wachtwoord_reset' },
+        process.env.JWT_SECRET,
+        { expiresIn: '30m' }
+      )
+      const link = `http://localhost:3000/reset-wachtwoord.html?token=${resetToken}`
+
+      /* Eenvoudige "e-mail" naar de serverconsole (geen mailserver in dit project) */
+      console.log(`\n[EMAIL] Aan: ${email}\nKlik op deze link om je wachtwoord te veranderen:\n${link}\n`)
+    }
+
+    /* Altijd hetzelfde antwoord, zodat je niet kunt zien welke e-mails bestaan */
+    res.json({ bericht: 'Als dit e-mailadres bestaat, is er een e-mail met een reset-link verzonden.' })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ fout: 'Serverfout' })
+  }
+})
+
+/* POST /api/auth/wachtwoord-reset - zet een nieuw wachtwoord op basis van de reset-token */
+router.post('/wachtwoord-reset', async (req, res) => {
+  const { token, nieuwWachtwoord } = req.body
+
+  if (!token || !nieuwWachtwoord) {
+    return res.status(400).json({ fout: 'Token en nieuw wachtwoord zijn verplicht' })
+  }
+  if (nieuwWachtwoord.length < 6) {
+    return res.status(400).json({ fout: 'Wachtwoord moet minstens 6 tekens lang zijn' })
+  }
+
+  let payload
+  try {
+    payload = jwt.verify(token, process.env.JWT_SECRET)
+  } catch {
+    return res.status(400).json({ fout: 'De reset-link is ongeldig of verlopen. Vraag een nieuwe aan.' })
+  }
+
+  if (payload.doel !== 'wachtwoord_reset') {
+    return res.status(400).json({ fout: 'Ongeldige reset-link' })
+  }
+
+  try {
+    const hash = await bcrypt.hash(nieuwWachtwoord, 10)
+    const [resultaat] = await db.query('UPDATE persoon SET wachtwoord_hash = ? WHERE id = ?', [hash, payload.id])
+
+    if (resultaat.affectedRows === 0) {
+      return res.status(404).json({ fout: 'Gebruiker niet gevonden' })
+    }
+
+    res.json({ bericht: 'Wachtwoord gewijzigd' })
   } catch (err) {
     console.error(err)
     res.status(500).json({ fout: 'Serverfout' })

@@ -7,10 +7,10 @@ if (!token || rol !== 'docent') {
   window.location.href = '../index.html'
 }
 
-const inhoud        = document.getElementById('evaluatieInhoud')
-const stageSelectie = document.getElementById('stageSelectie')
+const inhoud         = document.getElementById('evaluatieInhoud')
+const studentenLijst = document.getElementById('studentenLijst')
 
-/* Laad de studenten die deze docent begeleidt */
+/* Laad de toegewezen studenten als lijst */
 async function laadStages() {
   try {
     const antwoord = await fetch(API_URL + '/api/docent/mijn-studenten', {
@@ -18,22 +18,38 @@ async function laadStages() {
     })
 
     if (!antwoord.ok) {
-      stageSelectie.innerHTML = '<option value="">Kan studenten niet laden</option>'
+      studentenLijst.innerHTML = '<tr><td colspan="4">Kan studenten niet laden.</td></tr>'
       return
     }
 
     const studenten = await antwoord.json()
 
-    stageSelectie.innerHTML = '<option value="">Kies een student...</option>'
-    for (const s of studenten) {
-      const optie = document.createElement('option')
-      optie.value = s.stage_id
-      optie.textContent = (s.voornaam + ' ' + s.achternaam).trim() || 'Student'
-      stageSelectie.appendChild(optie)
+    if (studenten.length === 0) {
+      studentenLijst.innerHTML = '<tr><td colspan="4">Je hebt nog geen toegewezen studenten.</td></tr>'
+      return
     }
 
+    studentenLijst.innerHTML = ''
+    for (const s of studenten) {
+      const naam = (s.voornaam + ' ' + s.achternaam).trim() || 'Student'
+      const rij = document.createElement('tr')
+      rij.innerHTML =
+        '<td>' + naam + '</td>' +
+        '<td>' + (s.opleiding || '-') + '</td>' +
+        '<td>' + (s.bedrijf || '-') + '</td>' +
+        '<td><a class="details-link" href="#" data-stage="' + s.stage_id + '">Openen</a></td>'
+      studentenLijst.appendChild(rij)
+    }
+
+    studentenLijst.querySelectorAll('.details-link').forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault()
+        laadEvaluaties(link.dataset.stage)
+      })
+    })
+
   } catch (fout) {
-    stageSelectie.innerHTML = '<option value="">Serverfout</option>'
+    studentenLijst.innerHTML = '<tr><td colspan="4">Serverfout.</td></tr>'
   }
 }
 
@@ -313,13 +329,5 @@ window.slaDocentFeedbackOp  = slaDocentFeedbackOp
 window.sluitEvaluatieAf     = sluitEvaluatieAf
 window.toonRubriek          = toonRubriek
 window.slaRubriekOp         = slaRubriekOp
-
-stageSelectie.addEventListener('change', function () {
-  if (this.value) {
-    laadEvaluaties(this.value)
-  } else {
-    inhoud.innerHTML = ''
-  }
-})
 
 laadStages()

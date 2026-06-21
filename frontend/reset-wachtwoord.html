@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stageplatform - Wachtwoord opnieuw instellen</title>
+  <link rel="stylesheet" href="css/stijl.css" />
+  <link rel="stylesheet" href="css/login.css" />
+</head>
+<body class="login-pagina">
+
+  <div class="login-wrapper">
+    <div class="login-kaart">
+
+      <h1>Nieuw wachtwoord</h1>
+      <p class="login-subtitel">Kies een nieuw wachtwoord voor je account.</p>
+
+      <form id="resetForm" novalidate>
+        <div class="form-group">
+          <label for="nieuwWachtwoord">Nieuw wachtwoord</label>
+          <input type="password" id="nieuwWachtwoord" placeholder="Minimaal 6 tekens" required />
+        </div>
+
+        <div class="form-group">
+          <label for="herhaalWachtwoord">Herhaal wachtwoord</label>
+          <input type="password" id="herhaalWachtwoord" placeholder="Herhaal je wachtwoord" required />
+        </div>
+
+        <p id="melding" class="melding" hidden></p>
+
+        <button type="submit" class="btn btn--primair btn--login">Wachtwoord opslaan</button>
+      </form>
+
+    </div>
+  </div>
+
+  <script>
+    const API_URL = 'http://localhost:3000';
+    const token = new URLSearchParams(window.location.search).get('token') || '';
+    const melding = document.getElementById('melding');
+
+    function toon(tekst, soort) {
+      melding.className = 'melding melding--' + soort;
+      melding.textContent = tekst;
+      melding.hidden = false;
+    }
+
+    if (!token) {
+      toon('Geen geldige reset-link. Vraag een nieuwe aan op de loginpagina.', 'fout');
+    }
+
+    document.getElementById('resetForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const nieuwWachtwoord = document.getElementById('nieuwWachtwoord').value;
+      const herhaal = document.getElementById('herhaalWachtwoord').value;
+      melding.hidden = true;
+
+      if (nieuwWachtwoord.length < 6) {
+        toon('Wachtwoord moet minstens 6 tekens lang zijn.', 'fout');
+        return;
+      }
+      if (nieuwWachtwoord !== herhaal) {
+        toon('De wachtwoorden komen niet overeen.', 'fout');
+        return;
+      }
+
+      try {
+        const antwoord = await fetch(API_URL + '/api/auth/wachtwoord-reset', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ token, nieuwWachtwoord })
+        });
+        const data = await antwoord.json();
+
+        if (!antwoord.ok) {
+          toon(data.fout || 'Wachtwoord wijzigen mislukt.', 'fout');
+          return;
+        }
+
+        toon('Wachtwoord gewijzigd. Je wordt naar de login gebracht...', 'succes');
+        setTimeout(function () { window.location.href = 'index.html'; }, 1500);
+      } catch (fout) {
+        toon('Kan geen verbinding maken met de server.', 'fout');
+      }
+    });
+  </script>
+</body>
+</html>

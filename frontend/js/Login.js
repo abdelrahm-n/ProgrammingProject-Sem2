@@ -135,3 +135,33 @@ document.getElementById('devLoginBtn').addEventListener('click', async function 
     foutmelding.hidden = false;
   }
 });
+
+/* Wachtwoord vergeten: stuur een reset-link naar het e-mailadres */
+document.getElementById('vergetenBtn').addEventListener('click', async function () {
+  const resetMelding = document.getElementById('resetMelding');
+  const gebruikersnaam = document.getElementById('gebruikersnaam').value.trim();
+  resetMelding.hidden = true;
+
+  if (!gebruikersnaam) {
+    resetMelding.className = 'melding melding--fout';
+    resetMelding.textContent = 'Vul eerst je gebruikersnaam in.';
+    resetMelding.hidden = false;
+    return;
+  }
+
+  try {
+    const antwoord = await fetch(API_URL + '/api/auth/wachtwoord-vergeten', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: gebruikersnaam + domein })
+    });
+    const data = await antwoord.json();
+    resetMelding.className = 'melding melding--succes';
+    resetMelding.textContent = data.bericht || 'E-mail verzonden.';
+    resetMelding.hidden = false;
+  } catch (fout) {
+    resetMelding.className = 'melding melding--fout';
+    resetMelding.textContent = 'Kan geen verbinding maken met de server.';
+    resetMelding.hidden = false;
+  }
+});

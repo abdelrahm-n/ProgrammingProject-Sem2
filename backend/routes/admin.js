@@ -71,9 +71,9 @@ router.post('/gebruiker-aanmaken', controleerToken, isAdmin, async (req, res) =>
     admin: 'admin.ehb.be'
   }
 
-  const schoneVoornaam = voornaam.toLowerCase().replace(/[^a-z]/g, '')
-  const schoneAchternaam = achternaam.toLowerCase().replace(/[^a-z]/g, '')
-  const email = schoneVoornaam + '.' + schoneAchternaam + '@' + domeinen[rol]
+  /* Spaties in een naam (bv. "Abdelkarim Kantine") worden een punt in de e-mail */
+  const schoonNaamdeel = (tekst) => tekst.trim().toLowerCase().replace(/\s+/g, '.').replace(/[^a-z.]/g, '')
+  const email = schoonNaamdeel(voornaam) + '.' + schoonNaamdeel(achternaam) + '@' + domeinen[rol]
 
   try {
     const [bestaand] = await db.query('SELECT id FROM persoon WHERE email = ?', [email])
@@ -81,54 +81,63 @@ router.post('/gebruiker-aanmaken', controleerToken, isAdmin, async (req, res) =>
       return res.status(409).json({ fout: 'Dit e-mailadres is al in gebruik: ' + email })
     }
 
-    /* Studentnummer vooraf checken zodat een dubbel nummer geen half account achterlaat */
-    if (rol === 'student' && extra?.studentnummer) {
-      const [nr] = await db.query('SELECT persoon_id FROM student WHERE studentnummer = ?', [extra.studentnummer])
-      if (nr.length > 0) {
-        return res.status(409).json({ fout: 'Dit studentnummer is al in gebruik' })
+    /* Opleiding valideren; bij een ongeldige keuze de eerste opleiding gebruiken */
+    let opleidingId = null
+    if (rol === 'student') {
+      opleidingId = extra?.opleiding_id || null
+      if (opleidingId) {
+        const [opl] = await db.query('SELECT id FROM opleiding WHERE id = ?', [opleidingId])
+        if (opl.length === 0) opleidingId = null
+      }
+      if (!opleidingId) {
+        const [eerste] = await db.query('SELECT id FROM opleiding ORDER BY id LIMIT 1')
+        opleidingId = eerste.length > 0 ? eerste[0].id : null
       }
     }
 
     const hash = await bcrypt.hash(wachtwoord, 10)
 
-    const [resultaat] = await db.query(
-      'INSERT INTO persoon (voornaam, achternaam, email, wachtwoord_hash, rol, actief) VALUES (?, ?, ?, ?, ?, TRUE)',
-      [voornaam, achternaam, email, hash, rol]
-    )
+    /* Persoon + rol-rij in één transactie: faalt de rol-rij, dan blijft er
+       geen half account (persoon zonder student-rij) achter. */
+    const verbinding = await db.getConnection()
+    try {
+      await verbinding.beginTransaction()
 
-    const nieuweGebruikerId = resultaat.insertId
+      const [resultaat] = await verbinding.query(
+        'INSERT INTO persoon (voornaam, achternaam, email, wachtwoord_hash, rol, actief) VALUES (?, ?, ?, ?, ?, TRUE)',
+        [voornaam, achternaam, email, hash, rol]
+      )
+      const nieuweGebruikerId = resultaat.insertId
+      let studentnummer = null
 
-    if (rol === 'student') {
-      await db.query(
-        'INSERT INTO student (persoon_id, studentnummer, opleiding_id) VALUES (?, ?, ?)',
-        [nieuweGebruikerId, extra?.studentnummer || null, extra?.opleiding_id || 1]
-      )
-    } else if (rol === 'docent') {
-      await db.query(
-        'INSERT INTO docent (persoon_id, vakgroep) VALUES (?, ?)',
-        [nieuweGebruikerId, extra?.vakgroep || null]
-      )
-    } else if (rol === 'stagementor') {
-      await db.query(
-        'INSERT INTO stagementor (persoon_id, functie, bedrijf_id) VALUES (?, ?, ?)',
-        [nieuweGebruikerId, extra?.functie || null, extra?.bedrijf_id || null]
-      )
-    } else if (rol === 'stagecommissie') {
-      await db.query(
-        'INSERT INTO stagecommissielid (persoon_id, commissie_rol) VALUES (?, ?)',
-        [nieuweGebruikerId, extra?.commissie_rol || null]
-      )
-    } else if (rol === 'admin') {
-      await db.query(
-        'INSERT INTO administratie (persoon_id, dienst) VALUES (?, ?)',
-        [nieuweGebruikerId, extra?.dienst || null]
-      )
+      if (rol === 'student') {
+        /* Studentnummer automatisch genereren (uniek, op basis van het persoon-id) */
+        studentnummer = 'r' + String(nieuweGebruikerId).padStart(7, '0')
+        await verbinding.query(
+          'INSERT INTO student (persoon_id, studentnummer, opleiding_id) VALUES (?, ?, ?)',
+          [nieuweGebruikerId, studentnummer, opleidingId]
+        )
+      } else if (rol === 'docent') {
+        await verbinding.query('INSERT INTO docent (persoon_id, vakgroep) VALUES (?, ?)', [nieuweGebruikerId, extra?.vakgroep || null])
+      } else if (rol === 'stagementor') {
+        await verbinding.query('INSERT INTO stagementor (persoon_id, functie, bedrijf_id) VALUES (?, ?, ?)', [nieuweGebruikerId, extra?.functie || null, extra?.bedrijf_id || null])
+      } else if (rol === 'stagecommissie') {
+        await verbinding.query('INSERT INTO stagecommissielid (persoon_id, commissie_rol) VALUES (?, ?)', [nieuweGebruikerId, extra?.commissie_rol || null])
+      } else if (rol === 'admin') {
+        await verbinding.query('INSERT INTO administratie (persoon_id, dienst) VALUES (?, ?)', [nieuweGebruikerId, extra?.dienst || null])
+      }
+
+      await verbinding.commit()
+      res.status(201).json({ bericht: 'Account aangemaakt', email, id: nieuweGebruikerId, studentnummer })
+    } catch (err) {
+      await verbinding.rollback().catch(() => {})
+      throw err
+    } finally {
+      verbinding.release()
     }
-
-    res.status(201).json({ bericht: 'Account aangemaakt', email, id: nieuweGebruikerId })
   } catch (err) {
     console.error(err)
-    res.status(500).json({ fout: 'Serverfout' })
+    res.status(500).json({ fout: 'Serverfout bij aanmaken account' })
   }
 })
 
