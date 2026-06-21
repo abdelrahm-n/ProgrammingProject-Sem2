@@ -105,6 +105,18 @@
   color: var(--color-text-secondary);
 }
 
+/* === Handtekeningen badges in tabel === */
+.handtekeningen-cell {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.handtekeningen-cell .badge {
+  font-size: 11px;
+  padding: 2px 8px;
+}
+
 /* === Button varianten === */
 
 .btn--succes {

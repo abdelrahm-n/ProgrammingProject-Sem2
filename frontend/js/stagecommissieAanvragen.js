@@ -2,8 +2,10 @@ const API_URL = "http://localhost:3000";
 const token = localStorage.getItem("token") || "";
 
 const lijstCard = document.getElementById("lijst-card");
+const afgerondCard = document.getElementById("afgerond-card");
 const detailCard = document.getElementById("detail-card");
-const aanvraagLijst = document.getElementById("aanvraag-lijst");
+const actiefLijst = document.getElementById("actiefLijst");
+const afgerondLijst = document.getElementById("afgerondLijst");
 const tabelBody = document.getElementById("aanvraag-tabel-body");
 const detailTitel = document.getElementById("detailTitel");
 const statusBadge = document.getElementById("aanvraagStatus");
@@ -20,11 +22,19 @@ let huidigeAanvraagId = null;
 let openstaandeBeslissing = null;
 
 const statusLabels = {
-  ingediend: "Nieuwe aanvraag",
+  ingediend: "Ingediend",
   in_behandeling: "In behandeling",
   goedgekeurd: "Goedgekeurd",
   afgekeurd: "Afgekeurd",
   aanpassing_vereist: "Aanpassing vereist"
+};
+
+const badgeClasses = {
+  ingediend: "badge--ingediend",
+  in_behandeling: "badge--actief",
+  goedgekeurd: "badge--goedgekeurd",
+  afgekeurd: "badge--afgekeurd",
+  aanpassing_vereist: "badge--waarschuwing"
 };
 
 function toonDatum(waarde) {
@@ -43,6 +53,7 @@ function escape(tekst) {
 
 function toonDetail() {
   lijstCard.style.display = "none";
+  afgerondCard.style.display = "none";
   detailCard.style.display = "block";
   window.scrollTo(0, 0);
 }
@@ -50,11 +61,30 @@ function toonDetail() {
 function toonLijst() {
   detailCard.style.display = "none";
   lijstCard.style.display = "block";
+  afgerondCard.style.display = "block";
   huidigeAanvraagId = null;
   laadLijst();
 }
 
 /* ---------- LIJST ---------- */
+
+function bouwTabel(aanvragen) {
+  var html = '<table><thead><tr><th>Student</th><th>Bedrijf</th><th>Ingediend op</th><th>Status</th><th>Actie</th></tr></thead><tbody>';
+  aanvragen.forEach(function(a) {
+    var naam = escape(a.voornaam + " " + a.achternaam);
+    var label = statusLabels[a.status] || a.status;
+    var badgeCls = badgeClasses[a.status] || '';
+    html += '<tr>';
+    html += '<td><strong>' + naam + '</strong></td>';
+    html += '<td>' + escape(a.bedrijf) + '</td>';
+    html += '<td>' + toonDatum(a.aangemaakt_op) + '</td>';
+    html += '<td><span class="badge ' + badgeCls + '">' + label + '</span></td>';
+    html += '<td><a href="#" class="btn btn--primair btn--sm" onclick="openDetail(' + a.id + '); return false;">Bekijk</a></td>';
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  return html;
+}
 
 async function laadLijst() {
   try {
@@ -63,35 +93,34 @@ async function laadLijst() {
     });
 
     if (!antwoord.ok) {
-      aanvraagLijst.innerHTML = "<p>Kan de aanvragen niet laden.</p>";
+      actiefLijst.innerHTML = "<p>Kan de aanvragen niet laden.</p>";
       return;
     }
 
     const aanvragen = await antwoord.json();
 
     if (aanvragen.length === 0) {
-      aanvraagLijst.innerHTML = "<p>Er zijn nog geen ingediende aanvragen.</p>";
+      actiefLijst.innerHTML = "<p>Er zijn nog geen ingediende aanvragen.</p>";
+      afgerondLijst.innerHTML = "";
       return;
     }
 
-    aanvraagLijst.innerHTML = "";
-    aanvragen.forEach(a => {
-      const label = statusLabels[a.status] || a.status;
-      const item = document.createElement("div");
-      item.className = "aanvraag-lijst-item";
-      item.addEventListener("click", () => openDetail(a.id));
-      item.innerHTML =
-        '<div class="lijst-info">' +
-          '<span class="lijst-naam">' + escape(a.voornaam + " " + a.achternaam) + "</span>" +
-          '<span class="lijst-meta">' +
-            escape(a.bedrijf) + " &middot; ingediend op " + toonDatum(a.aangemaakt_op) +
-          "</span>" +
-        "</div>" +
-        '<span class="status-badge status-' + a.status + '">' + label + "</span>";
-      aanvraagLijst.appendChild(item);
-    });
+    var actief = aanvragen.filter(function(a) { return a.status === "ingediend" || a.status === "in_behandeling"; });
+    var afgerond = aanvragen.filter(function(a) { return a.status === "goedgekeurd" || a.status === "afgekeurd" || a.status === "aanpassing_vereist"; });
+
+    if (actief.length === 0) {
+      actiefLijst.innerHTML = "<p>Geen aanvragen die op je actie wachten.</p>";
+    } else {
+      actiefLijst.innerHTML = bouwTabel(actief);
+    }
+
+    if (afgerond.length === 0) {
+      afgerondLijst.innerHTML = "<p>Geen afgeronde aanvragen.</p>";
+    } else {
+      afgerondLijst.innerHTML = bouwTabel(afgerond);
+    }
   } catch (fout) {
-    aanvraagLijst.innerHTML = "<p>Kan geen verbinding maken met de server.</p>";
+    actiefLijst.innerHTML = "<p>Kan geen verbinding maken met de server.</p>";
   }
 }
 
@@ -178,21 +207,6 @@ async function verstuurBeslissing(beslissing, feedback) {
 
     sluitPopup();
     toonLijst();
-const urlParams = new URLSearchParams(window.location.search);
-const svId = urlParams.get("sv_id");
-
-if (svId) {
-  openDetail(svId);
-} else {
-const urlParams = new URLSearchParams(window.location.search);
-const svId = urlParams.get("sv_id");
-
-if (svId) {
-  openDetail(svId);
-} else {
-  laadLijst();
-}
-}
   } catch (fout) {
     alert("Kan geen verbinding maken met de server.");
   }
