@@ -46,12 +46,12 @@
   white-space: nowrap;
 }
 
-.badge--ingediend { background: #FFF3CD; color: #856404; }
-.badge--goedgekeurd { background: #D6F5E0; color: #1A6633; }
-.badge--afgekeurd { background: #FDDDE0; color: #990018; }
-.badge--actief { background: #CFE2FF; color: #084298; }
-.badge--afgerond { background: #E2E3E5; color: #41464B; }
-.badge--waarschuwing { background: #FFF3CD; color: #856404; }
+.badge--ingediend { background: #FFF3CD !important; color: #856404 !important; }
+.badge--goedgekeurd { background: #D6F5E0 !important; color: #1A6633 !important; }
+.badge--afgekeurd { background: #FDDDE0 !important; color: #990018 !important; }
+.badge--actief { background: #CFE2FF !important; color: #084298 !important; }
+.badge--afgerond { background: #E2E3E5 !important; color: #41464B !important; }
+.badge--waarschuwing { background: #FFF3CD !important; color: #856404 !important; }
 
 /* === Actie knoppen row === */
 .actie-knoppen {
@@ -428,6 +428,86 @@
 
 .overzicht-rij .form-group {
   margin-bottom: 0;
+}
+
+/* === Alert stat card === */
+.stat-card--alert {
+  border-color: var(--color-warning);
+}
+
+.stat-card--ok {
+  border-color: var(--color-success);
+}
+
+/* === Actie rij (dashboard open acties) === */
+.actie-rij {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--color-border-light);
+  text-decoration: none;
+  color: var(--color-text);
+  transition: background 0.15s ease;
+}
+
+.actie-rij:last-child {
+  border-bottom: none;
+}
+
+.actie-rij:hover {
+  background: #FAFAFA;
+  margin: 0 -24px;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+.actie-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--rol-accent-licht);
+  color: var(--rol-accent);
+  flex-shrink: 0;
+}
+
+.actie-tekst {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+.actie-tekst strong {
+  font-size: 14px;
+}
+
+.actie-tekst span {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.actie-rij--meer {
+  justify-content: center;
+  border-top: 1px solid var(--color-border-light);
+  margin-top: 4px;
+  padding-top: 14px;
+}
+
+.actie-rij--meer .actie-tekst {
+  align-items: center;
+  color: var(--rol-accent);
+}
+
+.actie-lege-lijst {
+  padding: 20px 0;
+  text-align: center;
+  color: var(--color-text-muted);
+  font-size: 14px;
 }
 
 /* === Responsive === */
