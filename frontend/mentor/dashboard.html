@@ -56,6 +56,11 @@
           </table>
         </section>
 
+        <section class="mentor-dashboard-card">
+          <h2>Aangevraagde besprekingen</h2>
+          <div id="besprekingenLijst">Even laden...</div>
+        </section>
+
         <section class="mentor-stats">
           <a href="stagiairs.html" class="mentor-stat-card">
             <h3>Totale studenten</h3>
@@ -81,6 +86,58 @@
 
   <script src="../js/mentorDashboard.js"></script>
   <script src="../js/nav.js"></script>
+
+  <!-- Besprekingsaanvragen van stagiairs -->
+  <script>
+    (function () {
+      const API_URL = 'http://localhost:3000';
+      const token = localStorage.getItem('token') || '';
+      const box = document.getElementById('besprekingenLijst');
+      if (!box) return;
+      const esc = (t) => { if (t == null) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; };
+      const statusLabel = { aangevraagd: 'Aangevraagd', bevestigd: 'Bevestigd', geweigerd: 'Geweigerd' };
+
+      async function laad() {
+        if (!token) { box.textContent = 'Niet ingelogd.'; return; }
+        let lijst;
+        try {
+          const res = await fetch(API_URL + '/api/besprekingen/mentor', { headers: { 'Authorization': 'Bearer ' + token } });
+          if (!res.ok) throw new Error();
+          lijst = await res.json();
+        } catch (e) { box.innerHTML = '<p style="color:#6b7280;">Kon de besprekingen niet laden.</p>'; return; }
+
+        if (!lijst.length) { box.innerHTML = '<p style="color:#6b7280;">Geen besprekingsaanvragen.</p>'; return; }
+
+        box.innerHTML = lijst.map(b => `
+          <div style="border:1px solid #ececec;border-radius:8px;padding:14px;margin-bottom:12px;">
+            <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;">
+              <strong>${esc(b.student_voornaam + ' ' + b.student_achternaam)}</strong>
+              <span style="font-size:13px;font-weight:700;color:${b.status === 'bevestigd' ? '#166534' : (b.status === 'geweigerd' ? '#b91c1c' : '#6b7280')};">${statusLabel[b.status] || b.status}</span>
+            </div>
+            ${b.voorkeur_datum ? '<div style="font-size:13px;color:#6b7280;margin-top:4px;">Voorkeursdatum: ' + new Date(b.voorkeur_datum).toLocaleDateString('nl-BE') + '</div>' : ''}
+            ${b.bericht ? '<div style="margin-top:6px;">' + esc(b.bericht) + '</div>' : '<div style="color:#9ca3af;margin-top:6px;">Geen bericht</div>'}
+            ${b.status === 'aangevraagd' ? `
+              <div style="margin-top:10px;display:flex;gap:8px;">
+                <button type="button" onclick="besprekingAntwoord(${b.id},'bevestigd')" style="background:#2E9E49;color:#fff;border:none;padding:8px 16px;border-radius:999px;font-weight:600;cursor:pointer;">Bevestigen</button>
+                <button type="button" onclick="besprekingAntwoord(${b.id},'geweigerd')" style="background:#9ca3af;color:#fff;border:none;padding:8px 16px;border-radius:999px;font-weight:600;cursor:pointer;">Weigeren</button>
+              </div>` : ''}
+          </div>`).join('');
+      }
+
+      window.besprekingAntwoord = async function (id, status) {
+        try {
+          const res = await fetch(API_URL + '/api/besprekingen/' + id, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+            body: JSON.stringify({ status })
+          });
+          if (res.ok) laad();
+        } catch (e) { /* stil */ }
+      };
+
+      laad();
+    })();
+  </script>
 
 </body>
 
