@@ -57,12 +57,17 @@ function toonStagiairs(studenten) {
       : "Geen logboek";
 
     const status = student.logboek_status || "nog niet gestart";
-
+    console.log(student);
     html += `
       <tr>
-        <td>${naam}</td>
-        <td>${week} ${status}</td>
-      </tr>
+    <td>${naam}</td>
+    <td>${week}</td>
+    <td>
+      <a class="btn btn--primair" href="logboek-detail.html?studentId=${student.student_id}">
+        Bekijken
+      </a>
+    </td>
+  </tr>
     `;
   });
 
