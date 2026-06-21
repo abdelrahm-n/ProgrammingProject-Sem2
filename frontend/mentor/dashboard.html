@@ -30,23 +30,45 @@
     <div class="app-body">
       <nav class="sidebar"></nav>
 
-      <main class="content-area">
+      <main class="content-area mentor-dashboard">
 
-        <section class="page-header">
+        <section class="mentor-dashboard-header">
           <h1>Dashboard</h1>
           <p>Welkom terug! Hier zie je een overzicht van je studenten.</p>
         </section>
 
-        <section class="student-card" id="wachtSectie" style="display:none;">
-          <h2>Wacht op jouw handtekening</h2>
-          <p>Deze studenten hebben de overeenkomst al ondertekend. Jij moet nu namens het bedrijf ondertekenen.</p>
-          <div id="wachtLijst"></div>
+        <section class="mentor-dashboard-card">
+          <h2>Mijn stagiairs</h2>
+
+          <table class="mentor-dashboard-table">
+            <thead>
+              <tr>
+                <th>Naam</th>
+                <th>Laatste logboek</th>
+              </tr>
+            </thead>
+            <tbody id="stagiairsTabel">
+              <tr>
+                <td colspan="2">Even laden...</td>
+              </tr>
+            </tbody>
+          </table>
         </section>
 
-        <section class="student-card">
-          <h2>Mijn stagiairs</h2>
-          <div id="stagiairsLijst">
-            <p>Even laden...</p>
+        <section class="mentor-stats">
+          <div class="mentor-stat-card">
+            <h3>Totale studenten</h3>
+            <p id="totaalStudenten">0</p>
+          </div>
+
+          <div class="mentor-stat-card mentor-stat-ok">
+            <h3>In orde</h3>
+            <p id="inOrde">0</p>
+          </div>
+
+          <div class="mentor-stat-card mentor-stat-alert">
+            <h3>Actie vereist</h3>
+            <p id="actieVereist">0</p>
           </div>
         </section>
 
