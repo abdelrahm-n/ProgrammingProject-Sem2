@@ -25,7 +25,7 @@ async function laadMentorDashboard() {
   } catch (err) {
     console.error("Fout bij laden dashboard:", err);
     document.getElementById("stagiairsTabel").innerHTML =
-      "<p>Dashboard kon niet geladen worden.</p>";
+      "<tr><td colspan='2'>Dashboard kon niet geladen worden.</td></tr>";
   }
 }
 
@@ -37,47 +37,36 @@ function toonStatistieken(statistieken) {
 
 
 function toonStagiairs(studenten) {
-  const stagiairsLijst = document.getElementById("stagiairsTabel");
+  const stagiairsTabel = document.getElementById("stagiairsTabel");
 
   if (!studenten || studenten.length === 0) {
-    stagiairsLijst.innerHTML = "<p>Je hebt nog geen actieve stagiairs.</p>";
+    stagiairsTabel.innerHTML = `
+      <tr>
+        <td colspan="2">Je hebt nog geen actieve stagiairs.</td>
+      </tr>
+    `;
     return;
   }
 
-  let html = `
-    <table>
-      <thead>
-        <tr>
-          <th>Student</th>
-          <th>Bedrijf</th>
-          <th>Laatste logboekweek</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-  `;
+  let html = "";
 
   studenten.forEach((student) => {
     const naam = `${student.voornaam} ${student.achternaam}`;
-    const week = student.week_nummer ? `Week ${student.week_nummer}` : "Nog geen logboek";
-    const status = student.logboek_status || "Nog niet gestart";
+    const week = student.week_nummer
+      ? `Logboek week ${student.week_nummer}`
+      : "Geen logboek";
+
+    const status = student.logboek_status || "nog niet gestart";
 
     html += `
       <tr>
         <td>${naam}</td>
-        <td>${student.bedrijf || "-"}</td>
-        <td>${week}</td>
-        <td>${status}</td>
+        <td>${week} ${status}</td>
       </tr>
     `;
   });
 
-  html += `
-      </tbody>
-    </table>
-  `;
-
-  stagiairsLijst.innerHTML = html;
+  stagiairsTabel.innerHTML = html;
 }
 
 laadMentorDashboard();
