@@ -308,14 +308,18 @@ router.get('/studenten', controleerToken, isAdmin, async (req, res) => {
               st.studentnummer, o.naam AS opleiding,
               sv.id AS voorstel_id, sv.functie,
               b.naam AS bedrijf_naam,
-              dp.voornaam AS docent_voornaam, dp.achternaam AS docent_achternaam,
-              mp.voornaam AS mentor_voornaam, mp.achternaam AS mentor_achternaam,
+              COALESCE(dp.voornaam, svdp.voornaam) AS docent_voornaam,
+              COALESCE(dp.achternaam, svdp.achternaam) AS docent_achternaam,
+              COALESCE(mp.voornaam, svmp.voornaam) AS mentor_voornaam,
+              COALESCE(mp.achternaam, svmp.achternaam) AS mentor_achternaam,
               svs.naam AS status_stage
        FROM persoon p
        JOIN student st ON p.id = st.persoon_id
        LEFT JOIN opleiding o ON st.opleiding_id = o.id
        LEFT JOIN stagevoorstel sv ON sv.student_id = p.id AND sv.status_id = (SELECT id FROM stagevoorstel_status WHERE naam = 'goedgekeurd')
        LEFT JOIN bedrijf b ON sv.bedrijf_id = b.id
+       LEFT JOIN persoon svdp ON sv.docent_id = svdp.id
+       LEFT JOIN persoon svmp ON sv.mentor_id = svmp.id
        LEFT JOIN stage s ON s.student_id = p.id
        LEFT JOIN docent d ON s.docent_id = d.persoon_id
        LEFT JOIN persoon dp ON d.persoon_id = dp.id
@@ -513,34 +517,29 @@ router.put('/stagevoorstellen/:id/koppel', controleerToken, isAdmin, async (req,
       return res.status(404).json({ fout: 'Voorstel niet gevonden' })
     }
 
-    if (mentor_id) {
-      await db.query('UPDATE stagevoorstel SET mentor_id = ? WHERE id = ?', [mentor_id, voorstelId])
-
-      /* FIX: ook stage-record bijwerken als het bestaat */
-      const [bestaandeStageMentor] = await db.query(
-        `SELECT s.id FROM stage s
-         JOIN stageovereenkomst so ON s.stageovereenkomst_id = so.id
-         WHERE so.stagevoorstel_id = ?`,
-        [voorstelId]
-      )
-      if (bestaandeStageMentor.length > 0) {
-        await db.query('UPDATE stage SET mentor_id = ? WHERE id = ?', [mentor_id, bestaandeStageMentor[0].id])
-      }
-    }
-
     const studentId = voorstel[0].student_id
 
+    /* Toewijzing altijd op het stagevoorstel bewaren, ook als er nog geen stage is */
+    if (mentor_id) {
+      await db.query('UPDATE stagevoorstel SET mentor_id = ? WHERE id = ?', [mentor_id, voorstelId])
+    }
     if (docent_id) {
-      /* Zoek of er al een stage is voor dit voorstel */
-      const [bestaandeStage] = await db.query(
-        `SELECT s.id FROM stage s
-         JOIN stageovereenkomst so ON s.stageovereenkomst_id = so.id
-         WHERE so.stagevoorstel_id = ?`,
-        [voorstelId]
-      )
+      await db.query('UPDATE stagevoorstel SET docent_id = ? WHERE id = ?', [docent_id, voorstelId])
+    }
 
-      if (bestaandeStage.length > 0) {
-        await db.query('UPDATE stage SET docent_id = ?, mentor_id = ? WHERE id = ?', [docent_id, mentor_id || voorstel[0].mentor_id, bestaandeStage[0].id])
+    /* Bestaat er al een stage voor dit voorstel? Dan die ook bijwerken */
+    const [bestaandeStage] = await db.query(
+      `SELECT s.id FROM stage s
+       JOIN stageovereenkomst so ON s.stageovereenkomst_id = so.id
+       WHERE so.stagevoorstel_id = ?`,
+      [voorstelId]
+    )
+    if (bestaandeStage.length > 0) {
+      if (mentor_id) {
+        await db.query('UPDATE stage SET mentor_id = ? WHERE id = ?', [mentor_id, bestaandeStage[0].id])
+      }
+      if (docent_id) {
+        await db.query('UPDATE stage SET docent_id = ? WHERE id = ?', [docent_id, bestaandeStage[0].id])
       }
     }
 
@@ -651,14 +650,18 @@ router.put('/stageovereenkomsten/:id/valideer', controleerToken, isAdmin, async 
 
     if (bestaandeStage.length === 0) {
       const [sv] = await db.query(
-        'SELECT student_id, bedrijf_id, mentor_id, startdatum, einddatum FROM stagevoorstel WHERE id = ?',
+        'SELECT student_id, bedrijf_id, mentor_id, docent_id, startdatum, einddatum FROM stagevoorstel WHERE id = ?',
         [ow.stagevoorstel_id]
       )
 
       if (sv.length > 0) {
         const s = sv[0]
-        const [docent] = await db.query('SELECT persoon_id FROM docent LIMIT 1')
-        const docentId = docent.length > 0 ? docent[0].persoon_id : null
+        /* Gebruik de toegewezen docent; val terug op de eerste docent als er geen is */
+        let docentId = s.docent_id
+        if (!docentId) {
+          const [docent] = await db.query('SELECT persoon_id FROM docent LIMIT 1')
+          docentId = docent.length > 0 ? docent[0].persoon_id : null
+        }
 
         await db.query(
           `INSERT INTO stage (stageovereenkomst_id, student_id, bedrijf_id, mentor_id, docent_id, startdatum, einddatum, actief)

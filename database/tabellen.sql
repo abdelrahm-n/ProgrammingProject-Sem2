@@ -122,6 +122,7 @@ CREATE TABLE stagevoorstel (
     student_id INT,
     bedrijf_id INT,
     mentor_id INT,
+    docent_id INT,
     academiejaar_id INT,
 
     omschrijving_opdracht TEXT,
@@ -143,6 +144,9 @@ CREATE TABLE stagevoorstel (
 
     FOREIGN KEY (mentor_id)
         REFERENCES stagementor(persoon_id),
+
+    FOREIGN KEY (docent_id)
+        REFERENCES docent(persoon_id),
 
     FOREIGN KEY (academiejaar_id)
         REFERENCES academiejaar(id),

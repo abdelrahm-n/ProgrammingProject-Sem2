@@ -143,6 +143,12 @@ blokkeerWeekend("eindDatum");
 /* Stagevoorstel indienen */
 async function stagevoorstelIndienen() {
   if (!valideerAlleVelden()) {
+    /* Spring naar het eerste foute veld zodat de melding zichtbaar is */
+    const eersteFout = document.querySelector(".fout");
+    if (eersteFout) {
+      eersteFout.scrollIntoView({ behavior: "smooth", block: "center" });
+      eersteFout.focus();
+    }
     return;
   }
 
