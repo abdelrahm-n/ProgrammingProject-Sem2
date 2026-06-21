@@ -404,26 +404,49 @@ router.get('/dashboard', controleerToken, isMentor, async (req, res) => {
   try {
     const [studenten] = await db.query(
       `SELECT 
-          p.id AS student_id,
-          p.voornaam,
-          p.achternaam,
-          b.naam AS bedrijf,
-          lw.week_nummer,
-          lw.week_start,
-          ls.naam AS logboek_status
-       FROM stage s
-       JOIN persoon p ON s.student_id = p.id
-       JOIN bedrijf b ON s.bedrijf_id = b.id
-       LEFT JOIN logboek_week lw ON lw.id = (
-          SELECT lw2.id
-          FROM logboek_week lw2
-          WHERE lw2.stage_id = s.id
-          ORDER BY lw2.week_nummer DESC
-          LIMIT 1
-       )
-       LEFT JOIN logboek_status ls ON lw.status_id = ls.id
-       WHERE s.mentor_id = ? AND s.actief = TRUE
-       ORDER BY p.achternaam`,
+      p.id AS student_id,
+      p.voornaam,
+      p.achternaam,
+      b.naam AS bedrijf,
+
+      lw.week_nummer,
+      lw.week_start,
+      ls.naam AS logboek_status,
+
+      so.id AS stageovereenkomst_id,
+      os.naam AS overeenkomst_status,
+      so.getekend_door_bedrijf,
+
+      em.id AS evaluatie_id,
+      et.naam AS evaluatie_type
+
+   FROM stage s
+   JOIN persoon p ON s.student_id = p.id
+   JOIN bedrijf b ON s.bedrijf_id = b.id
+
+   LEFT JOIN logboek_week lw ON lw.id = (
+      SELECT lw2.id
+      FROM logboek_week lw2
+      WHERE lw2.stage_id = s.id
+      ORDER BY lw2.week_nummer DESC
+      LIMIT 1
+   )
+   LEFT JOIN logboek_status ls ON lw.status_id = ls.id
+
+   LEFT JOIN stageovereenkomst so ON s.stageovereenkomst_id = so.id
+   LEFT JOIN overeenkomst_status os ON so.status_id = os.id
+
+   LEFT JOIN evaluatie_moment em ON em.id = (
+      SELECT em2.id
+      FROM evaluatie_moment em2
+      WHERE em2.stage_id = s.id
+      ORDER BY em2.datum DESC
+      LIMIT 1
+   )
+   LEFT JOIN evaluatie_type et ON em.type_id = et.id
+
+   WHERE s.mentor_id = ? AND s.actief = TRUE
+   ORDER BY p.achternaam`,
       [req.gebruiker.id]
     )
 
@@ -450,11 +473,6 @@ router.get('/dashboard', controleerToken, isMentor, async (req, res) => {
     res.status(500).json({ fout: 'Serverfout' })
   }
 })
-
-
-
-
-
 
 
 

@@ -47,12 +47,24 @@
             <p><strong>Opleiding:</strong> <span id="studentStudy">-</span></p>
             <p><strong>Bedrijf:</strong> <span id="studentBedrijf">-</span></p>
           </div>
-        </section>
 
-        <section class="dashboard-card">
-          <h2>Weken</h2>
-          <div id="weekTabel"></div>
-        </section>
+          <div class="logboeken-table-container">
+            <table class="student-logboeken-table">
+              <thead>
+                <tr>
+                  <th>Week</th>
+                  <th>Logboeken</th>
+                  <th>Status</th>
+                  <th>Mentorfeedback</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody id="weekBody">
+                <tr><td colspan="5">Laden...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </main>
     </div>
   </div>
@@ -63,16 +75,14 @@
     const token = localStorage.getItem('token') || '';
     const params = new URLSearchParams(window.location.search);
     const studentId = params.get('student');
+    const body = document.getElementById('weekBody');
 
-    var openWeekId = null;
-
-    function escape(t){ if(t==null) return '(niet ingevuld)'; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
-    function toonDatum(w){ return w ? new Date(w).toLocaleDateString('nl-BE', { weekday:'long', day:'numeric', month:'long' }) : '-'; }
+    function escape(t){ if(t==null) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
 
     const statusLabels = {
       goedgekeurd: { klasse: 'badge badge--goedgekeurd', tekst: 'Goedgekeurd' },
-      ingediend:   { klasse: 'badge badge--ingediend',   tekst: 'Ingediend' },
-      open:        { klasse: 'badge badge--actief',      tekst: 'Open' }
+      ingediend:   { klasse: 'badge badge--actief',      tekst: 'Ingediend' },
+      open:        { klasse: 'badge badge--actief',      tekst: 'Ingediend' }
     };
 
     async function openWeek(linkEl, weekId) {
