@@ -3,32 +3,32 @@ const API_URL = 'http://localhost:3000'
 const token = localStorage.getItem('token')
 const rol   = localStorage.getItem('rol')
 
-if (!token || rol !== 'docent') {
+if (!token || rol !== 'mentor') {
   window.location.href = '../index.html'
 }
 
 const inhoud        = document.getElementById('evaluatieInhoud')
 const stageSelectie = document.getElementById('stageSelectie')
 
-/* Laad de studenten die deze docent begeleidt */
+/* Laad de stages die de mentor begeleidt */
 async function laadStages() {
   try {
-    const antwoord = await fetch(API_URL + '/api/docent/mijn-studenten', {
+    const antwoord = await fetch(API_URL + '/api/stages/mijn', {
       headers: { 'Authorization': 'Bearer ' + token }
     })
 
     if (!antwoord.ok) {
-      stageSelectie.innerHTML = '<option value="">Kan studenten niet laden</option>'
+      stageSelectie.innerHTML = '<option value="">Kan stages niet laden</option>'
       return
     }
 
-    const studenten = await antwoord.json()
+    const stages = await antwoord.json()
 
     stageSelectie.innerHTML = '<option value="">Kies een student...</option>'
-    for (const s of studenten) {
+    for (const s of stages) {
       const optie = document.createElement('option')
-      optie.value = s.stage_id
-      optie.textContent = (s.voornaam + ' ' + s.achternaam).trim() || 'Student'
+      optie.value = s.id
+      optie.textContent = s.student_naam || 'Student ' + s.student_id
       stageSelectie.appendChild(optie)
     }
 
@@ -37,7 +37,7 @@ async function laadStages() {
   }
 }
 
-/* Laad evaluaties voor de geselecteerde stage */
+/* Laad evaluaties voor de gekozen stage */
 async function laadEvaluaties(stageId) {
   inhoud.innerHTML = '<p class="tekst-muted">Laden...</p>'
 
@@ -69,33 +69,9 @@ async function laadEvaluaties(stageId) {
       kaart.innerHTML = `
         <div class="kaart-titel">
           ${ev.type_naam === 'finaal' ? 'Finale evaluatie' : 'Tussentijdse evaluatie'} &mdash; ${formateerDatum(ev.datum)}
-          ${ev.eindresultaat_score !== null ? '<span class="badge badge--goedgekeurd" style="float:right">Eindscore: ' + ev.eindresultaat_score + '</span>' : ''}
         </div>
         <div class="formulier-kaart" id="beoordelingen-${ev.id}">
           <p class="tekst-muted">Laden...</p>
-        </div>
-        <div class="formulier-kaart" style="border-top:1px solid var(--color-border-light)">
-          <div class="form-rij form-rij--2">
-            <div class="form-group">
-              <label>Eindscore</label>
-              <input type="number" min="0" max="20" step="0.5"
-                id="eindscore-${ev.id}"
-                value="${ev.eindresultaat_score !== null ? ev.eindresultaat_score : ''}"
-                placeholder="0 t/m 20"
-              />
-            </div>
-            <div class="form-group">
-              <label>Algemene feedback</label>
-              <input type="text"
-                id="algfeedback-${ev.id}"
-                value="${ev.algemene_feedback || ''}"
-                placeholder="Optionele algemene feedback..."
-              />
-            </div>
-          </div>
-          <div class="form-acties">
-            <button class="btn btn--primair btn--sm" onclick="sluitEvaluatieAf(${ev.id})">Eindscore opslaan</button>
-          </div>
         </div>
       `
       inhoud.appendChild(kaart)
@@ -133,24 +109,34 @@ async function laadBeoordelingen(evaluatieId) {
         <p style="font-weight:bold;margin-bottom:8px">${b.competentie_naam}</p>
 
         ${b.student_score != null ? `<p style="margin-bottom:4px"><em>Zelfscore student:</em> ${b.student_score}/5</p>` : ''}
-        ${b.student_reflectie ? `<p style="margin-bottom:8px"><em>Reflectie student:</em> ${b.student_reflectie}</p>` : '<p class="tekst-muted" style="margin-bottom:8px">Student heeft nog geen reflectie ingevuld.</p>'}
-        ${b.mentor_score !== null ? `<p style="margin-bottom:8px"><strong>Score mentor:</strong> ${b.mentor_score}/10 &mdash; ${b.mentor_feedback || 'geen feedback'}</p>` : ''}
+        ${b.student_reflectie ? `<p style="margin-bottom:12px"><em>Reflectie student:</em> ${b.student_reflectie}</p>` : '<p class="tekst-muted" style="margin-bottom:12px">Student heeft nog geen reflectie ingevuld.</p>'}
 
-        <div class="form-group" style="max-width:400px">
-          <label>Jouw feedback (docent)</label>
-          <textarea
-            id="docentfeedback-${evaluatieId}-${b.competentie_id}"
-            class="feedback-input"
-            rows="2"
-            placeholder="Geef feedback op deze competentie..."
-          >${b.docent_feedback || ''}</textarea>
+        <div class="form-rij form-rij--2">
+          <div class="form-group">
+            <label>Score (1-10)</label>
+            <input
+              type="number" min="1" max="10"
+              id="score-${evaluatieId}-${b.competentie_id}"
+              value="${b.mentor_score !== null ? b.mentor_score : ''}"
+              placeholder="1 t/m 10"
+            />
+          </div>
+          <div class="form-group">
+            <label>Feedback</label>
+            <input
+              type="text"
+              id="feedback-${evaluatieId}-${b.competentie_id}"
+              value="${b.mentor_feedback || ''}"
+              placeholder="Optionele feedback..."
+            />
+          </div>
         </div>
 
         <div class="form-acties">
           <button
             class="btn btn--primair btn--sm"
-            onclick="slaDocentFeedbackOp(${evaluatieId}, ${b.competentie_id})"
-          >Feedback opslaan</button>
+            onclick="slaScoreOp(${evaluatieId}, ${b.competentie_id})"
+          >Score opslaan</button>
         </div>
       `
 
@@ -189,50 +175,28 @@ async function maakEvaluatie(stageId) {
   }
 }
 
-/* Sla docent feedback op per competentie */
-async function slaDocentFeedbackOp(evaluatieId, competentieId) {
-  const feedback = document.getElementById('docentfeedback-' + evaluatieId + '-' + competentieId).value
+/* Sla de score op van de mentor */
+async function slaScoreOp(evaluatieId, competentieId) {
+  const score    = document.getElementById('score-' + evaluatieId + '-' + competentieId).value
+  const feedback = document.getElementById('feedback-' + evaluatieId + '-' + competentieId).value
 
-  try {
-    const antwoord = await fetch(API_URL + '/api/evaluaties/' + evaluatieId + '/docent-feedback', {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + token
-      },
-      body: JSON.stringify({ competentie_id: competentieId, docent_feedback: feedback })
-    })
-
-    if (antwoord.ok) {
-      alert('Feedback opgeslagen.')
-    } else {
-      alert('Opslaan mislukt.')
-    }
-  } catch (fout) {
-    alert('Kan geen verbinding maken met de server.')
+  if (!score || score < 1 || score > 10) {
+    alert('Voer een score in tussen 1 en 10.')
+    return
   }
-}
-
-/* Sla de eindscore op en sluit de evaluatie af */
-async function sluitEvaluatieAf(evaluatieId) {
-  const score    = document.getElementById('eindscore-' + evaluatieId).value
-  const feedback = document.getElementById('algfeedback-' + evaluatieId).value
 
   try {
-    const antwoord = await fetch(API_URL + '/api/evaluaties/' + evaluatieId + '/afsluiten', {
+    const antwoord = await fetch(API_URL + '/api/evaluaties/' + evaluatieId + '/score', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + token
       },
-      body: JSON.stringify({
-        eindresultaat_score: score ? parseFloat(score) : null,
-        algemene_feedback: feedback || null
-      })
+      body: JSON.stringify({ competentie_id: competentieId, mentor_score: parseInt(score), mentor_feedback: feedback })
     })
 
     if (antwoord.ok) {
-      alert('Eindscore opgeslagen.')
+      alert('Score opgeslagen.')
     } else {
       alert('Opslaan mislukt.')
     }
@@ -247,9 +211,8 @@ function formateerDatum(datum) {
 }
 
 /* Globale functies voor onclick in HTML */
-window.maakEvaluatie        = maakEvaluatie
-window.slaDocentFeedbackOp  = slaDocentFeedbackOp
-window.sluitEvaluatieAf     = sluitEvaluatieAf
+window.maakEvaluatie  = maakEvaluatie
+window.slaScoreOp     = slaScoreOp
 
 stageSelectie.addEventListener('change', function () {
   if (this.value) {
