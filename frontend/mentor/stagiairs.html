@@ -33,14 +33,14 @@
           <p>Overzicht van alle aan jou toegewezen stagiairs.</p>
         </section>
 
-        <section class="dashboard-card" id="lijst-card">
-          <h2>Wacht op jouw actie</h2>
-          <div id="actiefLijst"></div>
+        <section class="dashboard-card" id="handtekening-card">
+          <h2>Wachtend op jouw handtekening</h2>
+          <div id="handtekeningLijst"></div>
         </section>
 
-        <section class="dashboard-card" id="afgerond-card">
-          <h2>Afgerond</h2>
-          <div id="afgerondLijst"></div>
+        <section class="dashboard-card" id="alle-card">
+          <h2>Mijn stagiairs</h2>
+          <div id="alleLijst"></div>
         </section>
 
         <section class="dashboard-card" id="detail-card" style="display:none;">
@@ -82,27 +82,27 @@
   <script>
     const API_URL = 'http://localhost:3000';
     const token = localStorage.getItem('token') || '';
-    const lijstCard = document.getElementById('lijst-card');
-    const afgerondCard = document.getElementById('afgerond-card');
+    const handtekeningCard = document.getElementById('handtekening-card');
+    const alleCard = document.getElementById('alle-card');
     const detailCard = document.getElementById('detail-card');
-    const actiefLijst = document.getElementById('actiefLijst');
-    const afgerondLijst = document.getElementById('afgerondLijst');
+    const handtekeningLijst = document.getElementById('handtekeningLijst');
+    const alleLijst = document.getElementById('alleLijst');
 
     function escape(t){ if(t==null) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
 
     function toonDatum(v) { return v ? new Date(v).toLocaleDateString('nl-BE') : '-'; }
 
     function toonDetail() {
-      lijstCard.style.display = 'none';
-      afgerondCard.style.display = 'none';
+      handtekeningCard.style.display = 'none';
+      alleCard.style.display = 'none';
       detailCard.style.display = 'block';
       window.scrollTo(0, 0);
     }
 
     function toonLijst() {
       detailCard.style.display = 'none';
-      lijstCard.style.display = 'block';
-      afgerondCard.style.display = 'block';
+      handtekeningCard.style.display = 'block';
+      alleCard.style.display = 'block';
       laadLijst();
     }
 
@@ -111,7 +111,26 @@
       if (veld) veld.textContent = waarde || '-';
     }
 
-    function bouwTabel(data) {
+    function bouwWachtendTabel(data) {
+      var html = '<table><thead><tr>';
+      html += '<th>Student</th><th>Bedrijf</th><th>Actie</th>';
+      html += '</tr></thead><tbody>';
+
+      data.forEach(function(o) {
+        var naam = escape(o.student_voornaam + ' ' + o.student_achternaam);
+
+        html += '<tr>';
+        html += '<td><strong>' + naam + '</strong></td>';
+        html += '<td>' + (escape(o.bedrijf_naam) || '-') + '</td>';
+        html += '<td><a href="stageovereenkomst.html?id=' + o.overeenkomst_id + '" class="btn btn--primair btn--sm">Ondertekenen</a></td>';
+        html += '</tr>';
+      });
+
+      html += '</tbody></table>';
+      return html;
+    }
+
+    function bouwAlleTabel(data) {
       var html = '<table><thead><tr>';
       html += '<th>Student</th><th>Bedrijf</th><th>Periode</th><th>Overeenkomst</th><th>Actie</th>';
       html += '</tr></thead><tbody>';
@@ -208,28 +227,27 @@
         if (!res.ok) throw new Error('niet ok');
         var data = await res.json();
       } catch (e) {
-        actiefLijst.innerHTML = '<p>Kon stagiairs niet laden.</p>';
+        handtekeningLijst.innerHTML = '<p>Kon stagiairs niet laden.</p>';
         return;
       }
 
       if (!data || !data.length) {
-        actiefLijst.innerHTML = '<p>Je hebt nog geen stagiairs.</p>';
+        handtekeningLijst.innerHTML = '<p>Je hebt nog geen stagiairs.</p>';
         return;
       }
 
-      var actief = [];
-      var afgerond = [];
+      var wachtend = [];
+      var alle = [];
 
       data.forEach(function(o) {
         if (o.getekend_door_student && !o.getekend_door_bedrijf) {
-          actief.push(o);
-        } else {
-          afgerond.push(o);
+          wachtend.push(o);
         }
+        alle.push(o);
       });
 
-      actiefLijst.innerHTML = actief.length > 0 ? bouwTabel(actief) : '<p>Geen stagiairs waar je actie op moet ondernemen.</p>';
-      afgerondLijst.innerHTML = afgerond.length > 0 ? bouwTabel(afgerond) : '<p>Geen afgeronde stagiairs.</p>';
+      handtekeningLijst.innerHTML = wachtend.length > 0 ? bouwWachtendTabel(wachtend) : '<p>Geen overeenkomsten die op je handtekening wachten.</p>';
+      alleLijst.innerHTML = alle.length > 0 ? bouwAlleTabel(alle) : '<p>Geen stagiairs gevonden.</p>';
     }
 
     document.getElementById('terugNaarLijst').addEventListener('click', toonLijst);

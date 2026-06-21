@@ -64,7 +64,7 @@
               </tbody>
             </table>
           </div>
-        </div>
+        </section>
       </main>
     </div>
   </div>
@@ -78,6 +78,13 @@
     const body = document.getElementById('weekBody');
 
     function escape(t){ if(t==null) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+
+    function toonDatum(datum) {
+      if (!datum) return '-';
+      return new Date(datum).toLocaleDateString('nl-BE', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+    }
+
+    var openWeekId = null;
 
     const statusLabels = {
       goedgekeurd: { klasse: 'badge badge--goedgekeurd', tekst: 'Goedgekeurd' },
@@ -186,7 +193,7 @@
 
     async function laadDetail() {
       if (!studentId) {
-        document.getElementById('weekTabel').innerHTML = '<p>Geen student ID.</p>';
+        document.getElementById('weekBody').innerHTML = '<tr><td colspan="5">Geen student ID.</td></tr>';
         return;
       }
 
@@ -194,7 +201,7 @@
         var resp = await fetch(API_URL + '/api/logboeken/student/' + studentId, {
           headers: { 'Authorization': 'Bearer ' + token }
         });
-        if (!resp.ok) { document.getElementById('weekTabel').innerHTML = '<p>Kon logboek niet laden.</p>'; return; }
+        if (!resp.ok) { document.getElementById('weekBody').innerHTML = '<tr><td colspan="5">Kon logboek niet laden.</td></tr>'; return; }
         var data = await resp.json();
 
         if (data.student) {
@@ -207,16 +214,14 @@
 
         var weken = data.weken || [];
         if (!weken.length) {
-          document.getElementById('weekTabel').innerHTML = '<p>Nog geen logboeken ingevuld.</p>';
+          document.getElementById('weekBody').innerHTML = '<tr><td colspan="5">Nog geen logboeken ingevuld.</td></tr>';
           return;
         }
 
         var dagenPerWeek = 5;
-        var html = '<table><thead><tr>';
-        html += '<th>Week</th><th>Dagen</th><th>Status</th><th>Feedback</th><th>Actie</th>';
-        html += '</tr></thead><tbody>';
+        var html = '';
 
-        weken.reverse().forEach(function(week) {
+        weken.forEach(function(week) {
           var info = statusLabels[week.status] || statusLabels.open;
           var weekUniek = week.dagen ? week.dagen.length : 0;
 
@@ -229,10 +234,9 @@
           html += '</tr>';
         });
 
-        html += '</tbody></table>';
-        document.getElementById('weekTabel').innerHTML = html;
+        document.getElementById('weekBody').innerHTML = html;
       } catch (err) {
-        document.getElementById('weekTabel').innerHTML = '<p>Fout bij laden.</p>';
+        document.getElementById('weekBody').innerHTML = '<tr><td colspan="5">Fout bij laden.</td></tr>';
       }
     }
 
