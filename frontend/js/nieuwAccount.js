@@ -9,9 +9,14 @@ const domeinen = {
   admin: "admin.ehb.be"
 };
 
+/* Spaties in een naam (bv. "Abdelkarim Kantine") worden een punt in de e-mail */
+function schoonNaamdeel(tekst) {
+  return tekst.trim().toLowerCase().replace(/\s+/g, ".").replace(/[^a-z.]/g, "");
+}
+
 function genereerEmail() {
-  const voornaam = document.getElementById("voornaam").value.trim().toLowerCase().replace(/[^a-z]/g, "");
-  const achternaam = document.getElementById("achternaam").value.trim().toLowerCase().replace(/[^a-z]/g, "");
+  const voornaam = schoonNaamdeel(document.getElementById("voornaam").value);
+  const achternaam = schoonNaamdeel(document.getElementById("achternaam").value);
   const rol = document.getElementById("rol").value;
 
   if (voornaam && achternaam && rol) {
@@ -97,7 +102,6 @@ document.getElementById("accountForm").addEventListener("submit", async function
   const extra = {};
 
   if (rol === "student") {
-    extra.studentnummer = document.getElementById("studentnummer").value.trim() || null;
     extra.opleiding_id = document.getElementById("opleiding").value || 1;
   } else if (rol === "docent") {
     extra.vakgroep = document.getElementById("vakgroep").value.trim() || null;
@@ -129,7 +133,8 @@ document.getElementById("accountForm").addEventListener("submit", async function
     }
 
     melding.className = "melding melding--succes";
-    melding.textContent = "Account aangemaakt (" + data.email + "). Je wordt doorgestuurd...";
+    melding.textContent = "Account aangemaakt (" + data.email + ")" +
+      (data.studentnummer ? ", studentnummer " + data.studentnummer : "") + ". Je wordt doorgestuurd...";
     document.getElementById("accountForm").reset();
     document.getElementById("extraVelden").style.display = "none";
     document.getElementById("emailPreview").style.display = "none";

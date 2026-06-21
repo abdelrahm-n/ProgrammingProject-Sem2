@@ -71,22 +71,14 @@ router.post('/gebruiker-aanmaken', controleerToken, isAdmin, async (req, res) =>
     admin: 'admin.ehb.be'
   }
 
-  const schoneVoornaam = voornaam.toLowerCase().replace(/[^a-z]/g, '')
-  const schoneAchternaam = achternaam.toLowerCase().replace(/[^a-z]/g, '')
-  const email = schoneVoornaam + '.' + schoneAchternaam + '@' + domeinen[rol]
+  /* Spaties in een naam (bv. "Abdelkarim Kantine") worden een punt in de e-mail */
+  const schoonNaamdeel = (tekst) => tekst.trim().toLowerCase().replace(/\s+/g, '.').replace(/[^a-z.]/g, '')
+  const email = schoonNaamdeel(voornaam) + '.' + schoonNaamdeel(achternaam) + '@' + domeinen[rol]
 
   try {
     const [bestaand] = await db.query('SELECT id FROM persoon WHERE email = ?', [email])
     if (bestaand.length > 0) {
       return res.status(409).json({ fout: 'Dit e-mailadres is al in gebruik: ' + email })
-    }
-
-    /* Studentnummer vooraf checken zodat een dubbel nummer geen half account achterlaat */
-    if (rol === 'student' && extra?.studentnummer) {
-      const [nr] = await db.query('SELECT persoon_id FROM student WHERE studentnummer = ?', [extra.studentnummer])
-      if (nr.length > 0) {
-        return res.status(409).json({ fout: 'Dit studentnummer is al in gebruik' })
-      }
     }
 
     /* Opleiding valideren; bij een ongeldige keuze de eerste opleiding gebruiken */
@@ -116,11 +108,14 @@ router.post('/gebruiker-aanmaken', controleerToken, isAdmin, async (req, res) =>
         [voornaam, achternaam, email, hash, rol]
       )
       const nieuweGebruikerId = resultaat.insertId
+      let studentnummer = null
 
       if (rol === 'student') {
+        /* Studentnummer automatisch genereren (uniek, op basis van het persoon-id) */
+        studentnummer = 'r' + String(nieuweGebruikerId).padStart(7, '0')
         await verbinding.query(
           'INSERT INTO student (persoon_id, studentnummer, opleiding_id) VALUES (?, ?, ?)',
-          [nieuweGebruikerId, extra?.studentnummer || null, opleidingId]
+          [nieuweGebruikerId, studentnummer, opleidingId]
         )
       } else if (rol === 'docent') {
         await verbinding.query('INSERT INTO docent (persoon_id, vakgroep) VALUES (?, ?)', [nieuweGebruikerId, extra?.vakgroep || null])
@@ -133,7 +128,7 @@ router.post('/gebruiker-aanmaken', controleerToken, isAdmin, async (req, res) =>
       }
 
       await verbinding.commit()
-      res.status(201).json({ bericht: 'Account aangemaakt', email, id: nieuweGebruikerId })
+      res.status(201).json({ bericht: 'Account aangemaakt', email, id: nieuweGebruikerId, studentnummer })
     } catch (err) {
       await verbinding.rollback().catch(() => {})
       throw err
