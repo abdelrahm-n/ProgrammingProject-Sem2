@@ -404,10 +404,12 @@ router.get('/dashboard', controleerToken, isMentor, async (req, res) => {
   try {
     const [studenten] = await db.query(
       `SELECT 
+      s.id AS stage_id,
       p.id AS student_id,
       p.voornaam,
       p.achternaam,
       b.naam AS bedrijf,
+      o.naam AS opleiding,
 
       lw.week_nummer,
       lw.week_start,
@@ -423,6 +425,8 @@ router.get('/dashboard', controleerToken, isMentor, async (req, res) => {
    FROM stage s
    JOIN persoon p ON s.student_id = p.id
    JOIN bedrijf b ON s.bedrijf_id = b.id
+   LEFT JOIN student st ON s.student_id = st.persoon_id
+   LEFT JOIN opleiding o ON st.opleiding_id = o.id
 
    LEFT JOIN logboek_week lw ON lw.id = (
       SELECT lw2.id

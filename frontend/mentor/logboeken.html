@@ -39,7 +39,7 @@
         </section>
 
         <section class="dashboard-card" id="afgerond-card">
-          <h2>Afgerond</h2>
+          <h2>Alle logboeken</h2>
           <div id="afgerondLijst"></div>
         </section>
       </main>
@@ -55,24 +55,27 @@
 
     function escape(t){ if(t==null) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
 
-    function bouwTabel(data) {
+    function bouwTabel(data, toonStatus) {
       var html = '<table><thead><tr>';
-      html += '<th>Naam</th><th>Richting</th><th>Logboek</th><th>Actie</th>';
+      html += '<th>Naam</th><th>Richting</th><th>Week</th>';
+      if (toonStatus) html += '<th>Status</th>';
+      html += '<th>Actie</th>';
       html += '</tr></thead><tbody>';
 
-      data.forEach(function(s) {
-        var naam = escape(s.voornaam + ' ' + s.achternaam);
-        var ingevuld = Math.ceil(Number(s.aantal_dagen_ingevuld || 0) / 5);
-        var totaal = Number(s.totaal_weken || 0);
-        var isVolledig = ingevuld >= totaal && totaal > 0;
-        var badgeClass = isVolledig ? 'badge badge--goedgekeurd' : 'badge badge--actief';
-        var tekst = isVolledig ? 'Volledig' : ingevuld + '/' + totaal + ' weken';
+      data.forEach(function(l) {
+        var naam = escape(l.studentNaam || (l.voornaam + ' ' + l.achternaam));
+
+        var statusBadge = '';
+        if (l.status === 'goedgekeurd') statusBadge = '<span class="badge badge--goedgekeurd">Goedgekeurd</span>';
+        else if (l.status === 'ingediend') statusBadge = '<span class="badge badge--ingediend">Ingediend</span>';
+        else statusBadge = '<span class="badge">' + escape(l.status) + '</span>';
 
         html += '<tr>';
         html += '<td><strong>' + naam + '</strong></td>';
-        html += '<td>' + (escape(s.opleiding) || '-') + '</td>';
-        html += '<td><span class="' + badgeClass + '">' + tekst + '</span></td>';
-        html += '<td><a href="logboek-detail.html?student=' + s.student_id + '" class="btn btn--primair btn--sm">Bekijk</a></td>';
+        html += '<td>' + (escape(l.opleiding) || '-') + '</td>';
+        html += '<td>Week ' + escape(l.week_nummer) + '</td>';
+        if (toonStatus) html += '<td>' + statusBadge + '</td>';
+        html += '<td><a href="logboek-detail.html?student=' + (l.student_id || l.studentId) + '" class="btn btn--primair btn--sm">Bekijk</a></td>';
         html += '</tr>';
       });
 
@@ -81,52 +84,65 @@
     }
 
     async function laadLijst() {
-      var studenten, dashboardData;
+      var dashboardData;
 
       try {
-        var res1 = await fetch(API_URL + '/api/logboeken/studenten', {
+        var res = await fetch(API_URL + '/api/mentor/dashboard', {
           headers: { 'Authorization': 'Bearer ' + token }
         });
-        if (!res1.ok) throw new Error('niet ok');
-        studenten = await res1.json();
+        if (!res.ok) throw new Error('niet ok');
+        dashboardData = await res.json();
       } catch (e) {
-        actiefLijst.innerHTML = '<p>Kon studenten niet laden.</p>';
+        actiefLijst.innerHTML = '<p>Kon gegevens niet laden.</p>';
         return;
       }
 
-      try {
-        var res2 = await fetch(API_URL + '/api/mentor/dashboard', {
-          headers: { 'Authorization': 'Bearer ' + token }
-        });
-        if (res2.ok) dashboardData = await res2.json();
-      } catch (e) {}
+      var studenten = dashboardData.studenten || [];
 
       if (!studenten.length) {
         actiefLijst.innerHTML = '<p>Je hebt nog geen toegewezen stagiairs.</p>';
         return;
       }
 
-      var statusMap = {};
-      if (dashboardData && dashboardData.studenten) {
-        dashboardData.studenten.forEach(function(s) {
-          statusMap[s.student_id] = s.logboek_status || null;
+      var alleLogboeken = [];
+
+      for (var i = 0; i < studenten.length; i++) {
+        var s = studenten[i];
+        if (!s.stage_id) continue;
+
+        try {
+          var res2 = await fetch(API_URL + '/api/mentor/logboeken/' + s.stage_id, {
+            headers: { 'Authorization': 'Bearer ' + token }
+          });
+          if (!res2.ok) continue;
+          var weken = await res2.json();
+        } catch (e) { continue; }
+
+        weken.forEach(function(w) {
+          alleLogboeken.push({
+            student_id: s.student_id,
+            studentNaam: s.voornaam + ' ' + s.achternaam,
+            opleiding: s.opleiding,
+            week_nummer: w.week_nummer,
+            status: w.status_naam
+          });
         });
       }
 
-      var actief = [];
-      var afgerond = [];
+      alleLogboeken.reverse();
 
-      studenten.forEach(function(s) {
-        var status = statusMap[s.student_id];
-        if (status === 'goedgekeurd') {
-          afgerond.push(s);
-        } else {
-          actief.push(s);
+      var wachtend = [];
+      var alle = [];
+
+      alleLogboeken.forEach(function(l) {
+        alle.push(l);
+        if (l.status === 'ingediend') {
+          wachtend.push(l);
         }
       });
 
-      actiefLijst.innerHTML = actief.length > 0 ? bouwTabel(actief) : '<p>Geen studenten waar je logboeken van moet beoordelen.</p>';
-      afgerondLijst.innerHTML = afgerond.length > 0 ? bouwTabel(afgerond) : '<p>Geen afgeronde logboeken.</p>';
+      actiefLijst.innerHTML = wachtend.length > 0 ? bouwTabel(wachtend, true) : '<p>Geen logboeken die op je beoordeling wachten.</p>';
+      afgerondLijst.innerHTML = alle.length > 0 ? bouwTabel(alle, true) : '<p>Nog geen logboeken ingevuld.</p>';
     }
 
     laadLijst();
