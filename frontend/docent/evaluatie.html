@@ -34,11 +34,20 @@
           <p class="view-subtitel">Geef feedback per competentie en stel de eindscore in voor jouw studenten</p>
         </div>
 
-        <div class="form-group" style="max-width:320px;margin-bottom:24px">
-          <label for="stageSelectie">Student kiezen</label>
-          <select id="stageSelectie">
-            <option value="">Laden...</option>
-          </select>
+        <div class="logboeken-table-container" style="margin-bottom:24px">
+          <table class="student-logboeken-table">
+            <thead>
+              <tr>
+                <th>Naam</th>
+                <th>Richting</th>
+                <th>Bedrijf</th>
+                <th>Evaluatie</th>
+              </tr>
+            </thead>
+            <tbody id="studentenLijst">
+              <tr><td colspan="4">Laden...</td></tr>
+            </tbody>
+          </table>
         </div>
 
         <div id="evaluatieInhoud"></div>

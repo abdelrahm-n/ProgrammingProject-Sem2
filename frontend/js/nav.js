@@ -13,11 +13,12 @@ if (!localStorage.getItem('token')) {
   window.location.href = rootPad
 }
 
-// --- Globale 401/403 handler: vang gefaalde API-aanroepen op ---
+// --- Globale 401 handler: enkel uitloggen bij een verlopen/ongeldige sessie ---
 var origineleFetch = window.fetch
 window.fetch = function () {
   return origineleFetch.apply(this, arguments).then(function (antwoord) {
-    if (antwoord && (antwoord.status === 401 || antwoord.status === 403)) {
+    // 403 is een verboden actie -> de pagina toont zelf een melding, geen uitlog.
+    if (antwoord && antwoord.status === 401) {
       localStorage.clear()
       window.location.href = rootPad
     }

@@ -89,46 +89,60 @@ router.post('/gebruiker-aanmaken', controleerToken, isAdmin, async (req, res) =>
       }
     }
 
-    const hash = await bcrypt.hash(wachtwoord, 10)
-
-    const [resultaat] = await db.query(
-      'INSERT INTO persoon (voornaam, achternaam, email, wachtwoord_hash, rol, actief) VALUES (?, ?, ?, ?, ?, TRUE)',
-      [voornaam, achternaam, email, hash, rol]
-    )
-
-    const nieuweGebruikerId = resultaat.insertId
-
+    /* Opleiding valideren; bij een ongeldige keuze de eerste opleiding gebruiken */
+    let opleidingId = null
     if (rol === 'student') {
-      await db.query(
-        'INSERT INTO student (persoon_id, studentnummer, opleiding_id) VALUES (?, ?, ?)',
-        [nieuweGebruikerId, extra?.studentnummer || null, extra?.opleiding_id || 1]
-      )
-    } else if (rol === 'docent') {
-      await db.query(
-        'INSERT INTO docent (persoon_id, vakgroep) VALUES (?, ?)',
-        [nieuweGebruikerId, extra?.vakgroep || null]
-      )
-    } else if (rol === 'stagementor') {
-      await db.query(
-        'INSERT INTO stagementor (persoon_id, functie, bedrijf_id) VALUES (?, ?, ?)',
-        [nieuweGebruikerId, extra?.functie || null, extra?.bedrijf_id || null]
-      )
-    } else if (rol === 'stagecommissie') {
-      await db.query(
-        'INSERT INTO stagecommissielid (persoon_id, commissie_rol) VALUES (?, ?)',
-        [nieuweGebruikerId, extra?.commissie_rol || null]
-      )
-    } else if (rol === 'admin') {
-      await db.query(
-        'INSERT INTO administratie (persoon_id, dienst) VALUES (?, ?)',
-        [nieuweGebruikerId, extra?.dienst || null]
-      )
+      opleidingId = extra?.opleiding_id || null
+      if (opleidingId) {
+        const [opl] = await db.query('SELECT id FROM opleiding WHERE id = ?', [opleidingId])
+        if (opl.length === 0) opleidingId = null
+      }
+      if (!opleidingId) {
+        const [eerste] = await db.query('SELECT id FROM opleiding ORDER BY id LIMIT 1')
+        opleidingId = eerste.length > 0 ? eerste[0].id : null
+      }
     }
 
-    res.status(201).json({ bericht: 'Account aangemaakt', email, id: nieuweGebruikerId })
+    const hash = await bcrypt.hash(wachtwoord, 10)
+
+    /* Persoon + rol-rij in één transactie: faalt de rol-rij, dan blijft er
+       geen half account (persoon zonder student-rij) achter. */
+    const verbinding = await db.getConnection()
+    try {
+      await verbinding.beginTransaction()
+
+      const [resultaat] = await verbinding.query(
+        'INSERT INTO persoon (voornaam, achternaam, email, wachtwoord_hash, rol, actief) VALUES (?, ?, ?, ?, ?, TRUE)',
+        [voornaam, achternaam, email, hash, rol]
+      )
+      const nieuweGebruikerId = resultaat.insertId
+
+      if (rol === 'student') {
+        await verbinding.query(
+          'INSERT INTO student (persoon_id, studentnummer, opleiding_id) VALUES (?, ?, ?)',
+          [nieuweGebruikerId, extra?.studentnummer || null, opleidingId]
+        )
+      } else if (rol === 'docent') {
+        await verbinding.query('INSERT INTO docent (persoon_id, vakgroep) VALUES (?, ?)', [nieuweGebruikerId, extra?.vakgroep || null])
+      } else if (rol === 'stagementor') {
+        await verbinding.query('INSERT INTO stagementor (persoon_id, functie, bedrijf_id) VALUES (?, ?, ?)', [nieuweGebruikerId, extra?.functie || null, extra?.bedrijf_id || null])
+      } else if (rol === 'stagecommissie') {
+        await verbinding.query('INSERT INTO stagecommissielid (persoon_id, commissie_rol) VALUES (?, ?)', [nieuweGebruikerId, extra?.commissie_rol || null])
+      } else if (rol === 'admin') {
+        await verbinding.query('INSERT INTO administratie (persoon_id, dienst) VALUES (?, ?)', [nieuweGebruikerId, extra?.dienst || null])
+      }
+
+      await verbinding.commit()
+      res.status(201).json({ bericht: 'Account aangemaakt', email, id: nieuweGebruikerId })
+    } catch (err) {
+      await verbinding.rollback().catch(() => {})
+      throw err
+    } finally {
+      verbinding.release()
+    }
   } catch (err) {
     console.error(err)
-    res.status(500).json({ fout: 'Serverfout' })
+    res.status(500).json({ fout: 'Serverfout bij aanmaken account' })
   }
 })
 
