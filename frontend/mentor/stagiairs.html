@@ -6,7 +6,8 @@
   <title>Stageplatform - Mentor - Stagiairs</title>
   <link rel="stylesheet" href="../css/stijl.css" />
   <link rel="stylesheet" href="../css/mentor.css" />
-  <link rel="stylesheet" href="../css/logboeken.css" />
+  <link rel="stylesheet" href="../css/button.css" />
+  <link rel="stylesheet" href="../css/components.css" />
 </head>
 <body>
   <div id="app">
@@ -27,28 +28,52 @@
       <nav class="sidebar"></nav>
 
       <main class="content-area">
-        <div class="logboeken-panel">
-          <div class="logboeken-header">
-            <h1>Mijn stagiairs</h1>
+        <section class="dashboard-card">
+          <h1>Mijn stagiairs</h1>
+          <p>Overzicht van alle aan jou toegewezen stagiairs.</p>
+        </section>
+
+        <section class="dashboard-card" id="lijst-card">
+          <h2>Wacht op jouw actie</h2>
+          <div id="actiefLijst"></div>
+        </section>
+
+        <section class="dashboard-card" id="afgerond-card">
+          <h2>Afgerond</h2>
+          <div id="afgerondLijst"></div>
+        </section>
+
+        <section class="dashboard-card" id="detail-card" style="display:none;">
+          <button class="btn btn--secundair" id="terugNaarLijst" style="margin-bottom:16px;">&larr; Terug naar lijst</button>
+
+          <h2>Stagiair detail</h2>
+
+          <div class="student-card">
+            <h3>Studentgegevens</h3>
+            <div class="contract-info">
+              <p><strong>Naam:</strong> <span id="detailNaam"></span></p>
+              <p><strong>Studentnummer:</strong> <span id="detailStudentnummer"></span></p>
+              <p><strong>Opleiding:</strong> <span id="detailOpleiding"></span></p>
+              <p><strong>E-mail:</strong> <span id="detailEmail"></span></p>
+            </div>
           </div>
 
-          <div class="logboeken-table-container">
-            <table class="student-logboeken-table">
-              <thead>
-                <tr>
-                  <th>Student</th>
-                  <th>Bedrijf</th>
-                  <th>Periode</th>
-                  <th>Overeenkomst</th>
-                  <th>Actie</th>
-                </tr>
-              </thead>
-              <tbody id="stagiairsBody">
-                <tr><td colspan="5">Laden...</td></tr>
-              </tbody>
-            </table>
+          <div class="student-card">
+            <h3>Stagegegevens</h3>
+            <div class="contract-info">
+              <p><strong>Stagebedrijf:</strong> <span id="detailBedrijf"></span></p>
+              <p><strong>Stageperiode:</strong> <span id="detailPeriode"></span></p>
+              <p><strong>Stageopdracht:</strong> <span id="detailOpdracht"></span></p>
+            </div>
           </div>
-        </div>
+
+          <div class="student-card">
+            <h3>Overeenkomst</h3>
+            <div id="detailHandtekeningen"></div>
+            <p id="detailOvereenkomstTekst"></p>
+            <a id="detailOvereenkomstLink" href="#" class="btn btn--primair btn--sm" style="display:none;">Stageovereenkomst bekijken</a>
+          </div>
+        </section>
       </main>
     </div>
   </div>
@@ -57,29 +82,40 @@
   <script>
     const API_URL = 'http://localhost:3000';
     const token = localStorage.getItem('token') || '';
-    const body = document.getElementById('stagiairsBody');
+    const lijstCard = document.getElementById('lijst-card');
+    const afgerondCard = document.getElementById('afgerond-card');
+    const detailCard = document.getElementById('detail-card');
+    const actiefLijst = document.getElementById('actiefLijst');
+    const afgerondLijst = document.getElementById('afgerondLijst');
 
     function escape(t){ if(t==null) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
 
-    (async function () {
-      let data;
-      try {
-        const res = await fetch(API_URL + '/api/mentor/alle-stagiairs', {
-          headers: { 'Authorization': 'Bearer ' + token }
-        });
-        if (!res.ok) throw new Error('niet ok');
-        data = await res.json();
-      } catch (e) {
-        body.innerHTML = '<tr><td colspan="5">Kon stagiairs niet laden. Log opnieuw in als mentor.</td></tr>';
-        return;
-      }
+    function toonDatum(v) { return v ? new Date(v).toLocaleDateString('nl-BE') : '-'; }
 
-      if (!data || !data.length) {
-        body.innerHTML = '<tr><td colspan="5">Je hebt nog geen stagiairs.</td></tr>';
-        return;
-      }
+    function toonDetail() {
+      lijstCard.style.display = 'none';
+      afgerondCard.style.display = 'none';
+      detailCard.style.display = 'block';
+      window.scrollTo(0, 0);
+    }
 
-      body.innerHTML = '';
+    function toonLijst() {
+      detailCard.style.display = 'none';
+      lijstCard.style.display = 'block';
+      afgerondCard.style.display = 'block';
+      laadLijst();
+    }
+
+    function zet(id, waarde) {
+      var veld = document.getElementById(id);
+      if (veld) veld.textContent = waarde || '-';
+    }
+
+    function bouwTabel(data) {
+      var html = '<table><thead><tr>';
+      html += '<th>Student</th><th>Bedrijf</th><th>Periode</th><th>Overeenkomst</th><th>Actie</th>';
+      html += '</tr></thead><tbody>';
+
       data.forEach(function(o) {
         var naam = escape(o.student_voornaam + ' ' + o.student_achternaam);
         var periode = '';
@@ -88,21 +124,116 @@
         }
 
         var osBadge = '';
-        if (o.overeenkomst_status === 'wacht_op_handtekeningen') osBadge = '<span class="badge badge--actief">Wachtend</span>';
+        if (o.overeenkomst_status === 'wacht_op_handtekeningen') osBadge = '<span class="badge badge--ingediend">Wachtend</span>';
         else if (o.overeenkomst_status === 'volledig_getekend') osBadge = '<span class="badge badge--goedgekeurd">Getekend</span>';
-        else if (o.overeenkomst_status === 'gevalideerd') osBadge = '<span class="badge badge--goedgekeurd">Gevalideerd</span>';
+        else if (o.overeenkomst_status === 'gevalideerd') osBadge = '<span class="badge badge--actief">Gevalideerd</span>';
         else osBadge = '<span class="badge">' + escape(o.overeenkomst_status) + '</span>';
 
-        var tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${naam}</td>
-          <td>${escape(o.bedrijf_naam) || '-'}</td>
-          <td>${periode}</td>
-          <td>${osBadge}</td>
-          <td><a class="details-link" href="stagiair-detail.html?id=${o.overeenkomst_id}">Bekijken</a></td>`;
-        body.appendChild(tr);
+        html += '<tr>';
+        html += '<td><strong>' + naam + '</strong></td>';
+        html += '<td>' + (escape(o.bedrijf_naam) || '-') + '</td>';
+        html += '<td>' + periode + '</td>';
+        html += '<td>' + osBadge + '</td>';
+        html += '<td><a href="#" class="btn btn--primair btn--sm" onclick="openDetail(' + o.overeenkomst_id + '); return false;">Bekijk</a></td>';
+        html += '</tr>';
       });
-    })();
+
+      html += '</tbody></table>';
+      return html;
+    }
+
+    async function openDetail(id) {
+      document.getElementById('detailNaam').textContent = 'Laden...';
+      document.getElementById('detailStudentnummer').textContent = '';
+      document.getElementById('detailOpleiding').textContent = '';
+      document.getElementById('detailEmail').textContent = '';
+      document.getElementById('detailBedrijf').textContent = '';
+      document.getElementById('detailPeriode').textContent = '';
+      document.getElementById('detailOpdracht').textContent = '';
+      document.getElementById('detailHandtekeningen').innerHTML = '';
+      document.getElementById('detailOvereenkomstTekst').textContent = '';
+      document.getElementById('detailOvereenkomstLink').style.display = 'none';
+
+      toonDetail();
+
+      try {
+        var resp = await fetch(API_URL + '/api/mentor/overeenkomst/' + id, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+
+        if (!resp.ok) {
+          document.getElementById('detailNaam').textContent = 'Kon gegevens niet laden.';
+          return;
+        }
+
+        var d = await resp.json();
+
+        zet('detailNaam', d.student_voornaam + ' ' + d.student_achternaam);
+        zet('detailStudentnummer', d.studentnummer);
+        zet('detailOpleiding', d.opleiding);
+        zet('detailEmail', d.student_email);
+        zet('detailBedrijf', d.bedrijf_naam);
+        zet('detailPeriode', toonDatum(d.startdatum) + ' - ' + toonDatum(d.einddatum));
+        zet('detailOpdracht', d.omschrijving_opdracht);
+
+        var handtekeningenHtml = '<div class="handtekeningen-rij">';
+        handtekeningenHtml += '<span class="badge ' + (d.getekend_door_student ? 'badge--goedgekeurd' : 'badge--afgekeurd') + '">Student</span>';
+        handtekeningenHtml += '<span class="badge ' + (d.getekend_door_bedrijf ? 'badge--goedgekeurd' : 'badge--afgekeurd') + '">Bedrijf</span>';
+        handtekeningenHtml += '<span class="badge ' + (d.getekend_door_school ? 'badge--goedgekeurd' : 'badge--afgekeurd') + '">School</span>';
+        handtekeningenHtml += '</div>';
+        document.getElementById('detailHandtekeningen').innerHTML = handtekeningenHtml;
+
+        var link = document.getElementById('detailOvereenkomstLink');
+        var tekst = document.getElementById('detailOvereenkomstTekst');
+
+        if (d.getekend_door_bedrijf) {
+          tekst.textContent = 'Deze overeenkomst is al ondertekend door het bedrijf.';
+        } else if (d.getekend_door_student) {
+          tekst.textContent = 'De student heeft de overeenkomst al ondertekend. Jij moet nu namens het bedrijf ondertekenen.';
+          link.href = 'stageovereenkomst.html?id=' + id;
+          link.style.display = 'inline-block';
+        } else {
+          tekst.textContent = 'De student heeft de overeenkomst nog niet ondertekend.';
+        }
+      } catch (err) {
+        document.getElementById('detailNaam').textContent = 'Fout bij laden.';
+      }
+    }
+
+    async function laadLijst() {
+      try {
+        var res = await fetch(API_URL + '/api/mentor/alle-stagiairs', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (!res.ok) throw new Error('niet ok');
+        var data = await res.json();
+      } catch (e) {
+        actiefLijst.innerHTML = '<p>Kon stagiairs niet laden.</p>';
+        return;
+      }
+
+      if (!data || !data.length) {
+        actiefLijst.innerHTML = '<p>Je hebt nog geen stagiairs.</p>';
+        return;
+      }
+
+      var actief = [];
+      var afgerond = [];
+
+      data.forEach(function(o) {
+        if (o.getekend_door_student && !o.getekend_door_bedrijf) {
+          actief.push(o);
+        } else {
+          afgerond.push(o);
+        }
+      });
+
+      actiefLijst.innerHTML = actief.length > 0 ? bouwTabel(actief) : '<p>Geen stagiairs waar je actie op moet ondernemen.</p>';
+      afgerondLijst.innerHTML = afgerond.length > 0 ? bouwTabel(afgerond) : '<p>Geen afgeronde stagiairs.</p>';
+    }
+
+    document.getElementById('terugNaarLijst').addEventListener('click', toonLijst);
+    laadLijst();
   </script>
 </body>
 </html>

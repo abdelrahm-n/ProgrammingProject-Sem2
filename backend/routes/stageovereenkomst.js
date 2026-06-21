@@ -4,6 +4,15 @@ import controleerToken from "../middleware/controleerToken.js"
 
 const router = express.Router()
 
+/* Hulpfunctie: controleer of de gebruiker een van de toegestane rollen heeft */
+function controleerRol(req, res, volgende, toegestaneRollen) {
+  if (!toegestaneRollen.includes(req.gebruiker.rol)) {
+    res.status(403).json({ fout: 'Geen toegang voor deze rol' })
+    return false
+  }
+  return true
+}
+
 /* Bepaal de docent voor een stage: de toegewezen docent van het voorstel,
    anders de eerste docent als terugval. */
 async function bepaalDocentId(stagevoorstelId) {
@@ -75,8 +84,10 @@ router.get("/mijn", controleerToken, async (req, res) => {
   }
 })
 
-/* GET /api/stageovereenkomst/commissie/wachtend - overeenkomsten wachtend op handtekening hogeschool */
-router.get("/commissie/wachtend", controleerToken, async (req, res) => {
+/* GET /api/stageovereenkomst/commissie/alle - alle overeenkomsten voor de stagecommissie */
+router.get("/commissie/alle", controleerToken, async (req, res) => {
+  if (!controleerRol(req, res, null, ['stagecommissie'])) return
+
   try {
     const [rows] = await db.query(
       `SELECT so.id AS overeenkomst_id, so.getekend_door_student, so.getekend_door_bedrijf, so.getekend_door_school,
@@ -96,7 +107,6 @@ router.get("/commissie/wachtend", controleerToken, async (req, res) => {
        JOIN bedrijf b ON sv.bedrijf_id = b.id
        LEFT JOIN stagementor sm ON sv.mentor_id = sm.persoon_id
        LEFT JOIN persoon mp ON sm.persoon_id = mp.id
-       WHERE so.getekend_door_student = TRUE AND so.getekend_door_bedrijf = TRUE AND so.getekend_door_school = FALSE
        ORDER BY so.aangemaakt_op DESC`
     )
     res.json(rows)

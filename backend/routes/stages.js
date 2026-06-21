@@ -228,7 +228,11 @@ router.get('/overzicht', controleerToken, async (req, res) => {
        JOIN bedrijf b ON sv.bedrijf_id = b.id
        LEFT JOIN stageovereenkomst so ON sv.id = so.stagevoorstel_id
        LEFT JOIN overeenkomst_status os ON so.status_id = os.id
-       ORDER BY sv.aangemaakt_op DESC`
+       ORDER BY CASE
+         WHEN svs.naam IN ('ingediend', 'in_behandeling') THEN 0
+         WHEN svs.naam = 'aanpassing_vereist' THEN 1
+         ELSE 2
+       END, sv.aangemaakt_op DESC`
     )
     res.json(rijen)
   } catch (err) {
