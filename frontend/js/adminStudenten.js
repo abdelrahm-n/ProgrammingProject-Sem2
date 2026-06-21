@@ -86,9 +86,7 @@ async function laadStudenten() {
   }
 }
 
-/* ============================================================
-   KOPPEL MENTOR & DOCENT
-   ============================================================ */
+/* KOPPEL MENTOR & DOCENT */
 
 let alleMentoren = [];
 let alleDocenten = [];

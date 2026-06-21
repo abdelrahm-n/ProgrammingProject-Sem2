@@ -69,9 +69,7 @@ async function laadDocenten() {
 
 laadDocenten();
 
-/* ============================================================
-   BEWERK DOCENT
-   ============================================================ */
+/* BEWERK DOCENT */
 
 function openBewerkDocent(id, voornaam, achternaam, email, actief, vakgroep) {
   document.getElementById("bewerkDocentId").value = id;

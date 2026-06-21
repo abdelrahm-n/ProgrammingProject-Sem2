@@ -129,10 +129,15 @@ document.getElementById("accountForm").addEventListener("submit", async function
     }
 
     melding.className = "melding melding--succes";
-    melding.textContent = "Account aangemaakt! E-mailadres: " + data.email;
+    melding.textContent = "Account aangemaakt (" + data.email + "). Je wordt doorgestuurd...";
     document.getElementById("accountForm").reset();
     document.getElementById("extraVelden").style.display = "none";
     document.getElementById("emailPreview").style.display = "none";
+
+    /* Terug naar de lijst zodat het nieuwe account meteen zichtbaar is */
+    setTimeout(function () {
+      window.location.href = "gebruikers.html";
+    }, 1200);
 
   } catch (fout) {
     melding.className = "melding melding--fout";

@@ -74,10 +74,19 @@ router.post('/', controleerToken, async (req, res) => {
     return res.status(400).json({ fout: 'Einddatum moet na de startdatum liggen' })
   }
 
+  /* Valideer dat de gebruiker een geldig studentprofiel heeft */
+  const [studentCheck] = await db.query(
+    'SELECT persoon_id FROM student WHERE persoon_id = ?',
+    [req.gebruiker.id]
+  )
+  if (studentCheck.length === 0) {
+    return res.status(400).json({ fout: 'Je studentprofiel is niet gevonden. Neem contact op met de administrator.' })
+  }
+
   try {
     const [bedrijf] = await db.query(
-      'INSERT INTO bedrijf (naam, adres, email, telefoon) VALUES (?, ?, ?, ?)',
-      [a.stagebedrijf, a.adresBedrijf || null, a.emailBedrijf || null, a.telefoonBedrijf || null]
+      'INSERT INTO bedrijf (naam, adres, email, telefoon, contactpersoon) VALUES (?, ?, ?, ?, ?)',
+      [a.stagebedrijf, a.adresBedrijf || null, a.emailBedrijf || null, a.telefoonBedrijf || null, a.contactPersoon || null]
     )
 
     const [status] = await db.query("SELECT id FROM stagevoorstel_status WHERE naam = 'ingediend'")
@@ -91,14 +100,15 @@ router.post('/', controleerToken, async (req, res) => {
     )
 
     const [voorstel] = await db.query(
-      `INSERT INTO stagevoorstel (student_id, bedrijf_id, mentor_id, academiejaar_id, omschrijving_opdracht, startdatum, einddatum, status_id)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO stagevoorstel (student_id, bedrijf_id, mentor_id, academiejaar_id, omschrijving_opdracht, functie, startdatum, einddatum, status_id)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         req.gebruiker.id,
         bedrijf.insertId,
         a.mentor_id || null,
         academiejaar.length > 0 ? academiejaar[0].id : null,
         a.stageopdracht,
+        a.functie || null,
         a.startDatum,
         a.eindDatum,
         status[0].id
