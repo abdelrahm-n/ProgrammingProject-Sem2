@@ -6,10 +6,10 @@
   <title>Stageplatform - Docent - Logboeken</title>
   <link rel="stylesheet" href="../css/stijl.css" />
   <link rel="stylesheet" href="../css/docent.css" />
-  <link rel="stylesheet" href="../css/logboeken.css" />
+  <link rel="stylesheet" href="../css/button.css" />
+  <link rel="stylesheet" href="../css/components.css" />
 </head>
 <body>
-
   <div id="app">
     <header class="header">
       <div class="header-logo">
@@ -28,27 +28,16 @@
       <nav class="sidebar"></nav>
 
       <main class="content-area">
-        <div class="logboeken-panel">
-          <div class="logboeken-header">
-            <h1>Logboek overzicht</h1>
-          </div>
+        <section class="dashboard-card">
+          <h1>Logboek overzicht</h1>
+          <p>Overzicht van de logboeken van je studenten.</p>
+        </section>
 
-          <div class="logboeken-table-container">
-            <table class="student-logboeken-table">
-              <thead>
-                <tr>
-                  <th>Naam</th>
-                  <th>Richting</th>
-                  <th>Logboek</th>
-                  <th>Details</th>
-                </tr>
-              </thead>
-              <tbody id="studentenBody">
-                <tr><td colspan="4">Laden...</td></tr>
-              </tbody>
-            </table>
+        <section class="dashboard-card">
+          <div id="logboekenOverzicht">
+            <p>Laden...</p>
           </div>
-        </div>
+        </section>
       </main>
     </div>
   </div>
@@ -57,44 +46,50 @@
   <script>
     const API_URL = 'http://localhost:3000';
     const token = localStorage.getItem('token') || '';
-    const body = document.getElementById('studentenBody');
+    const container = document.getElementById('logboekenOverzicht');
 
     function escape(t){ if(t==null) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
 
     (async function () {
-      let studenten;
+      var studenten;
       try {
-        const res = await fetch(API_URL + '/api/logboeken/studenten', {
+        var res = await fetch(API_URL + '/api/logboeken/studenten', {
           headers: { 'Authorization': 'Bearer ' + token }
         });
         if (!res.ok) throw new Error('niet ok');
         studenten = await res.json();
       } catch (e) {
-        body.innerHTML = '<tr><td colspan="4">Kon studenten niet laden. Log opnieuw in als docent.</td></tr>';
+        container.innerHTML = '<p>Kon studenten niet laden. Log opnieuw in als docent.</p>';
         return;
       }
 
       if (!studenten.length) {
-        body.innerHTML = '<tr><td colspan="4">Je hebt nog geen toegewezen studenten.</td></tr>';
+        container.innerHTML = '<p>Je hebt nog geen toegewezen studenten.</p>';
         return;
       }
 
-      body.innerHTML = '';
-      studenten.forEach(s => {
-        const naam = escape(s.voornaam + ' ' + s.achternaam);
-        const ingevuld = Math.ceil(Number(s.aantal_dagen_ingevuld || 0) / 5);
-        const totaal = Number(s.totaal_weken || 0);
-        const isVolledig = ingevuld >= totaal && totaal > 0;
-        const klasse = 'badge badge--actief';
-        const tekst = isVolledig ? 'Volledig' : ingevuld + '/' + totaal + ' weken';
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${naam}</td>
-          <td>${escape(s.opleiding) || '-'}</td>
-          <td><span class="${klasse}">${tekst}</span></td>
-          <td><a class="details-link" href="logboeken-detail.html?student=${s.student_id}">Bekijken</a></td>`;
-        body.appendChild(tr);
+      var html = '<table><thead><tr>';
+      html += '<th>Naam</th><th>Richting</th><th>Logboek</th><th>Actie</th>';
+      html += '</tr></thead><tbody>';
+
+      studenten.forEach(function(s) {
+        var naam = escape(s.voornaam + ' ' + s.achternaam);
+        var ingevuld = Math.ceil(Number(s.aantal_dagen_ingevuld || 0) / 5);
+        var totaal = Number(s.totaal_weken || 0);
+        var isVolledig = ingevuld >= totaal && totaal > 0;
+        var badgeClass = isVolledig ? 'badge badge--goedgekeurd' : 'badge badge--actief';
+        var tekst = isVolledig ? 'Volledig' : ingevuld + '/' + totaal + ' weken';
+
+        html += '<tr>';
+        html += '<td><strong>' + naam + '</strong></td>';
+        html += '<td>' + (escape(s.opleiding) || '-') + '</td>';
+        html += '<td><span class="' + badgeClass + '">' + tekst + '</span></td>';
+        html += '<td><a href="logboeken-detail.html?student=' + s.student_id + '" class="btn btn--primair btn--sm">Bekijk</a></td>';
+        html += '</tr>';
       });
+
+      html += '</tbody></table>';
+      container.innerHTML = html;
     })();
   </script>
 </body>
