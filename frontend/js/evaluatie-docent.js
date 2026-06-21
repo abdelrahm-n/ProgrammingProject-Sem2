@@ -37,8 +37,11 @@ async function laadStages() {
   }
 }
 
+let stageIdHuidig = null
+
 /* Laad evaluaties voor de geselecteerde stage */
 async function laadEvaluaties(stageId) {
+  stageIdHuidig = stageId
   inhoud.innerHTML = '<p class="tekst-muted">Laden...</p>'
 
   try {
@@ -48,19 +51,21 @@ async function laadEvaluaties(stageId) {
 
     const evaluaties = await antwoord.json()
 
+    const planKnoppen = `
+      <div style="margin-bottom:16px;display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn--primair btn--sm" onclick="maakEvaluatie(${stageId}, 1)">Plan tussentijdse evaluatie</button>
+        <button class="btn btn--secundair btn--sm" onclick="maakEvaluatie(${stageId}, 2)">Plan eindevaluatie</button>
+      </div>`
+
     if (evaluaties.length === 0) {
       inhoud.innerHTML = `
-        <p class="tekst-muted" style="margin-bottom:16px">Nog geen evaluatiemomenten voor deze student.</p>
-        <button class="btn btn--primair btn--sm" onclick="maakEvaluatie(${stageId})">Nieuw evaluatiemoment aanmaken</button>
+        <p class="tekst-muted" style="margin-bottom:16px">Nog geen evaluatiemomenten voor deze student. Plan er een zodat de student zijn zelfreflectie kan invullen.</p>
+        ${planKnoppen}
       `
       return
     }
 
-    inhoud.innerHTML = `
-      <div style="margin-bottom:16px">
-        <button class="btn btn--primair btn--sm" onclick="maakEvaluatie(${stageId})">Nieuw evaluatiemoment aanmaken</button>
-      </div>
-    `
+    inhoud.innerHTML = planKnoppen
 
     for (const ev of evaluaties) {
       const kaart = document.createElement('div')
@@ -132,6 +137,13 @@ async function laadBeoordelingen(evaluatieId) {
       rij.innerHTML = `
         <p style="font-weight:bold;margin-bottom:8px">${b.competentie_naam}</p>
 
+        <div style="background:#fafafa;border:1px solid #eee;border-radius:8px;padding:10px;margin-bottom:10px;font-size:13px;line-height:1.5">
+          <strong>Rubriek</strong><br>
+          <span>5 (sterk): ${b.rubric_volledig || '-'}</span><br>
+          <span>3 (goed): ${b.rubric_goed || '-'}</span><br>
+          <span>1 (onvoldoende): ${b.rubric_onvoldoende || '-'}</span>
+        </div>
+
         ${b.student_score != null ? `<p style="margin-bottom:4px"><em>Zelfscore student:</em> ${b.student_score}/5</p>` : ''}
         ${b.student_reflectie ? `<p style="margin-bottom:8px"><em>Reflectie student:</em> ${b.student_reflectie}</p>` : '<p class="tekst-muted" style="margin-bottom:8px">Student heeft nog geen reflectie ingevuld.</p>'}
         ${b.mentor_score !== null ? `<p style="margin-bottom:8px"><strong>Score mentor:</strong> ${b.mentor_score}/5 &mdash; ${b.mentor_feedback || 'geen feedback'}</p>` : ''}
@@ -151,6 +163,25 @@ async function laadBeoordelingen(evaluatieId) {
             class="btn btn--primair btn--sm"
             onclick="slaDocentFeedbackOp(${evaluatieId}, ${b.competentie_id})"
           >Feedback opslaan</button>
+          <button class="btn btn--secundair btn--sm" onclick="toonRubriek(${b.competentie_id})">Rubriek aanpassen</button>
+        </div>
+
+        <div id="rubriek-${b.competentie_id}" style="display:none;margin-top:12px">
+          <div class="form-group" style="max-width:520px">
+            <label>Rubriek - sterk (5)</label>
+            <textarea id="rub-vol-${b.competentie_id}" rows="2">${b.rubric_volledig || ''}</textarea>
+          </div>
+          <div class="form-group" style="max-width:520px">
+            <label>Rubriek - goed (3)</label>
+            <textarea id="rub-goed-${b.competentie_id}" rows="2">${b.rubric_goed || ''}</textarea>
+          </div>
+          <div class="form-group" style="max-width:520px">
+            <label>Rubriek - onvoldoende (1)</label>
+            <textarea id="rub-onv-${b.competentie_id}" rows="2">${b.rubric_onvoldoende || ''}</textarea>
+          </div>
+          <div class="form-acties">
+            <button class="btn btn--primair btn--sm" onclick="slaRubriekOp(${stageIdHuidig}, ${b.competentie_id})">Rubriek opslaan</button>
+          </div>
         </div>
       `
 
@@ -162,10 +193,8 @@ async function laadBeoordelingen(evaluatieId) {
   }
 }
 
-/* Maak een nieuw evaluatiemoment aan */
-async function maakEvaluatie(stageId) {
-  const type = prompt('Welk type evaluatie?\n1 = Tussentijds\n2 = Finaal\n\nVoer 1 of 2 in:')
-  const type_id = type === '2' ? 2 : 1
+/* Maak een nieuw evaluatiemoment aan (type_id 1 = tussentijds, 2 = finaal) */
+async function maakEvaluatie(stageId, type_id) {
   const datum = new Date().toISOString().split('T')[0]
 
   try {
@@ -213,6 +242,38 @@ async function slaDocentFeedbackOp(evaluatieId, competentieId) {
   }
 }
 
+/* Toon of verberg de rubriek-editor van een competentie */
+function toonRubriek(competentieId) {
+  const vak = document.getElementById('rubriek-' + competentieId)
+  vak.style.display = vak.style.display === 'none' ? 'block' : 'none'
+}
+
+/* Sla de aangepaste rubriekteksten van een competentie op */
+async function slaRubriekOp(stageId, competentieId) {
+  const body = {
+    rubric_volledig: document.getElementById('rub-vol-' + competentieId).value,
+    rubric_goed: document.getElementById('rub-goed-' + competentieId).value,
+    rubric_onvoldoende: document.getElementById('rub-onv-' + competentieId).value
+  }
+
+  try {
+    const antwoord = await fetch(API_URL + '/api/competenties/' + competentieId, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+      body: JSON.stringify(body)
+    })
+
+    if (antwoord.ok) {
+      alert('Rubriek opgeslagen.')
+      laadEvaluaties(stageId)
+    } else {
+      alert('Opslaan mislukt.')
+    }
+  } catch (fout) {
+    alert('Kan geen verbinding maken met de server.')
+  }
+}
+
 /* Sla de eindscore op en sluit de evaluatie af */
 async function sluitEvaluatieAf(evaluatieId) {
   const score    = document.getElementById('eindscore-' + evaluatieId).value
@@ -250,6 +311,8 @@ function formateerDatum(datum) {
 window.maakEvaluatie        = maakEvaluatie
 window.slaDocentFeedbackOp  = slaDocentFeedbackOp
 window.sluitEvaluatieAf     = sluitEvaluatieAf
+window.toonRubriek          = toonRubriek
+window.slaRubriekOp         = slaRubriekOp
 
 stageSelectie.addEventListener('change', function () {
   if (this.value) {

@@ -37,14 +37,32 @@ router.post('/', controleerToken, async (req, res) => {
   }
 })
 
-/* PUT /api/competenties/:id - pas een competentie aan */
+/* PUT /api/competenties/:id - pas een competentie aan.
+   Enkel meegestuurde velden worden gewijzigd (COALESCE houdt de rest) */
 router.put('/:id', controleerToken, async (req, res) => {
-  const { naam, beschrijving, gewicht, actief } = req.body
+  const { naam, beschrijving, gewicht, actief, rubric_volledig, rubric_goed, rubric_onvoldoende } = req.body
 
   try {
     await db.query(
-      'UPDATE competentie SET naam = ?, beschrijving = ?, gewicht = ?, actief = ? WHERE id = ?',
-      [naam, beschrijving || null, gewicht || 1, actief !== false, req.params.id]
+      `UPDATE competentie SET
+         naam = COALESCE(?, naam),
+         beschrijving = COALESCE(?, beschrijving),
+         gewicht = COALESCE(?, gewicht),
+         actief = COALESCE(?, actief),
+         rubric_volledig = COALESCE(?, rubric_volledig),
+         rubric_goed = COALESCE(?, rubric_goed),
+         rubric_onvoldoende = COALESCE(?, rubric_onvoldoende)
+       WHERE id = ?`,
+      [
+        naam ?? null,
+        beschrijving ?? null,
+        gewicht ?? null,
+        actief === undefined ? null : actief,
+        rubric_volledig ?? null,
+        rubric_goed ?? null,
+        rubric_onvoldoende ?? null,
+        req.params.id
+      ]
     )
     res.json({ bericht: 'Competentie bijgewerkt' })
   } catch (err) {
