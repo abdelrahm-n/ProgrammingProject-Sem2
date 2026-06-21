@@ -11,7 +11,8 @@ function controleerToken(req, res, next) {
 
   jwt.verify(token, process.env.JWT_SECRET, (err, gebruiker) => {
     if (err) {
-      return res.status(403).json({ fout: 'Ongeldig token' })
+      /* 401: token verlopen/ongeldig -> opnieuw inloggen (geen verboden actie) */
+      return res.status(401).json({ fout: 'Sessie verlopen, log opnieuw in' })
     }
     req.gebruiker = gebruiker
     next()
