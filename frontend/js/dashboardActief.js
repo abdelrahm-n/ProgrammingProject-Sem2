@@ -137,6 +137,7 @@ function vulDashboardIn(data) {
     var einde = data.evaluaties.find(function(e) { return e.type === "eindevaluatie"; });
     if (tussen) tussenDatum = formatDate(tussen.datum);
     if (einde) eindeDatum = formatDate(einde.datum);
+    else eindeDatum = formatDate(data.stage.einddatum);
   } else {
     tussenDatum = formatDate(midden);
     eindeDatum = formatDate(eind);

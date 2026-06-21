@@ -17,9 +17,9 @@ if (!localStorage.getItem('token')) {
 var origineleFetch = window.fetch
 window.fetch = function () {
   return origineleFetch.apply(this, arguments).then(function (antwoord) {
-    // 403 is een verboden actie -> de pagina toont zelf een melding, geen uitlog.
-    if (antwoord && antwoord.status === 401) {
-      localStorage.clear()
+    if (antwoord && (antwoord.status === 401 || antwoord.status === 403)) {
+      window.__sessionLost = true
+      localStorage.removeItem('token')
       window.location.href = rootPad
     }
     return antwoord
