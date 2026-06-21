@@ -180,9 +180,9 @@ router.post('/registreren', async (req, res) => {
     return res.status(400).json({ fout: 'Wachtwoord moet minstens 6 tekens lang zijn' })
   }
 
-  const schoneVoornaam = voornaam.toLowerCase().replace(/[^a-z]/g, '')
-  const schoneAchternaam = achternaam.toLowerCase().replace(/[^a-z]/g, '')
-  const email = schoneVoornaam + '.' + schoneAchternaam + '@mentor.ehb.be'
+  /* Spaties in een naam (bv. "Abdelkarim Kantine") worden een punt in de e-mail */
+  const schoonNaamdeel = (tekst) => tekst.trim().toLowerCase().replace(/\s+/g, '.').replace(/[^a-z.]/g, '')
+  const email = schoonNaamdeel(voornaam) + '.' + schoonNaamdeel(achternaam) + '@mentor.ehb.be'
 
   try {
     const [bestaand] = await db.query(
