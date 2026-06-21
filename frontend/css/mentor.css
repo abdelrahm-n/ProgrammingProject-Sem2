@@ -122,3 +122,13 @@ td {
   border-radius: 20px;
   font-size: 13px;
 }
+
+.mentor-stat-card {
+  text-decoration: none;
+  color: inherit;
+}
+
+.mentor-stat-card:hover {
+  transform: translateY(-2px);
+  cursor: pointer;
+}
