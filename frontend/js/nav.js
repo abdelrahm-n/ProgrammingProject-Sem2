@@ -55,10 +55,12 @@ var sidebarConfig = {
   ],
   admin: [
     { bestand: 'dashboard.html',      label: 'Dashboard' },
-    { bestand: 'studenten.html',      label: 'Student' },
-    { bestand: 'docenten.html',       label: 'Docent' },
+    { bestand: 'gebruikers.html',     label: 'Gebruikers' },
+    { bestand: 'studenten.html',      label: 'Studenten' },
+    { bestand: 'docenten.html',       label: 'Docenten' },
+    { bestand: 'mentoren.html',       label: 'Mentoren' },
     { bestand: 'bedrijven.html',      label: 'Bedrijven' },
-    { bestand: 'stages.html',         label: 'Stage' },
+    { bestand: 'stages.html',         label: 'Stages' },
     { bestand: 'documenten.html',     label: 'Documenten' }
   ]
 }

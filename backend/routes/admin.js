@@ -171,33 +171,33 @@ router.put('/gebruikers/:id/rol', controleerToken, isAdmin, async (req, res) => 
       return res.status(400).json({ fout: 'Gebruiker heeft al deze rol' })
     }
 
-    /* Verwijder uit huidige role-tabel */
+    /* Verwijder uit huidige role-tabel (ignoreren als FK constraints falen) */
     if (oudeRol === 'student') {
-      await db.query('DELETE FROM student WHERE persoon_id = ?', [gebruikerId])
+      await db.query('DELETE FROM student WHERE persoon_id = ?', [gebruikerId]).catch(() => {})
     } else if (oudeRol === 'docent') {
-      await db.query('DELETE FROM docent WHERE persoon_id = ?', [gebruikerId])
+      await db.query('DELETE FROM docent WHERE persoon_id = ?', [gebruikerId]).catch(() => {})
     } else if (oudeRol === 'stagementor') {
-      await db.query('DELETE FROM stagementor WHERE persoon_id = ?', [gebruikerId])
+      await db.query('DELETE FROM stagementor WHERE persoon_id = ?', [gebruikerId]).catch(() => {})
     } else if (oudeRol === 'stagecommissie') {
-      await db.query('DELETE FROM stagecommissielid WHERE persoon_id = ?', [gebruikerId])
+      await db.query('DELETE FROM stagecommissielid WHERE persoon_id = ?', [gebruikerId]).catch(() => {})
     } else if (oudeRol === 'admin') {
-      await db.query('DELETE FROM administratie WHERE persoon_id = ?', [gebruikerId])
+      await db.query('DELETE FROM administratie WHERE persoon_id = ?', [gebruikerId]).catch(() => {})
     }
 
     /* Update de rol in persoon */
     await db.query('UPDATE persoon SET rol = ? WHERE id = ?', [nieuweRol, gebruikerId])
 
-    /* Voeg toe aan nieuwe role-tabel */
+    /* Voeg toe aan nieuwe role-tabel (IGNORE als al bestaat) */
     if (nieuweRol === 'student') {
-      await db.query('INSERT INTO student (persoon_id, studentnummer, opleiding_id) VALUES (?, ?, ?)', [gebruikerId, null, 1])
+      await db.query('INSERT IGNORE INTO student (persoon_id, studentnummer, opleiding_id) VALUES (?, ?, ?)', [gebruikerId, null, 1])
     } else if (nieuweRol === 'docent') {
-      await db.query('INSERT INTO docent (persoon_id, vakgroep) VALUES (?, ?)', [gebruikerId, null])
+      await db.query('INSERT IGNORE INTO docent (persoon_id, vakgroep) VALUES (?, ?)', [gebruikerId, null])
     } else if (nieuweRol === 'stagementor') {
-      await db.query('INSERT INTO stagementor (persoon_id, functie, bedrijf_id) VALUES (?, ?, ?)', [gebruikerId, null, null])
+      await db.query('INSERT IGNORE INTO stagementor (persoon_id, functie, bedrijf_id) VALUES (?, ?, ?)', [gebruikerId, null, null])
     } else if (nieuweRol === 'stagecommissie') {
-      await db.query('INSERT INTO stagecommissielid (persoon_id, commissie_rol) VALUES (?, ?)', [gebruikerId, null])
+      await db.query('INSERT IGNORE INTO stagecommissielid (persoon_id, commissie_rol) VALUES (?, ?)', [gebruikerId, null])
     } else if (nieuweRol === 'admin') {
-      await db.query('INSERT INTO administratie (persoon_id, dienst) VALUES (?, ?)', [gebruikerId, null])
+      await db.query('INSERT IGNORE INTO administratie (persoon_id, dienst) VALUES (?, ?)', [gebruikerId, null])
     }
 
     /* Stuur notificatie naar de gebruiker */
@@ -288,6 +288,25 @@ router.get('/docenten', controleerToken, isAdmin, async (req, res) => {
        ORDER BY p.achternaam`
     )
     res.json(rijen)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ fout: 'Serverfout' })
+  }
+})
+
+router.put('/docenten/:id', controleerToken, isAdmin, async (req, res) => {
+  const { voornaam, achternaam, email, actief, vakgroep } = req.body
+
+  try {
+    await db.query(
+      'UPDATE persoon SET voornaam = ?, achternaam = ?, email = ?, actief = ? WHERE id = ?',
+      [voornaam, achternaam, email, actief ? 1 : 0, req.params.id]
+    )
+    await db.query(
+      'UPDATE docent SET vakgroep = ? WHERE persoon_id = ?',
+      [vakgroep || null, req.params.id]
+    )
+    res.json({ bericht: 'Docent bijgewerkt' })
   } catch (err) {
     console.error(err)
     res.status(500).json({ fout: 'Serverfout' })
@@ -522,6 +541,17 @@ router.put('/stagevoorstellen/:id/koppel', controleerToken, isAdmin, async (req,
 
     if (mentor_id) {
       await db.query('UPDATE stagevoorstel SET mentor_id = ? WHERE id = ?', [mentor_id, voorstelId])
+
+      /* FIX: ook stage-record bijwerken als het bestaat */
+      const [bestaandeStageMentor] = await db.query(
+        `SELECT s.id FROM stage s
+         JOIN stageovereenkomst so ON s.stageovereenkomst_id = so.id
+         WHERE so.stagevoorstel_id = ?`,
+        [voorstelId]
+      )
+      if (bestaandeStageMentor.length > 0) {
+        await db.query('UPDATE stage SET mentor_id = ? WHERE id = ?', [mentor_id, bestaandeStageMentor[0].id])
+      }
     }
 
     const studentId = voorstel[0].student_id

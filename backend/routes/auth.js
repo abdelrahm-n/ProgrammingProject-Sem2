@@ -60,7 +60,8 @@ router.post('/login', async (req, res) => {
       naam: persoon.voornaam + ' ' + persoon.achternaam,
       email: persoon.email,
       studentnummer: studentgegevens.studentnummer || null,
-      opleiding: studentgegevens.opleiding || null
+      opleiding: studentgegevens.opleiding || null,
+      opleiding_id: studentgegevens.opleiding_id || null
     })
 
   } catch (err) {
