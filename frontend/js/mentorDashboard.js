@@ -59,19 +59,35 @@ function toonStagiairs(studenten) {
     const status = student.logboek_status || "nog niet gestart";
     console.log(student);
     html += `
-      <tr>
-    <td>${naam}</td>
-    <td>${week}</td>
-    <td>
-      <a class="btn btn--primair" href="logboek-detail.html?studentId=${student.student_id}">
-        Bekijken
-      </a>
-    </td>
-  </tr>
-    `;
-  });
+<tr>
+  <td>${naam}</td>
+  <td>${week}</td>
 
-  stagiairsTabel.innerHTML = html;
+  <td>
+    <a class="btn btn--primair"
+       href="logboek-detail.html?student=${student.student_id}">
+      Bekijken
+    </a>
+  </td>
+
+  <td>
+    <a class="btn btn--secundair"
+href="stageovereenkomst.html?id=${student.stageovereenkomst_id}">
+      Bekijken
+    </a>
+  </td>
+
+  <td>
+    <a class="btn btn--primair"
+       href="evaluatie.html?student=${student.student_id}">
+      Invullen
+    </a>
+  </td>
+</tr>
+`;
+
+    stagiairsTabel.innerHTML = html;
+  });
 }
 
 laadMentorDashboard();
