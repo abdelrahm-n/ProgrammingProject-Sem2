@@ -6,56 +6,6 @@
   <title>Stageplatform - Docent - Dashboard</title>
   <link rel="stylesheet" href="../css/stijl.css" />
   <link rel="stylesheet" href="../css/docent.css" />
-  <style>
-    .dash-head { margin: 0 0 28px 0; }
-    .dash-head h1 { font-size: 28px; font-weight: 800; color: #1E1E1E; margin: 0 0 6px 0; }
-    .dash-head p { margin: 0; color: #6b7280; font-size: 15px; }
-
-    .dash-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 24px;
-      max-width: 940px;
-    }
-    .dash-card {
-      position: relative;
-      display: flex; flex-direction: column; gap: 12px;
-      background: #ffffff;
-      border: 1px solid #ececec;
-      border-radius: 14px;
-      padding: 26px 24px 28px;
-      text-decoration: none; color: #1E1E1E;
-      box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
-      transition: box-shadow .18s ease, transform .12s ease, border-color .18s ease;
-      overflow: hidden;
-    }
-    .dash-card::before {
-      content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 5px;
-      background: var(--rol-accent, #8B0015); opacity: 0; transition: opacity .18s ease;
-    }
-    .dash-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 14px 32px rgba(15, 23, 42, 0.12);
-      border-color: #e0c7cc;
-    }
-    .dash-card:hover::before { opacity: 1; }
-
-    .dash-icon {
-      display: inline-flex; align-items: center; justify-content: center;
-      width: 52px; height: 52px; border-radius: 14px;
-      background: var(--rol-accent-licht, #FFF0F1);
-      color: var(--rol-accent, #8B0015);
-    }
-    .dash-card h3 { margin: 6px 0 0 0; font-size: 18px; font-weight: 800; }
-    .dash-card p { margin: 0; font-size: 13.5px; color: #6b7280; line-height: 1.55; }
-    .dash-pijl {
-      margin-top: auto; align-self: flex-start;
-      font-size: 13px; font-weight: 700; color: var(--rol-accent, #8B0015);
-      display: inline-flex; align-items: center; gap: 6px;
-      opacity: 0; transform: translateX(-4px); transition: opacity .18s ease, transform .18s ease;
-    }
-    .dash-card:hover .dash-pijl { opacity: 1; transform: translateX(0); }
-  </style>
 </head>
 <body>
 
@@ -77,102 +27,48 @@
       <nav class="sidebar"></nav>
 
       <main class="content-area">
-        <div class="dash-head">
-          <h1 id="docentNaam">Welkom terug</h1>
-          <p>Kies hieronder wat je wil bekijken voor je studenten.</p>
-        </div>
 
-        <section id="ondertekenSectie" style="display:none;max-width:940px;margin:0 0 28px 0;background:#fff;border:1px solid #ececec;border-radius:14px;padding:22px 24px;">
-          <h2 style="margin:0 0 14px 0;font-size:18px;font-weight:800;">Stageovereenkomsten te ondertekenen</h2>
-          <div id="ondertekenLijst"></div>
+        <section class="page-header">
+          <h1 id="docentNaam">Dashboard</h1>
+          <p>Welkom terug! Hier zie je een overzicht van je studenten.</p>
         </section>
 
-        <div class="dash-grid">
-          <a href="logboeken.html" class="dash-card">
-            <span class="dash-icon">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
-              </svg>
-            </span>
-            <h3>Logboeken</h3>
-            <p>Bekijk hier de logboeken van je studenten.</p>
-            <span class="dash-pijl">Openen →</span>
-          </a>
+        <section class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-getal" id="totaalStudenten">0</div>
+            <div class="stat-label">Studenten</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-getal" id="logboekFeedbackCount">0</div>
+            <div class="stat-label">Logboeken beoordeeld</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-getal" id="evaluatiesCount">0</div>
+            <div class="stat-label">Evaluaties</div>
+          </div>
+        </section>
 
-          <a href="studenten.html" class="dash-card">
-            <span class="dash-icon">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                <path d="M3 3v18h18"/><path d="M7 14l3-3 3 3 5-6"/>
-              </svg>
-            </span>
-            <h3>Studentenfiche</h3>
-            <p>Details bekijken van de leerlingen.</p>
-            <span class="dash-pijl">Openen →</span>
-          </a>
+        <section class="dashboard-card" style="margin-top: var(--sp-3);">
+          <h2>Laatste logboeken</h2>
+          <div id="logboekLijst"><p class="text-muted">Even laden...</p></div>
+        </section>
 
-          <a href="evaluatie.html" class="dash-card">
-            <span class="dash-icon">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
-              </svg>
-            </span>
-            <h3>Evaluatie</h3>
-            <p>Plan evaluaties, geef scores en bekijk de zelfreflectie van de student.</p>
-            <span class="dash-pijl">Openen →</span>
-          </a>
-        </div>
+        <section class="dashboard-card" style="margin-top: var(--sp-3);">
+          <h2>Laatste evaluaties</h2>
+          <div id="evaluatiesLijst"><p class="text-muted">Even laden...</p></div>
+        </section>
+
+        <section class="dashboard-card" style="margin-top: var(--sp-3);">
+          <h2>Mijn studenten</h2>
+          <div id="studentenLijst"><p class="text-muted">Even laden...</p></div>
+        </section>
+
       </main>
     </div>
   </div>
 
+  <script src="../js/docentDashboard.js"></script>
   <script src="../js/nav.js"></script>
-  <script>
-    const naam = localStorage.getItem('naam');
-    if (naam) document.getElementById('docentNaam').textContent = 'Welkom terug, ' + naam;
-
-    const API_URL = 'http://localhost:3000';
-    const token = localStorage.getItem('token') || '';
-    function escape(t){ if(t==null) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
-    function toonDatum(w){ return w ? new Date(w).toLocaleDateString('nl-BE') : '-'; }
-
-    async function laadTeOndertekenen() {
-      try {
-        const res = await fetch(API_URL + '/api/docent/te-ondertekenen', {
-          headers: { 'Authorization': 'Bearer ' + token }
-        });
-        if (!res.ok) return;
-        const lijst = await res.json();
-        if (!lijst.length) return;
-
-        document.getElementById('ondertekenSectie').style.display = 'block';
-        const doel = document.getElementById('ondertekenLijst');
-        doel.innerHTML = lijst.map(o => `
-          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #f0f0f0;">
-            <div>
-              <strong>${escape(o.voornaam + ' ' + o.achternaam)}</strong> &mdash; ${escape(o.bedrijf)}<br>
-              <span style="color:#6b7280;font-size:13px;">${toonDatum(o.startdatum)} t.e.m. ${toonDatum(o.einddatum)}</span>
-            </div>
-            <button class="btn btn--primair btn--sm" onclick="ondertekenOvereenkomst(${o.stagevoorstel_id})">Ondertekenen</button>
-          </div>`).join('');
-      } catch (e) { /* stil */ }
-    }
-
-    window.ondertekenOvereenkomst = async function (stagevoorstelId) {
-      try {
-        const res = await fetch(API_URL + '/api/stageovereenkomst/' + stagevoorstelId + '/onderteken-school', {
-          method: 'PUT',
-          headers: { 'Authorization': 'Bearer ' + token }
-        });
-        if (!res.ok) { const r = await res.json().catch(() => ({})); throw new Error(r.fout || 'mislukt'); }
-        alert('Ondertekend.');
-        laadTeOndertekenen();
-      } catch (e) {
-        alert('Ondertekenen mislukt: ' + e.message);
-      }
-    };
-
-    laadTeOndertekenen();
-  </script>
 
 </body>
 </html>

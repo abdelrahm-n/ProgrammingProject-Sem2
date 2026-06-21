@@ -6,10 +6,10 @@
   <title>Stageplatform - Docent - Studenten</title>
   <link rel="stylesheet" href="../css/stijl.css" />
   <link rel="stylesheet" href="../css/docent.css" />
-  <link rel="stylesheet" href="../css/logboeken.css" />
+  <link rel="stylesheet" href="../css/button.css" />
+  <link rel="stylesheet" href="../css/components.css" />
 </head>
 <body>
-
   <div id="app">
     <header class="header">
       <div class="header-logo">
@@ -28,26 +28,16 @@
       <nav class="sidebar"></nav>
 
       <main class="content-area">
-        <div class="logboeken-panel">
-          <div class="logboeken-header">
-            <h1>Studenten</h1>
-          </div>
+        <section class="dashboard-card">
+          <h1>Studenten</h1>
+          <p>Overzicht van je toegewezen studenten.</p>
+        </section>
 
-          <div class="logboeken-table-container">
-            <table class="student-logboeken-table">
-              <thead>
-                <tr>
-                  <th>Naam</th>
-                  <th>Score</th>
-                  <th>Actie</th>
-                </tr>
-              </thead>
-              <tbody id="studentenBody">
-                <tr><td colspan="3">Laden...</td></tr>
-              </tbody>
-            </table>
+        <section class="dashboard-card">
+          <div id="studentenOverzicht">
+            <p>Laden...</p>
           </div>
-        </div>
+        </section>
       </main>
     </div>
   </div>
@@ -56,39 +46,46 @@
   <script>
     const API_URL = 'http://localhost:3000';
     const token = localStorage.getItem('token') || '';
-    const body = document.getElementById('studentenBody');
+    const container = document.getElementById('studentenOverzicht');
 
     function escape(t){ if(t==null) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
 
     async function laad() {
-      let studenten;
+      var studenten;
       try {
-        const res = await fetch(API_URL + '/api/docent/mijn-studenten', {
+        var res = await fetch(API_URL + '/api/docent/mijn-studenten', {
           headers: { 'Authorization': 'Bearer ' + token }
         });
         if (!res.ok) throw new Error('niet ok');
         studenten = await res.json();
       } catch (e) {
-        body.innerHTML = '<tr><td colspan="3">Kon studenten niet laden. Log opnieuw in als docent.</td></tr>';
+        container.innerHTML = '<p>Kon studenten niet laden. Log opnieuw in als docent.</p>';
         return;
       }
 
       if (!studenten.length) {
-        body.innerHTML = '<tr><td colspan="3">Geen toegewezen studenten.</td></tr>';
+        container.innerHTML = '<p>Geen toegewezen studenten.</p>';
         return;
       }
 
-      body.innerHTML = '';
-      studenten.forEach(s => {
-        const naam = escape(s.voornaam + ' ' + s.achternaam);
-        const score = (s.totaalscore != null) ? s.totaalscore : '-';
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${naam}<br><small style="color:#9ca3af;">${escape(s.opleiding) || '-'}</small></td>
-          <td>${score}</td>
-          <td><a class="details-link" href="studentenfiche.html?stage=${s.stage_id}">Bekijken</a></td>`;
-        body.appendChild(tr);
+      var html = '<table><thead><tr>';
+      html += '<th>Student</th><th>Bedrijf</th><th>Score</th><th>Actie</th>';
+      html += '</tr></thead><tbody>';
+
+      studenten.forEach(function(s) {
+        var naam = escape(s.voornaam + ' ' + s.achternaam);
+        var score = (s.totaalscore != null) ? s.totaalscore : '-';
+
+        html += '<tr>';
+        html += '<td><strong>' + naam + '</strong><br><small style="color:var(--color-text-muted);">' + (escape(s.opleiding) || '-') + '</small></td>';
+        html += '<td>' + (escape(s.bedrijf) || '-') + '</td>';
+        html += '<td>' + score + '</td>';
+        html += '<td><a href="studentenfiche.html?stage=' + s.stage_id + '" class="btn btn--primair btn--sm">Bekijk</a></td>';
+        html += '</tr>';
       });
+
+      html += '</tbody></table>';
+      container.innerHTML = html;
     }
 
     laad();
