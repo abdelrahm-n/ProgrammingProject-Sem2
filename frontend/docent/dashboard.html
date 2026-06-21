@@ -82,6 +82,11 @@
           <p>Kies hieronder wat je wil bekijken voor je studenten.</p>
         </div>
 
+        <section id="ondertekenSectie" style="display:none;max-width:940px;margin:0 0 28px 0;background:#fff;border:1px solid #ececec;border-radius:14px;padding:22px 24px;">
+          <h2 style="margin:0 0 14px 0;font-size:18px;font-weight:800;">Stageovereenkomsten te ondertekenen</h2>
+          <div id="ondertekenLijst"></div>
+        </section>
+
         <div class="dash-grid">
           <a href="logboeken.html" class="dash-card">
             <span class="dash-icon">
@@ -112,18 +117,7 @@
               </svg>
             </span>
             <h3>Evaluatie</h3>
-            <p>Evaluatie bekijken van de stagementor.</p>
-            <span class="dash-pijl">Openen →</span>
-          </a>
-
-          <a href="evaluatie.html" class="dash-card">
-            <span class="dash-icon">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
-                <circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/>
-              </svg>
-            </span>
-            <h3>Reflectie</h3>
-            <p>Bekijk de zelfreflectie van de student.</p>
+            <p>Plan evaluaties, geef scores en bekijk de zelfreflectie van de student.</p>
             <span class="dash-pijl">Openen →</span>
           </a>
         </div>
@@ -135,6 +129,49 @@
   <script>
     const naam = localStorage.getItem('naam');
     if (naam) document.getElementById('docentNaam').textContent = 'Welkom terug, ' + naam;
+
+    const API_URL = 'http://localhost:3000';
+    const token = localStorage.getItem('token') || '';
+    function escape(t){ if(t==null) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+    function toonDatum(w){ return w ? new Date(w).toLocaleDateString('nl-BE') : '-'; }
+
+    async function laadTeOndertekenen() {
+      try {
+        const res = await fetch(API_URL + '/api/docent/te-ondertekenen', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (!res.ok) return;
+        const lijst = await res.json();
+        if (!lijst.length) return;
+
+        document.getElementById('ondertekenSectie').style.display = 'block';
+        const doel = document.getElementById('ondertekenLijst');
+        doel.innerHTML = lijst.map(o => `
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #f0f0f0;">
+            <div>
+              <strong>${escape(o.voornaam + ' ' + o.achternaam)}</strong> &mdash; ${escape(o.bedrijf)}<br>
+              <span style="color:#6b7280;font-size:13px;">${toonDatum(o.startdatum)} t.e.m. ${toonDatum(o.einddatum)}</span>
+            </div>
+            <button class="btn btn--primair btn--sm" onclick="ondertekenOvereenkomst(${o.stagevoorstel_id})">Ondertekenen</button>
+          </div>`).join('');
+      } catch (e) { /* stil */ }
+    }
+
+    window.ondertekenOvereenkomst = async function (stagevoorstelId) {
+      try {
+        const res = await fetch(API_URL + '/api/stageovereenkomst/' + stagevoorstelId + '/onderteken-school', {
+          method: 'PUT',
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (!res.ok) { const r = await res.json().catch(() => ({})); throw new Error(r.fout || 'mislukt'); }
+        alert('Ondertekend.');
+        laadTeOndertekenen();
+      } catch (e) {
+        alert('Ondertekenen mislukt: ' + e.message);
+      }
+    };
+
+    laadTeOndertekenen();
   </script>
 
 </body>
