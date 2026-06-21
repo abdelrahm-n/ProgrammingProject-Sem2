@@ -129,13 +129,22 @@
         const detail = document.createElement('tr');
         detail.className = 'week-detail-rij';
         const dagenHtml = week.dagen && week.dagen.length
-          ? week.dagen.map(d => `
+          ? week.dagen.map(d => {
+              const bestaand = (d.feedback || []).map(f =>
+                `<div><em>${escape(f.voornaam + ' ' + f.achternaam)} (${escape(f.rol)}):</em> ${escape(f.feedback)}</div>`).join('');
+              return `
               <div class="dag-detail">
                 <strong>${toonDatum(d.datum)}</strong>
                 <div><em>Taken:</em> ${escape(d.uitgevoerde_taken)}</div>
                 <div><em>Reflectie:</em> ${escape(d.reflectie) || '-'}</div>
                 <div><em>Problemen:</em> ${escape(d.problemen_leerpunten) || '-'}</div>
-              </div>`).join('')
+                <div class="dag-feedback" style="margin-top:8px">
+                  ${bestaand}
+                  <textarea id="fb-${d.id}" rows="2" placeholder="Feedback geven op deze dag..." style="width:100%;margin-top:6px"></textarea>
+                  <button onclick="geefFeedback(${d.id})">Feedback opslaan</button>
+                </div>
+              </div>`;
+            }).join('')
           : '<p>Geen dagen ingevuld.</p>';
 
         const feedbackHtml = week.feedback_mentor
@@ -159,6 +168,24 @@
         });
       });
     })();
+
+    /* Docent geeft feedback op een logboekdag */
+    window.geefFeedback = async function (itemId) {
+      const veld = document.getElementById('fb-' + itemId);
+      const tekst = veld.value.trim();
+      if (!tekst) { alert('Schrijf eerst feedback.'); return; }
+      try {
+        const res = await fetch(API_URL + '/api/logboeken/dag/' + itemId + '/feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify({ feedback: tekst })
+        });
+        if (!res.ok) { const r = await res.json().catch(() => ({})); throw new Error(r.fout || 'mislukt'); }
+        window.location.reload();
+      } catch (e) {
+        alert('Opslaan mislukt: ' + e.message);
+      }
+    };
   </script>
 </body>
 </html>

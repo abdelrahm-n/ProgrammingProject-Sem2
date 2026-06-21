@@ -214,7 +214,25 @@ async function haalWekenVanStage(stageId) {
      ORDER BY ldi.datum ASC`,
     [stageId]
   )
-  return weken.map(w => ({ ...w, dagen: items.filter(i => i.logboek_week_id === w.id) }))
+
+  /* Feedback per dagitem ophalen (mentor en docent samen) */
+  const [feedback] = await db.query(
+    `SELECT lf.logboek_dag_item_id, lf.feedback, lf.gegeven_op,
+            p.voornaam, p.achternaam, p.rol
+     FROM logboek_feedback lf
+     JOIN logboek_dag_item ldi ON lf.logboek_dag_item_id = ldi.id
+     JOIN logboek_week lw ON ldi.logboek_week_id = lw.id
+     JOIN persoon p ON lf.afzender_id = p.id
+     WHERE lw.stage_id = ?
+     ORDER BY lf.gegeven_op ASC`,
+    [stageId]
+  )
+
+  const dagen = items.map(i => ({
+    ...i,
+    feedback: feedback.filter(f => f.logboek_dag_item_id === i.id)
+  }))
+  return weken.map(w => ({ ...w, dagen: dagen.filter(d => d.logboek_week_id === w.id) }))
 }
 
 /* Geeft de actieve stage van een student terug als de ingelogde
@@ -347,6 +365,45 @@ router.post('/week/:weekId/feedback', controleerToken, async (req, res) => {
       [feedback ?? null, statusId, status === 'goedgekeurd' ? new Date() : null, req.params.weekId]
     )
     res.json({ bericht: 'Feedback opgeslagen' })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ fout: 'Serverfout' })
+  }
+})
+
+/* POST /api/logboeken/dag/:itemId/feedback - docent of mentor geeft feedback op een dag */
+router.post('/dag/:itemId/feedback', controleerToken, async (req, res) => {
+  const { rol, id } = req.gebruiker
+  if (![ROL_MENTOR, ROL_DOCENT, ROL_ADMIN].includes(rol)) {
+    return res.status(403).json({ fout: 'Geen toegang' })
+  }
+  const { feedback } = req.body
+  if (!feedback || !feedback.trim()) {
+    return res.status(400).json({ fout: 'Feedback mag niet leeg zijn' })
+  }
+  try {
+    /* Controleer dat het dagitem bij een stage van deze gebruiker hoort */
+    const [rijen] = await db.query(
+      `SELECT s.mentor_id, s.docent_id
+       FROM logboek_dag_item ldi
+       JOIN logboek_week lw ON ldi.logboek_week_id = lw.id
+       JOIN stage s ON lw.stage_id = s.id
+       WHERE ldi.id = ?`,
+      [req.params.itemId]
+    )
+    if (rijen.length === 0) return res.status(404).json({ fout: 'Logboekdag niet gevonden' })
+
+    const stage = rijen[0]
+    const magWel = rol === ROL_ADMIN ||
+      (rol === ROL_MENTOR && stage.mentor_id === id) ||
+      (rol === ROL_DOCENT && stage.docent_id === id)
+    if (!magWel) return res.status(403).json({ fout: 'Geen toegang tot deze logboekdag' })
+
+    await db.query(
+      'INSERT INTO logboek_feedback (logboek_dag_item_id, afzender_id, feedback) VALUES (?, ?, ?)',
+      [req.params.itemId, id, feedback.trim()]
+    )
+    res.status(201).json({ bericht: 'Feedback opgeslagen' })
   } catch (err) {
     console.error(err)
     res.status(500).json({ fout: 'Serverfout' })
