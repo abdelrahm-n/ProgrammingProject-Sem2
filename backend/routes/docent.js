@@ -168,4 +168,27 @@ router.get('/evaluaties/:stageId', controleerToken, isDocent, async (req, res) =
   }
 })
 
+/* GET /api/docent/te-ondertekenen - overeenkomsten van toegewezen studenten die de docent nog moet tekenen */
+router.get('/te-ondertekenen', controleerToken, isDocent, async (req, res) => {
+  try {
+    const [rijen] = await db.query(
+      `SELECT so.id AS overeenkomst_id, sv.id AS stagevoorstel_id,
+              sv.omschrijving_opdracht, sv.startdatum, sv.einddatum,
+              so.getekend_door_student, so.getekend_door_bedrijf, so.getekend_door_school,
+              p.voornaam, p.achternaam, b.naam AS bedrijf
+       FROM stagevoorstel sv
+       JOIN stageovereenkomst so ON so.stagevoorstel_id = sv.id
+       JOIN persoon p ON sv.student_id = p.id
+       JOIN bedrijf b ON sv.bedrijf_id = b.id
+       WHERE sv.docent_id = ? AND so.getekend_door_school = FALSE
+       ORDER BY so.aangemaakt_op DESC`,
+      [req.gebruiker.id]
+    )
+    res.json(rijen)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ fout: 'Serverfout' })
+  }
+})
+
 export default router
