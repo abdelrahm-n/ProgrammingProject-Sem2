@@ -31,9 +31,7 @@ async function haalGebruikerOp(id) {
   return rijen.length > 0 ? rijen[0] : null
 }
 
-/* ============================================================
-   GEBRUIKERS - Overzicht
-   ============================================================ */
+/* GEBRUIKERS - Overzicht */
 
 router.get('/gebruikers', controleerToken, isAdmin, async (req, res) => {
   try {
@@ -47,9 +45,7 @@ router.get('/gebruikers', controleerToken, isAdmin, async (req, res) => {
   }
 })
 
-/* ============================================================
-   GEBRUIKERS - Account aanmaken (alle rollen)
-   ============================================================ */
+/* GEBRUIKERS - Account aanmaken (alle rollen) */
 
 router.post('/gebruiker-aanmaken', controleerToken, isAdmin, async (req, res) => {
   const { voornaam, achternaam, wachtwoord, rol, extra } = req.body
@@ -128,9 +124,7 @@ router.post('/gebruiker-aanmaken', controleerToken, isAdmin, async (req, res) =>
   }
 })
 
-/* ============================================================
-   GEBRUIKERS - Bewerken
-   ============================================================ */
+/* GEBRUIKERS - Bewerken */
 
 router.put('/gebruikers/:id', controleerToken, isAdmin, async (req, res) => {
   const { voornaam, achternaam, email, actief } = req.body
@@ -147,9 +141,7 @@ router.put('/gebruikers/:id', controleerToken, isAdmin, async (req, res) => {
   }
 })
 
-/* ============================================================
-   GEBRUIKERS - Rol wijzigen
-   ============================================================ */
+/* GEBRUIKERS - Rol wijzigen */
 
 router.put('/gebruikers/:id/rol', controleerToken, isAdmin, async (req, res) => {
   const { nieuweRol } = req.body
@@ -215,9 +207,7 @@ router.put('/gebruikers/:id/rol', controleerToken, isAdmin, async (req, res) => 
   }
 })
 
-/* ============================================================
-   GEBRUIKERS - Wachtwoord wijzigen
-   ============================================================ */
+/* GEBRUIKERS - Wachtwoord wijzigen */
 
 router.put('/gebruikers/:id/wachtwoord', controleerToken, isAdmin, async (req, res) => {
   const { nieuwWachtwoord } = req.body
@@ -248,9 +238,7 @@ router.put('/gebruikers/:id/wachtwoord', controleerToken, isAdmin, async (req, r
   }
 })
 
-/* ============================================================
-   GEBRUIKERS - Account verwijderen (soft delete)
-   ============================================================ */
+/* GEBRUIKERS - Account verwijderen (soft delete) */
 
 router.delete('/gebruikers/:id', controleerToken, isAdmin, async (req, res) => {
   try {
@@ -275,9 +263,7 @@ router.delete('/gebruikers/:id', controleerToken, isAdmin, async (req, res) => {
   }
 })
 
-/* ============================================================
-   DOCENTEN
-   ============================================================ */
+/* DOCENTEN */
 
 router.get('/docenten', controleerToken, isAdmin, async (req, res) => {
   try {
@@ -313,9 +299,7 @@ router.put('/docenten/:id', controleerToken, isAdmin, async (req, res) => {
   }
 })
 
-/* ============================================================
-   STUDENTEN
-   ============================================================ */
+/* STUDENTEN */
 
 router.get('/studenten', controleerToken, isAdmin, async (req, res) => {
   try {
@@ -348,9 +332,7 @@ router.get('/studenten', controleerToken, isAdmin, async (req, res) => {
   }
 })
 
-/* ============================================================
-   BEDRIJVEN
-   ============================================================ */
+/* BEDRIJVEN */
 
 router.get('/bedrijven', controleerToken, isAdmin, async (req, res) => {
   try {
@@ -409,9 +391,7 @@ router.put('/bedrijven/:id', controleerToken, isAdmin, async (req, res) => {
   }
 })
 
-/* ============================================================
-   MENTOREN
-   ============================================================ */
+/* MENTOREN */
 
 router.get('/mentoren', controleerToken, isAdmin, async (req, res) => {
   try {
@@ -445,9 +425,7 @@ router.put('/mentoren/:id', controleerToken, isAdmin, async (req, res) => {
   }
 })
 
-/* ============================================================
-   STAGES - Overzicht
-   ============================================================ */
+/* STAGES - Overzicht */
 
 router.get('/stages/overzicht', controleerToken, isAdmin, async (req, res) => {
   try {
@@ -498,9 +476,7 @@ router.get('/statistieken', controleerToken, isAdmin, async (req, res) => {
   }
 })
 
-/* ============================================================
-   STAGEVOORSTELLEN
-   ============================================================ */
+/* STAGEVOORSTELLEN */
 
 router.get('/stagevoorstellen', controleerToken, isAdmin, async (req, res) => {
   try {
@@ -525,9 +501,7 @@ router.get('/stagevoorstellen', controleerToken, isAdmin, async (req, res) => {
   }
 })
 
-/* ============================================================
-   STAGEVOORSTEL - Koppel mentor en docent
-   ============================================================ */
+/* STAGEVOORSTEL - Koppel mentor en docent */
 
 router.put('/stagevoorstellen/:id/koppel', controleerToken, isAdmin, async (req, res) => {
   const { mentor_id, docent_id } = req.body
@@ -618,9 +592,7 @@ router.put('/stagevoorstellen/:id/koppel', controleerToken, isAdmin, async (req,
   }
 })
 
-/* ============================================================
-   STAGEOVEREENKOMSTEN
-   ============================================================ */
+/* STAGEOVEREENKOMSTEN */
 
 router.get('/stageovereenkomsten', controleerToken, isAdmin, async (req, res) => {
   try {
@@ -719,9 +691,7 @@ router.put('/stageovereenkomsten/:id/valideer', controleerToken, isAdmin, async 
   }
 })
 
-/* ============================================================
-   DOCUMENTEN
-   ============================================================ */
+/* DOCUMENTEN */
 
 router.get('/documenten', controleerToken, isAdmin, async (req, res) => {
   try {
@@ -739,9 +709,7 @@ router.get('/documenten', controleerToken, isAdmin, async (req, res) => {
   }
 })
 
-/* ============================================================
-   OPLEIDINGEN (voor dropdowns)
-   ============================================================ */
+/* OPLEIDINGEN (voor dropdowns) */
 
 router.get('/opleidingen', controleerToken, isAdmin, async (req, res) => {
   try {
@@ -753,9 +721,7 @@ router.get('/opleidingen', controleerToken, isAdmin, async (req, res) => {
   }
 })
 
-/* ============================================================
-   ACADEMIEJAREN (voor dropdowns)
-   ============================================================ */
+/* ACADEMIEJAREN (voor dropdowns) */
 
 router.get('/academiejaren', controleerToken, isAdmin, async (req, res) => {
   try {

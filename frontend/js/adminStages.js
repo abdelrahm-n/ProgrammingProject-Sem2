@@ -180,9 +180,7 @@ async function valideerOvereenkomst(id) {
   }
 }
 
-/* ============================================================
-   KOPPEL MENTOR & DOCENT
-   ============================================================ */
+/* KOPPEL MENTOR & DOCENT */
 
 function openKoppel(voorstelId, studentNaam) {
   document.getElementById("koppelVoorstelId").value = voorstelId;

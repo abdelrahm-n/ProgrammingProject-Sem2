@@ -48,14 +48,17 @@ Surf daarna naar http://localhost:5500/index.html.
 
 Alle demo-gebruikers hebben hetzelfde wachtwoord: **demo123**
 
-| Rol            | E-mail                          |
-|----------------|---------------------------------|
-| Student        | jan.jansen@student.ehb.be       |
-| Student        | emma.peeters@student.ehb.be     |
-| Docent         | piet.pieters@docent.ehb.be      |
-| Stagementor    | sara.smeets@mentor.ehb.be       |
-| Stagecommissie | tom.thomas@commissie.ehb.be     |
-| Administratie  | an.anthonis@admin.ehb.be        |
+| Rol            | E-mail                            |
+|----------------|-----------------------------------|
+| Student        | amira.bensalem@student.ehb.be     |
+| Student        | luca.desmedt@student.ehb.be       |
+| Docent         | thomas.wouters@docent.ehb.be      |
+| Stagementor    | pieter.desmedt@mentor.ehb.be      |
+| Stagecommissie | katrien.lenaerts@commissie.ehb.be |
+| Administratie  | nele.pauwels@admin.ehb.be         |
+
+Op de loginpagina kies je eerst je rol en typ je enkel het deel vóór de @
+(bijv. `nele.pauwels`). Het domein wordt automatisch toegevoegd.
 
 Met de knop **Snel inloggen (dev)** op de loginpagina log je via de server in
 als de eerste demo-gebruiker van de gekozen rol (met een echt token).

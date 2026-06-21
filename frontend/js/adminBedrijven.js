@@ -69,9 +69,7 @@ async function laadBedrijven() {
   }
 }
 
-/* ============================================================
-   NIEUW BEDRIJF
-   ============================================================ */
+/* NIEUW BEDRIJF */
 
 function openNieuwBedrijf() {
   document.getElementById("nieuwBedrijfForm").reset();
@@ -131,9 +129,7 @@ document.getElementById("nieuwBedrijfForm").addEventListener("submit", async fun
   }
 });
 
-/* ============================================================
-   BEWERK BEDRIJF
-   ============================================================ */
+/* BEWERK BEDRIJF */
 
 function openBewerkBedrijf(id, naam, adres, email, telefoon, contact, actief) {
   document.getElementById("bewerkBedrijfId").value = id;

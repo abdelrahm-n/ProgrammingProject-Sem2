@@ -105,9 +105,7 @@ document.getElementById("zoekVeld").addEventListener("input", function () {
   toonGebruikers(gefilterd);
 });
 
-/* ============================================================
-   ROL WIJZIGEN
-   ============================================================ */
+/* ROL WIJZIGEN */
 
 function openRolWijzig(id, huidigeRol) {
   document.getElementById("rolModalId").value = id;
@@ -159,9 +157,7 @@ document.getElementById("rolForm").addEventListener("submit", async function(e) 
   }
 });
 
-/* ============================================================
-   WACHTWOORD WIJZIGEN
-   ============================================================ */
+/* WACHTWOORD WIJZIGEN */
 
 function openWachtwoord(id) {
   document.getElementById("wwModalId").value = id;
@@ -216,9 +212,7 @@ document.getElementById("wwForm").addEventListener("submit", async function(e) {
   }
 });
 
-/* ============================================================
-   GEBRUIKER VERWIJDEREN
-   ============================================================ */
+/* GEBRUIKER VERWIJDEREN */
 
 async function verwijderGebruiker(id, naam) {
   if (!confirm("Weet je zeker dat je " + naam + " wilt deactiveren?")) return;
