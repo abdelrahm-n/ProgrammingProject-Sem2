@@ -122,7 +122,13 @@ document.getElementById('devLoginBtn').addEventListener('click', async function 
     }
 
     bewaarSessie(data);
-    window.location.href = dashboards[data.rol] || 'index.html';
+
+    const rolOmgekeerd = {
+      stagementor: 'mentor',
+      stagecommissie: 'commissie'
+    };
+    const frontendRol = rolOmgekeerd[data.rol] || data.rol;
+    window.location.href = dashboards[frontendRol] || 'index.html';
 
   } catch (fout) {
     foutmelding.textContent = 'Kan geen verbinding maken met de server.';
