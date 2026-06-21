@@ -43,6 +43,34 @@
     </div>
   </div>
 
+  <!-- Koppel modal -->
+  <div id="koppelModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;justify-content:center;align-items:center;">
+    <div style="background:white;border-radius:8px;padding:24px;max-width:480px;width:90%;max-height:90vh;overflow-y:auto;">
+      <h3 style="margin-top:0;">Mentor & Docent koppelen</h3>
+      <p id="koppelStudentNaam" style="margin:0 0 16px 0;font-weight:600;"></p>
+      <form id="koppelForm" class="formulier" novalidate>
+        <input type="hidden" id="koppelVoorstelId" />
+        <div class="form-group">
+          <label for="koppelMentor">Mentor</label>
+          <select id="koppelMentor">
+            <option value="">Kies een mentor...</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="koppelDocent">Docent</label>
+          <select id="koppelDocent">
+            <option value="">Kies een docent...</option>
+          </select>
+        </div>
+        <p id="koppelMelding" class="melding"></p>
+        <div class="form-acties">
+          <button type="submit" class="btn btn--primair">Koppelen</button>
+          <button type="button" class="btn btn--secundair" onclick="sluitKoppelModal()">Annuleren</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script src="../js/nav.js"></script>
   <script src="../js/adminStudenten.js"></script>
 
