@@ -4,6 +4,15 @@ import controleerToken from "../middleware/controleerToken.js"
 
 const router = express.Router()
 
+/* Bepaal de docent voor een stage: de toegewezen docent van het voorstel,
+   anders de eerste docent als terugval. */
+async function bepaalDocentId(stagevoorstelId) {
+  const [sv] = await db.query("SELECT docent_id FROM stagevoorstel WHERE id = ?", [stagevoorstelId])
+  if (sv.length > 0 && sv[0].docent_id) return sv[0].docent_id
+  const [d] = await db.query("SELECT persoon_id FROM docent LIMIT 1")
+  return d.length > 0 ? d[0].persoon_id : null
+}
+
 /* GET /api/stageovereenkomst/mijn - haal stageovereenkomst op voor ingelogde student */
 router.get("/mijn", controleerToken, async (req, res) => {
   try {
@@ -165,14 +174,13 @@ router.put("/commissie/:id/onderteken", controleerToken, async (req, res) => {
 
         /* Activeer de stage automatisch als alle partijen hebben getekend */
         const [soData] = await db.query(
-          "SELECT so.id AS so_id, sv.student_id, sv.bedrijf_id, sv.mentor_id, sv.startdatum, sv.einddatum FROM stageovereenkomst so JOIN stagevoorstel sv ON so.stagevoorstel_id = sv.id WHERE so.id = ?",
+          "SELECT so.id AS so_id, sv.id AS stagevoorstel_id, sv.student_id, sv.bedrijf_id, sv.mentor_id, sv.startdatum, sv.einddatum FROM stageovereenkomst so JOIN stagevoorstel sv ON so.stagevoorstel_id = sv.id WHERE so.id = ?",
           [req.params.id]
         )
         const [bestaandeStage] = await db.query("SELECT id FROM stage WHERE stageovereenkomst_id = ?", [req.params.id])
         if (soData.length > 0 && bestaandeStage.length === 0) {
           const s = soData[0]
-          const [docent] = await db.query("SELECT persoon_id FROM docent LIMIT 1")
-          const docentId = docent.length > 0 ? docent[0].persoon_id : null
+          const docentId = await bepaalDocentId(s.stagevoorstel_id)
 
           await db.query(
             `INSERT INTO stage (stageovereenkomst_id, student_id, bedrijf_id, mentor_id, docent_id, startdatum, einddatum, actief)
@@ -200,7 +208,7 @@ router.get("/mijn/activateer", controleerToken, async (req, res) => {
   try {
     const [rows] = await db.query(
       `SELECT so.id, so.getekend_door_student, so.getekend_door_bedrijf, so.getekend_door_school,
-              so.gevalideerd_op, sv.startdatum, sv.student_id, sv.bedrijf_id, sv.mentor_id
+              so.gevalideerd_op, sv.id AS stagevoorstel_id, sv.startdatum, sv.student_id, sv.bedrijf_id, sv.mentor_id
        FROM stageovereenkomst so
        JOIN stagevoorstel sv ON so.stagevoorstel_id = sv.id
        JOIN student st ON sv.student_id = st.persoon_id
@@ -235,8 +243,7 @@ router.get("/mijn/activateer", controleerToken, async (req, res) => {
       await db.query("UPDATE stageovereenkomst SET status_id = ?, gevalideerd_op = NOW() WHERE id = ?", [status[0].id, o.id])
     }
 
-    const [docent] = await db.query("SELECT persoon_id FROM docent LIMIT 1")
-    const docentId = docent.length > 0 ? docent[0].persoon_id : null
+    const docentId = await bepaalDocentId(o.stagevoorstel_id)
 
     await db.query(
       `INSERT INTO stage (stageovereenkomst_id, student_id, bedrijf_id, mentor_id, docent_id, startdatum, einddatum, actief)
@@ -447,8 +454,7 @@ router.put("/:stagevoorstelId/onderteken-student", controleerToken, async (req, 
       )
       if (sv.length > 0 && bestaandeStage.length === 0) {
         const s = sv[0]
-        const [docent] = await db.query("SELECT persoon_id FROM docent LIMIT 1")
-        const docentId = docent.length > 0 ? docent[0].persoon_id : null
+        const docentId = await bepaalDocentId(stagevoorstelId)
         const [so] = await db.query("SELECT id FROM stageovereenkomst WHERE stagevoorstel_id = ?", [stagevoorstelId])
 
         await db.query(
@@ -515,8 +521,7 @@ router.put("/:stagevoorstelId/onderteken-bedrijf", controleerToken, async (req, 
       )
       if (sv.length > 0 && bestaandeStage.length === 0) {
         const s = sv[0]
-        const [docent] = await db.query("SELECT persoon_id FROM docent LIMIT 1")
-        const docentId = docent.length > 0 ? docent[0].persoon_id : null
+        const docentId = await bepaalDocentId(stagevoorstelId)
         const [so] = await db.query("SELECT id FROM stageovereenkomst WHERE stagevoorstel_id = ?", [stagevoorstelId])
 
         await db.query(
@@ -592,8 +597,7 @@ router.put("/:stagevoorstelId/onderteken-school", controleerToken, async (req, r
         )
         if (sv.length > 0 && bestaandeStage.length === 0) {
           const s = sv[0]
-          const [docent] = await db.query("SELECT persoon_id FROM docent LIMIT 1")
-          const docentId = docent.length > 0 ? docent[0].persoon_id : null
+          const docentId = await bepaalDocentId(stagevoorstelId)
           const [so] = await db.query("SELECT id FROM stageovereenkomst WHERE stagevoorstel_id = ?", [stagevoorstelId])
 
           await db.query(
@@ -667,9 +671,7 @@ router.put("/:stagevoorstelId/activeer", controleerToken, async (req, res) => {
     )
 
     if (sv.length > 0) {
-      const s = sv[0]
-      const [docent] = await db.query("SELECT persoon_id FROM docent LIMIT 1")
-      const docentId = docent.length > 0 ? docent[0].persoon_id : null
+      const docentId = await bepaalDocentId(stagevoorstelId)
 
       await db.query(
         `INSERT INTO stage (stageovereenkomst_id, student_id, bedrijf_id, mentor_id, docent_id, startdatum, einddatum, actief)
