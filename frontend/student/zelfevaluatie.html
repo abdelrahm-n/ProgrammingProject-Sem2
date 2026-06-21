@@ -51,6 +51,13 @@
           <h2 style="font-size:20px; font-weight:800; margin:0 0 14px 0;">Feedback van je mentor</h2>
           <div id="mentorFeedbackLijst"></div>
         </div>
+
+        <!-- Feedback van de docent (alleen-lezen) -->
+        <div id="docentFeedbackSectie" style="display:none; margin-top:28px;">
+          <h2 style="font-size:20px; font-weight:800; margin:0 0 14px 0;">Feedback van je docent</h2>
+          <p id="eindscoreRegel" style="display:none; font-weight:700; margin:0 0 12px 0;"></p>
+          <div id="docentFeedbackLijst"></div>
+        </div>
       </main>
     </div>
   </div>
@@ -64,6 +71,7 @@
     const indienenBtn = document.getElementById('indienenBtn');
 
     let evaluatieId = null;
+    let evaluatieMoment = null;
     let beoordelingen = [];
 
     function escape(t){ if(t==null) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
@@ -128,6 +136,7 @@
           return;
         }
         evaluatieId = tussen.id;
+        evaluatieMoment = tussen;
 
         const resB = await fetch(API_URL + '/api/evaluaties/' + evaluatieId + '/beoordelingen', {
           headers: { 'Authorization': 'Bearer ' + token }
@@ -135,6 +144,7 @@
         beoordelingen = await resB.json();
         renderCompetenties();
         renderMentorFeedback();
+        renderDocentFeedback();
       } catch (e) {
         toonMelding('Kon de evaluatie niet laden.', '#990018');
       }
@@ -151,6 +161,24 @@
             <span class="gewicht">${b.mentor_score != null ? 'Score mentor: ' + b.mentor_score + '/5' : ''}</span>
           </div>
           <p style="margin:6px 0 0 0;">${b.mentor_feedback ? escape(b.mentor_feedback) : '<span style="color:#9ca3af">(nog geen feedback)</span>'}</p>
+        </div>`).join('');
+    }
+
+    function renderDocentFeedback() {
+      const metFeedback = beoordelingen.filter(b => b.docent_feedback && b.docent_feedback.trim());
+      const eindscore = evaluatieMoment && evaluatieMoment.eindresultaat_score != null;
+      if (!metFeedback.length && !eindscore) return;
+
+      document.getElementById('docentFeedbackSectie').style.display = 'block';
+      if (eindscore) {
+        const r = document.getElementById('eindscoreRegel');
+        r.textContent = 'Eindscore docent: ' + evaluatieMoment.eindresultaat_score + '/20';
+        r.style.display = 'block';
+      }
+      document.getElementById('docentFeedbackLijst').innerHTML = beoordelingen.map(b => `
+        <div class="competentie-card">
+          <div class="competentie-header"><h3>${escape(b.competentie_naam)}</h3></div>
+          <p style="margin:6px 0 0 0;">${b.docent_feedback ? escape(b.docent_feedback) : '<span style="color:#9ca3af">(nog geen feedback)</span>'}</p>
         </div>`).join('');
     }
 
