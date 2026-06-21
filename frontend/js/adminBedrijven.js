@@ -8,6 +8,10 @@ function escape(tekst) {
   return div.innerHTML;
 }
 
+function esc(tekst) {
+  return "'" + String(tekst || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'") + "'";
+}
+
 async function laadBedrijven() {
   try {
     const antwoord = await fetch(API_URL + "/api/admin/bedrijven", {
@@ -45,7 +49,7 @@ async function laadBedrijven() {
           '<td style="padding:10px;">' + b.aantal_mentoren + '</td>' +
           '<td style="padding:10px;"><span style="color:' + kleur + ';font-weight:600;">' + status + '</span></td>' +
           '<td style="padding:10px;">' +
-            '<button class="btn btn--secundair" style="padding:4px 12px;font-size:0.85em;" onclick="openBewerkBedrijf(' + b.id + ', ' + JSON.stringify(escape(b.naam)) + ', ' + JSON.stringify(escape(b.adres || '')) + ', ' + JSON.stringify(escape(b.email || '')) + ', ' + JSON.stringify(escape(b.telefoon || '')) + ', ' + JSON.stringify(escape(b.contactpersoon || '')) + ', ' + (b.actief ? 'true' : 'false') + ')">Bewerken</button>' +
+            '<button class="btn btn--secundair" style="padding:4px 12px;font-size:0.85em;" onclick="openBewerkBedrijf(' + b.id + ', ' + esc(b.naam) + ', ' + esc(b.adres) + ', ' + esc(b.email) + ', ' + esc(b.telefoon) + ', ' + esc(b.contactpersoon) + ', ' + (b.actief ? 'true' : 'false') + ')">Bewerken</button>' +
           '</td>' +
         '</tr>';
     });

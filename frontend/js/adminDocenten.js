@@ -8,6 +8,10 @@ function escape(tekst) {
   return div.innerHTML;
 }
 
+function esc(tekst) {
+  return "'" + String(tekst || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'") + "'";
+}
+
 async function laadDocenten() {
   try {
     const antwoord = await fetch(API_URL + "/api/admin/docenten", {
@@ -29,6 +33,7 @@ async function laadDocenten() {
         '<th style="padding:10px;">Email</th>' +
         '<th style="padding:10px;">Vakgroep</th>' +
         '<th style="padding:10px;">Status</th>' +
+        '<th style="padding:10px;">Actie</th>' +
       '</tr></thead><tbody>';
 
     docenten.forEach(d => {
@@ -41,6 +46,9 @@ async function laadDocenten() {
           '<td style="padding:10px;">' + escape(d.email) + '</td>' +
           '<td style="padding:10px;">' + escape(d.vakgroep || "-") + '</td>' +
           '<td style="padding:10px;"><span style="color:' + kleur + ';font-weight:600;">' + status + '</span></td>' +
+          '<td style="padding:10px;">' +
+            '<button class="btn btn--secundair" style="padding:4px 12px;font-size:0.85em;" onclick="openBewerkDocent(' + d.id + ', ' + esc(d.voornaam) + ', ' + esc(d.achternaam) + ', ' + esc(d.email) + ', ' + (d.actief ? 'true' : 'false') + ', ' + esc(d.vakgroep) + ')">Bewerken</button>' +
+          '</td>' +
         '</tr>';
     });
 
@@ -60,3 +68,69 @@ async function laadDocenten() {
 }
 
 laadDocenten();
+
+/* ============================================================
+   BEWERK DOCENT
+   ============================================================ */
+
+function openBewerkDocent(id, voornaam, achternaam, email, actief, vakgroep) {
+  document.getElementById("bewerkDocentId").value = id;
+  document.getElementById("bewerkDocentVoornaam").value = voornaam;
+  document.getElementById("bewerkDocentAchternaam").value = achternaam;
+  document.getElementById("bewerkDocentEmail").value = email;
+  document.getElementById("bewerkDocentVakgroep").value = vakgroep;
+  document.getElementById("bewerkDocentMelding").className = "melding";
+  document.getElementById("bewerkDocentMelding").textContent = "";
+  document.getElementById("bewerkDocentModal").style.display = "flex";
+}
+
+function sluitBewerkDocent() {
+  document.getElementById("bewerkDocentModal").style.display = "none";
+}
+
+document.getElementById("bewerkDocentForm").addEventListener("submit", async function(e) {
+  e.preventDefault();
+
+  const id = document.getElementById("bewerkDocentId").value;
+  const voornaam = document.getElementById("bewerkDocentVoornaam").value.trim();
+  const achternaam = document.getElementById("bewerkDocentAchternaam").value.trim();
+  const email = document.getElementById("bewerkDocentEmail").value.trim();
+  const vakgroep = document.getElementById("bewerkDocentVakgroep").value.trim();
+  const melding = document.getElementById("bewerkDocentMelding");
+
+  if (!voornaam || !achternaam) {
+    melding.className = "melding melding--fout";
+    melding.textContent = "Naam is verplicht.";
+    return;
+  }
+
+  try {
+    const antwoord = await fetch(API_URL + "/api/admin/docenten/" + id, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      },
+      body: JSON.stringify({ voornaam, achternaam, email, actief: true, vakgroep })
+    });
+
+    const data = await antwoord.json().catch(() => ({}));
+
+    if (!antwoord.ok) {
+      melding.className = "melding melding--fout";
+      melding.textContent = data.fout || "Bewerken mislukt.";
+      return;
+    }
+
+    melding.className = "melding melding--succes";
+    melding.textContent = "Docent bijgewerkt!";
+    setTimeout(() => {
+      sluitBewerkDocent();
+      laadDocenten();
+    }, 1000);
+
+  } catch (fout) {
+    melding.className = "melding melding--fout";
+    melding.textContent = "Kan geen verbinding maken met de server.";
+  }
+});

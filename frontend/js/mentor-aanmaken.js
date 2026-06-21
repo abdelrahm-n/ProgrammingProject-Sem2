@@ -34,13 +34,19 @@ document.getElementById('mentorForm').addEventListener('submit', async function 
   }
 
   try {
-    const antwoord = await fetch(API_URL + '/api/admin/mentor-aanmaken', {
+    const antwoord = await fetch(API_URL + '/api/admin/gebruiker-aanmaken', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + token
       },
-      body: JSON.stringify({ voornaam, achternaam, wachtwoord, functie })
+      body: JSON.stringify({
+        voornaam: voornaam,
+        achternaam: achternaam,
+        wachtwoord: wachtwoord,
+        rol: 'stagementor',
+        extra: { functie: functie }
+      })
     })
 
     const data = await antwoord.json()

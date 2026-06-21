@@ -10,6 +10,10 @@ function escape(tekst) {
   return div.innerHTML;
 }
 
+function esc(tekst) {
+  return "'" + String(tekst || "").replace(/\\/g, "\\\\").replace(/'/g, "\\'") + "'";
+}
+
 async function laadBedrijven() {
   try {
     const antwoord = await fetch(API_URL + "/api/admin/bedrijven", {
@@ -60,7 +64,7 @@ async function laadMentoren() {
           '<td style="padding:10px;">' + escape(m.bedrijf_naam || "-") + '</td>' +
           '<td style="padding:10px;"><span style="color:' + kleur + ';font-weight:600;">' + status + '</span></td>' +
           '<td style="padding:10px;">' +
-            '<button class="btn btn--secundair" style="padding:4px 12px;font-size:0.85em;" onclick="openBewerk(' + m.id + ', ' + JSON.stringify(escape(m.functie || '')) + ', ' + (m.bedrijf_id || 'null') + ')">Bewerken</button> ' +
+            '<button class="btn btn--secundair" style="padding:4px 12px;font-size:0.85em;" onclick="openBewerk(' + m.id + ', ' + esc(m.functie) + ', ' + (m.bedrijf_id || 'null') + ')">Bewerken</button> ' +
           '</td>' +
         '</tr>';
     });
