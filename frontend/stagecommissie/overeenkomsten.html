@@ -30,12 +30,19 @@
       <main class="content-area">
         <section class="dashboard-card">
           <h1>Stageovereenkomsten</h1>
-          <p>Overeenkomsten die wachten op handtekening van de hogeschool.</p>
+          <p>Overzicht van alle stageovereenkomsten en hun ondertekeningstatus.</p>
         </section>
 
         <section class="dashboard-card">
-          <h2>Wachtend op handtekening</h2>
-          <div id="overeenkomstenLijst"></div>
+          <h2>Wacht op actie commissie</h2>
+          <p>Overeenkomsten waar de hogeschool nog moet ondertekenen.</p>
+          <div id="actiefLijst"></div>
+        </section>
+
+        <section class="dashboard-card">
+          <h2>Afgerond</h2>
+          <p>Overeenkomsten die volledig ondertekend en gevalideerd zijn.</p>
+          <div id="afgerondLijst"></div>
         </section>
       </main>
     </div>
@@ -46,37 +53,90 @@ const API_URL = 'http://localhost:3000';
 const token = localStorage.getItem('token');
 if (!token) window.location.href = '../index.html';
 
+const statusLabels = {
+  wacht_op_handtekeningen: { label: 'Wachtend', cls: 'badge--ingediend' },
+  volledig_getekend: { label: 'Volledig getekend', cls: 'badge--goedgekeurd' },
+  gevalideerd: { label: 'Gevalideerd', cls: 'badge--goedgekeurd' }
+};
+
+function tekenHandtekeningen(o) {
+  var parts = [];
+  parts.push('<span class="badge ' + (o.getekend_door_student ? 'badge--goedgekeurd' : 'badge--afgekeurd') + '">Student</span>');
+  parts.push('<span class="badge ' + (o.getekend_door_bedrijf ? 'badge--goedgekeurd' : 'badge--afgekeurd') + '">Bedrijf</span>');
+  parts.push('<span class="badge ' + (o.getekend_door_school ? 'badge--goedgekeurd' : 'badge--afgekeurd') + '">School</span>');
+  return parts.join(' ');
+}
+
+function bouwTabel(data) {
+  var html = '<table><thead><tr><th>Student</th><th>Bedrijf</th><th>Mentor</th><th>Periode</th><th>Handtekeningen</th><th>Actie</th></tr></thead><tbody>';
+  data.forEach(function(o) {
+    var naam = o.student_voornaam + ' ' + o.student_achternaam;
+    var mentor = o.mentor_voornaam ? o.mentor_voornaam + ' ' + o.mentor_achternaam : '-';
+    var periode = new Date(o.startdatum).toLocaleDateString('nl-BE') + ' - ' + new Date(o.einddatum).toLocaleDateString('nl-BE');
+    html += '<tr>';
+    html += '<td><strong>' + naam + '</strong></td>';
+    html += '<td>' + (o.bedrijf_naam || '-') + '</td>';
+    html += '<td>' + mentor + '</td>';
+    html += '<td>' + periode + '</td>';
+    html += '<td class="handtekeningen-cell">' + tekenHandtekeningen(o) + '</td>';
+    html += '<td><a href="stageovereenkomst.html?id=' + o.overeenkomst_id + '" class="btn btn--primair btn--sm">Bekijken</a></td>';
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  return html;
+}
+
+function bouwAfgerondTabel(data) {
+  var html = '<table><thead><tr><th>Student</th><th>Bedrijf</th><th>Periode</th><th>Status</th><th>Actie</th></tr></thead><tbody>';
+  data.forEach(function(o) {
+    var naam = o.student_voornaam + ' ' + o.student_achternaam;
+    var periode = new Date(o.startdatum).toLocaleDateString('nl-BE') + ' - ' + new Date(o.einddatum).toLocaleDateString('nl-BE');
+    var st = statusLabels[o.status] || { label: o.status, cls: '' };
+    html += '<tr>';
+    html += '<td><strong>' + naam + '</strong></td>';
+    html += '<td>' + (o.bedrijf_naam || '-') + '</td>';
+    html += '<td>' + periode + '</td>';
+    html += '<td><span class="badge ' + st.cls + '">' + st.label + '</span></td>';
+    html += '<td><a href="stageovereenkomst.html?id=' + o.overeenkomst_id + '" class="btn btn--primair btn--sm">Bekijk</a></td>';
+    html += '</tr>';
+  });
+  html += '</tbody></table>';
+  return html;
+}
+
 async function laadOvereenkomsten() {
   try {
-    const resp = await fetch(API_URL + '/api/stageovereenkomst/commissie/wachtend', {
+    var resp = await fetch(API_URL + '/api/stageovereenkomst/commissie/alle', {
       headers: { 'Authorization': 'Bearer ' + token }
     });
     if (resp.status === 401) { window.location.href = '../index.html'; return; }
-    const data = await resp.json();
-    const container = document.getElementById('overeenkomstenLijst');
+    var data = await resp.json();
+
+    var actiefContainer = document.getElementById('actiefLijst');
+    var afgerondContainer = document.getElementById('afgerondLijst');
 
     if (!data || data.length === 0) {
-      container.innerHTML = '<p>Geen overeenkomsten die op je handtekening wachten.</p>';
+      actiefContainer.innerHTML = '<p>Geen overeenkomsten gevonden.</p>';
+      afgerondContainer.innerHTML = '';
       return;
     }
 
-    let html = '<table><thead><tr><th>Student</th><th>Bedrijf</th><th>Mentor</th><th>Periode</th><th>Actie</th></tr></thead><tbody>';
-    data.forEach(function(o) {
-      var naam = o.student_voornaam + ' ' + o.student_achternaam;
-      var mentor = o.mentor_voornaam ? o.mentor_voornaam + ' ' + o.mentor_achternaam : '-';
-      var periode = new Date(o.startdatum).toLocaleDateString('nl-BE') + ' - ' + new Date(o.einddatum).toLocaleDateString('nl-BE');
-      html += '<tr>';
-      html += '<td>' + naam + '</td>';
-      html += '<td>' + (o.bedrijf_naam || '-') + '</td>';
-      html += '<td>' + mentor + '</td>';
-      html += '<td>' + periode + '</td>';
-      html += '<td><a href="stageovereenkomst.html?id=' + o.overeenkomst_id + '" class="btn btn--primair btn--sm">Ondertekenen</a></td>';
-      html += '</tr>';
-    });
-    html += '</tbody></table>';
-    container.innerHTML = html;
+    var actief = data.filter(function(o) { return !o.getekend_door_school; });
+    var afgerond = data.filter(function(o) { return o.getekend_door_school; });
+
+    if (actief.length === 0) {
+      actiefContainer.innerHTML = '<p>Geen overeenkomsten die op je actie wachten.</p>';
+    } else {
+      actiefContainer.innerHTML = bouwTabel(actief);
+    }
+
+    if (afgerond.length === 0) {
+      afgerondContainer.innerHTML = '<p>Geen afgeronde overeenkomsten.</p>';
+    } else {
+      afgerondContainer.innerHTML = bouwAfgerondTabel(afgerond);
+    }
   } catch (err) {
-    document.getElementById('overeenkomstenLijst').innerHTML = '<p>Fout bij laden.</p>';
+    document.getElementById('actiefLijst').innerHTML = '<p>Fout bij laden.</p>';
   }
 }
 
