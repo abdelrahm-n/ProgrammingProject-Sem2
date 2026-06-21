@@ -81,6 +81,14 @@ router.post('/gebruiker-aanmaken', controleerToken, isAdmin, async (req, res) =>
       return res.status(409).json({ fout: 'Dit e-mailadres is al in gebruik: ' + email })
     }
 
+    /* Studentnummer vooraf checken zodat een dubbel nummer geen half account achterlaat */
+    if (rol === 'student' && extra?.studentnummer) {
+      const [nr] = await db.query('SELECT persoon_id FROM student WHERE studentnummer = ?', [extra.studentnummer])
+      if (nr.length > 0) {
+        return res.status(409).json({ fout: 'Dit studentnummer is al in gebruik' })
+      }
+    }
+
     const hash = await bcrypt.hash(wachtwoord, 10)
 
     const [resultaat] = await db.query(

@@ -74,13 +74,19 @@ router.post('/', controleerToken, async (req, res) => {
     return res.status(400).json({ fout: 'Einddatum moet na de startdatum liggen' })
   }
 
-  /* Valideer dat de gebruiker een geldig studentprofiel heeft */
-  const [studentCheck] = await db.query(
-    'SELECT persoon_id FROM student WHERE persoon_id = ?',
-    [req.gebruiker.id]
-  )
+  /* Controleer of de ingelogde gebruiker nog bestaat en student is */
+  const [persoon] = await db.query('SELECT id, rol FROM persoon WHERE id = ?', [req.gebruiker.id])
+  if (persoon.length === 0) {
+    return res.status(401).json({ fout: 'Je sessie is verlopen. Log opnieuw in.' })
+  }
+  if (persoon[0].rol !== 'student') {
+    return res.status(403).json({ fout: 'Alleen studenten kunnen een stage indienen' })
+  }
+
+  /* Student-rij ontbreekt? Maak ze automatisch aan zodat indienen lukt */
+  const [studentCheck] = await db.query('SELECT persoon_id FROM student WHERE persoon_id = ?', [req.gebruiker.id])
   if (studentCheck.length === 0) {
-    return res.status(400).json({ fout: 'Je studentprofiel is niet gevonden. Neem contact op met de administrator.' })
+    await db.query('INSERT INTO student (persoon_id, studentnummer, opleiding_id) VALUES (?, NULL, 1)', [req.gebruiker.id])
   }
 
   try {
