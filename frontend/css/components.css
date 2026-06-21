@@ -63,7 +63,7 @@
 
 .actie-knoppen button,
 .actie-knoppen a {
-  min-width: 160px;
+  flex: 1;
   font-weight: 600;
   transition: all 0.2s ease;
 }
