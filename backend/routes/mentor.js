@@ -397,4 +397,69 @@ router.put('/evaluatie/:evaluatieId/score', controleerToken, isMentor, async (re
   }
 })
 
+
+
+/* GET /api/mentor/dashboard - gegevens voor dashboard mentor */
+router.get('/dashboard', controleerToken, isMentor, async (req, res) => {
+  try {
+    const [studenten] = await db.query(
+      `SELECT 
+          p.id AS student_id,
+          p.voornaam,
+          p.achternaam,
+          b.naam AS bedrijf,
+          lw.week_nummer,
+          lw.week_start,
+          ls.naam AS logboek_status
+       FROM stage s
+       JOIN persoon p ON s.student_id = p.id
+       JOIN bedrijf b ON s.bedrijf_id = b.id
+       LEFT JOIN logboek_week lw ON lw.id = (
+          SELECT lw2.id
+          FROM logboek_week lw2
+          WHERE lw2.stage_id = s.id
+          ORDER BY lw2.week_nummer DESC
+          LIMIT 1
+       )
+       LEFT JOIN logboek_status ls ON lw.status_id = ls.id
+       WHERE s.mentor_id = ? AND s.actief = TRUE
+       ORDER BY p.achternaam`,
+      [req.gebruiker.id]
+    )
+
+    const totaalStudenten = studenten.length
+
+    const inOrde = studenten.filter(
+      student => student.logboek_status === 'goedgekeurd'
+    ).length
+
+    const actieVereist = studenten.filter(
+      student => student.logboek_status !== 'goedgekeurd'
+    ).length
+
+    res.json({
+      studenten,
+      statistieken: {
+        totaalStudenten,
+        inOrde,
+        actieVereist
+      }
+    })
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ fout: 'Serverfout' })
+  }
+})
+
+
+
+
+
+
+
+
+
+
+
+
 export default router
