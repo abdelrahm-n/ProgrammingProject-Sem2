@@ -26,8 +26,13 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url))
 app.use(cors())
 app.use(express.json())
 
-// Frontend serveren zodat alles via http://localhost:3000 werkt
-app.use(express.static(path.join(__dirname, '../frontend')))
+// Frontend serveren zodat alles via http://localhost:3000 werkt.
+// Geen caching tijdens ontwikkeling, zodat je altijd de nieuwste HTML/JS/CSS krijgt.
+app.use(express.static(path.join(__dirname, '../frontend'), {
+  etag: false,
+  lastModified: false,
+  setHeaders: (res) => res.setHeader('Cache-Control', 'no-store')
+}))
 
 app.use('/api/auth',              authRoutes)
 app.use('/api/stages',            stagesRoutes)
