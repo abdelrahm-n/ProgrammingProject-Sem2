@@ -6,7 +6,17 @@
   <title>Stageplatform - Stagementor - Logboek Detail</title>
   <link rel="stylesheet" href="../css/stijl.css" />
   <link rel="stylesheet" href="../css/mentor.css" />
-  <link rel="stylesheet" href="../css/logboeken.css" />
+  <link rel="stylesheet" href="../css/button.css" />
+  <link rel="stylesheet" href="../css/components.css" />
+  <style>
+    .week-expand-row > td { padding: 0 !important; border: none !important; }
+    .week-expand-box { padding: 0; }
+    .day-card-inline { padding: 10px 0; border-bottom: 1px solid var(--color-border); }
+    .day-card-inline:last-child { border-bottom: none; }
+    .day-card-inline h4 { margin: 0 0 6px; font-size: 13px; color: var(--color-text-muted); }
+    .day-card-inline p { margin: 0 0 4px; font-size: 14px; }
+    .day-card-inline p:last-child { margin: 0; }
+  </style>
 </head>
 <body>
   <div id="app">
@@ -27,38 +37,18 @@
       <nav class="sidebar"></nav>
 
       <main class="content-area">
-        <div class="logboeken-panel">
-          <div class="logboeken-header">
-            <h1 id="studentName">Student</h1>
-            <div class="progress-info">
-              <div class="progress-item">
-                <span class="progress-label">Richting</span>
-                <span class="progress-value" id="studentStudy">-</span>
-              </div>
-              <div class="progress-item">
-                <span class="progress-label">Bedrijf</span>
-                <span class="progress-value" id="studentBedrijf">-</span>
-              </div>
-            </div>
+        <section class="dashboard-card">
+          <h1 id="studentName">Logboek</h1>
+          <div class="contract-info">
+            <p><strong>Opleiding:</strong> <span id="studentStudy">-</span></p>
+            <p><strong>Bedrijf:</strong> <span id="studentBedrijf">-</span></p>
           </div>
+        </section>
 
-          <div class="logboeken-table-container">
-            <table class="student-logboeken-table">
-              <thead>
-                <tr>
-                  <th>Week</th>
-                  <th>Logboeken</th>
-                  <th>Status</th>
-                  <th>Mentorfeedback</th>
-                  <th>Details</th>
-                </tr>
-              </thead>
-              <tbody id="weekBody">
-                <tr><td colspan="5">Laden...</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <section class="dashboard-card">
+          <h2>Weken</h2>
+          <div id="weekTabel"></div>
+        </section>
       </main>
     </div>
   </div>
@@ -69,59 +59,170 @@
     const token = localStorage.getItem('token') || '';
     const params = new URLSearchParams(window.location.search);
     const studentId = params.get('student');
-    const body = document.getElementById('weekBody');
 
-    function escape(t){ if(t==null) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+    var openWeekId = null;
 
-    const statusInfo = {
+    function escape(t){ if(t==null) return '(niet ingevuld)'; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+    function toonDatum(w){ return w ? new Date(w).toLocaleDateString('nl-BE', { weekday:'long', day:'numeric', month:'long' }) : '-'; }
+
+    const statusLabels = {
       goedgekeurd: { klasse: 'badge badge--goedgekeurd', tekst: 'Goedgekeurd' },
-      ingediend:   { klasse: 'badge badge--actief',      tekst: 'Ingediend' },
-      open:        { klasse: 'badge badge--actief',      tekst: 'Ingediend' }
+      ingediend:   { klasse: 'badge badge--ingediend',   tekst: 'Ingediend' },
+      open:        { klasse: 'badge badge--actief',      tekst: 'Open' }
     };
 
-    (async function () {
-      let data;
+    async function openWeek(linkEl, weekId) {
+      var weekRow = linkEl.closest('tr');
+
+      if (openWeekId === weekId) {
+        var existing = weekRow.parentNode.querySelector('.week-expand-row[data-week-expand="' + weekId + '"]');
+        if (existing) existing.remove();
+        openWeekId = null;
+        return;
+      }
+
+      var prevExpand = weekRow.parentNode.querySelector('.week-expand-row[data-week-expand]');
+      if (prevExpand) prevExpand.remove();
+      openWeekId = weekId;
+
+      var expandRow = document.createElement('tr');
+      expandRow.className = 'week-expand-row';
+      expandRow.setAttribute('data-week-expand', weekId);
+      expandRow.innerHTML = '<td colspan="5"><div class="week-expand-box"><p style="padding:8px 0;">Laden...</p></div></td>';
+      weekRow.parentNode.insertBefore(expandRow, weekRow.nextSibling);
+
       try {
-        const res = await fetch(API_URL + '/api/logboeken/student/' + studentId, {
+        var resp = await fetch(API_URL + '/api/logboeken/student/' + studentId, {
           headers: { 'Authorization': 'Bearer ' + token }
         });
-        if (!res.ok) throw new Error('niet ok');
-        data = await res.json();
+        if (!resp.ok) { expandRow.querySelector('.week-expand-box').innerHTML = '<p>Kon logboek niet laden.</p>'; return; }
+        var data = await resp.json();
+
+        var week = (data.weken || []).find(function(w) { return String(w.id) === String(weekId); });
+        if (!week) {
+          expandRow.querySelector('.week-expand-box').innerHTML = '<p>Week niet gevonden.</p>';
+          return;
+        }
+
+        var html = '';
+
+        if (week.dagen && week.dagen.length) {
+          week.dagen.forEach(function(d) {
+            html += '<div class="day-card-inline">';
+            html += '<h4>' + toonDatum(d.datum) + '</h4>';
+            html += '<p><strong>Taken:</strong> ' + escape(d.uitgevoerde_taken) + '</p>';
+            html += '<p><strong>Reflectie:</strong> ' + escape(d.reflectie) + '</p>';
+            html += '<p><strong>Leerpunten:</strong> ' + escape(d.problemen_leerpunten) + '</p>';
+            html += '</div>';
+          });
+        } else {
+          html += '<p>Geen dagen ingevuld.</p>';
+        }
+
+        var approveChecked = week.status === 'goedgekeurd' ? ' checked' : '';
+
+        html += '<div style="padding-top:12px; border-top:1px solid var(--color-border); margin-top:8px;">';
+        html += '<div style="display:flex; gap:16px; margin-bottom:10px;">';
+        html += '<label style="font-weight:600; cursor:pointer; font-size:14px;"><input type="radio" name="mentorDecision_' + weekId + '" value="goedgekeurd"' + approveChecked + '> Goedgekeurd</label>';
+        html += '<label style="font-weight:600; cursor:pointer; font-size:14px;"><input type="radio" name="mentorDecision_' + weekId + '" value="open"' + (!approveChecked ? ' checked' : '') + '> Terug naar student</label>';
+        html += '</div>';
+        html += '<textarea id="feedback_' + weekId + '" rows="2" placeholder="Feedback..." style="width:100%; padding:8px; border:1px solid var(--color-border); border-radius:var(--radius-sm); font-size:13px; margin-bottom:8px;">' + escape(week.feedback_mentor) + '</textarea>';
+        html += '<button class="btn btn--primair btn--sm" onclick="dienWeekIn(' + weekId + ', this);">Indienen</button>';
+        html += '<p id="weekFout_' + weekId + '" style="color:#990018; display:none; margin:8px 0 0;"></p>';
+        html += '</div>';
+
+        expandRow.querySelector('.week-expand-box').innerHTML = html;
+      } catch (err) {
+        expandRow.querySelector('.week-expand-box').innerHTML = '<p>Fout bij laden.</p>';
+      }
+    }
+
+    async function dienWeekIn(weekId, btnEl) {
+      var foutEl = document.getElementById('weekFout_' + weekId);
+      foutEl.style.display = 'none';
+      var radios = document.getElementsByName('mentorDecision_' + weekId);
+      var status = null;
+      radios.forEach(function(r) { if (r.checked) status = r.value; });
+
+      if (!status) {
+        foutEl.textContent = 'Kies een beoordeling.';
+        foutEl.style.display = 'block';
+        return;
+      }
+
+      btnEl.disabled = true;
+      btnEl.textContent = 'Bezig...';
+
+      try {
+        var res = await fetch(API_URL + '/api/logboeken/week/' + weekId + '/feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+          body: JSON.stringify({ feedback: document.getElementById('feedback_' + weekId).value, status: status })
+        });
+        var r = await res.json();
+        if (!res.ok) { foutEl.textContent = r.fout || 'Opslaan mislukt.'; foutEl.style.display = 'block'; btnEl.disabled = false; btnEl.textContent = 'Indienen'; return; }
+        location.reload();
       } catch (e) {
-        body.innerHTML = '<tr><td colspan="5">Kon logboek niet laden.</td></tr>';
+        foutEl.textContent = 'Kan geen verbinding maken met de server.';
+        foutEl.style.display = 'block';
+        btnEl.disabled = false;
+        btnEl.textContent = 'Indienen';
+      }
+    }
+
+    async function laadDetail() {
+      if (!studentId) {
+        document.getElementById('weekTabel').innerHTML = '<p>Geen student ID.</p>';
         return;
       }
 
-      if (data.student) {
-        document.getElementById('studentName').textContent = data.student.voornaam + ' ' + data.student.achternaam;
-        document.getElementById('studentStudy').textContent = data.student.opleiding || '-';
-      }
-      if (data.stage) {
-        document.getElementById('studentBedrijf').textContent = data.stage.bedrijf || '-';
-      }
+      try {
+        var resp = await fetch(API_URL + '/api/logboeken/student/' + studentId, {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (!resp.ok) { document.getElementById('weekTabel').innerHTML = '<p>Kon logboek niet laden.</p>'; return; }
+        var data = await resp.json();
 
-      const weken = data.weken || [];
-      if (!weken.length) {
-        body.innerHTML = '<tr><td colspan="5">Nog geen logboeken ingevuld.</td></tr>';
-        return;
-      }
+        if (data.student) {
+          document.getElementById('studentName').textContent = 'Logboek ' + data.student.voornaam + ' ' + data.student.achternaam;
+          document.getElementById('studentStudy').textContent = data.student.opleiding || '-';
+        }
+        if (data.stage) {
+          document.getElementById('studentBedrijf').textContent = data.stage.bedrijf || '-';
+        }
 
-      const dagenPerWeek = 5;
-      weken.reverse();
-      body.innerHTML = '';
-      weken.forEach(week => {
-        const info = statusInfo[week.status] || statusInfo.open;
-        const weekUniek = week.dagen ? [...new Set(week.dagen.map(d => d.datum))].length : 0;
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td><span class="week-badge">Week ${week.week_nummer}</span></td>
-          <td>${weekUniek} / ${dagenPerWeek}</td>
-          <td><span class="${info.klasse}">${info.tekst}</span></td>
-          <td><span class="feedback-text">${escape(week.feedback_mentor) || '-'}</span></td>
-          <td><a class="details-link" href="logboek-week.html?student=${studentId}&week=${week.id}">Bekijken</a></td>`;
-        body.appendChild(tr);
-      });
-    })();
+        var weken = data.weken || [];
+        if (!weken.length) {
+          document.getElementById('weekTabel').innerHTML = '<p>Nog geen logboeken ingevuld.</p>';
+          return;
+        }
+
+        var dagenPerWeek = 5;
+        var html = '<table><thead><tr>';
+        html += '<th>Week</th><th>Dagen</th><th>Status</th><th>Feedback</th><th>Actie</th>';
+        html += '</tr></thead><tbody>';
+
+        weken.reverse().forEach(function(week) {
+          var info = statusLabels[week.status] || statusLabels.open;
+          var weekUniek = week.dagen ? week.dagen.length : 0;
+
+          html += '<tr data-week-id="' + week.id + '">';
+          html += '<td><strong>Week ' + week.week_nummer + '</strong></td>';
+          html += '<td>' + weekUniek + ' / ' + dagenPerWeek + '</td>';
+          html += '<td><span class="' + info.klasse + '">' + info.tekst + '</span></td>';
+          html += '<td>' + escape(week.feedback_mentor) + '</td>';
+          html += '<td><a href="#" class="btn btn--primair btn--sm" onclick="openWeek(this, ' + week.id + '); return false;">Bekijk</a></td>';
+          html += '</tr>';
+        });
+
+        html += '</tbody></table>';
+        document.getElementById('weekTabel').innerHTML = html;
+      } catch (err) {
+        document.getElementById('weekTabel').innerHTML = '<p>Fout bij laden.</p>';
+      }
+    }
+
+    laadDetail();
   </script>
 </body>
 </html>
