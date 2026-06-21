@@ -18,7 +18,8 @@ var origineleFetch = window.fetch
 window.fetch = function () {
   return origineleFetch.apply(this, arguments).then(function (antwoord) {
     if (antwoord && (antwoord.status === 401 || antwoord.status === 403)) {
-      localStorage.clear()
+      window.__sessionLost = true
+      localStorage.removeItem('token')
       window.location.href = rootPad
     }
     return antwoord
