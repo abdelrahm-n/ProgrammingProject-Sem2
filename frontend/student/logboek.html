@@ -203,6 +203,8 @@
       }
 
       stagedata = data.stage;
+      competentielijst = data.competenties || [];
+      bouwCompetentieKnoppen();
 
       /* Datum-input beperken tot stageperiode + weekends blokkeren */
       var datumInput = document.getElementById('datumInput');
