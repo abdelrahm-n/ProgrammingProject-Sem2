@@ -126,8 +126,51 @@
     };
 
     let stagedata = null;
+    let competentielijst = [];
+    let geselecteerdeCompetenties = new Set();
 
     const tableBody = document.getElementById('logboekTableBody');
+
+    /* Korte LO-label afleiden uit de competentienaam ("LO1 - ..." -> "LO1") */
+    function loLabel(naam) {
+      if (!naam) return '';
+      return String(naam).split(/\s*-\s*/)[0].trim();
+    }
+
+    /* Badges met de gekoppelde competenties van een dag */
+    function competentieBadges(comps) {
+      if (!comps || !comps.length) return '';
+      return '<div class="lo-badges">' + comps.map(function (c) {
+        return '<span class="lo-badge" title="' + escape(c.naam) + '">' + escape(loLabel(c.naam)) + '</span>';
+      }).join('') + '</div>';
+    }
+
+    /* Keuzeknoppen voor competenties in de modal opbouwen */
+    function bouwCompetentieKnoppen() {
+      const houder = document.getElementById('competentieKnoppen');
+      if (!houder) return;
+      if (!competentielijst.length) {
+        houder.innerHTML = '<p style="color:#64748b;margin:0;">Geen competenties beschikbaar.</p>';
+        return;
+      }
+      houder.innerHTML = competentielijst.map(function (c) {
+        const actief = geselecteerdeCompetenties.has(c.id) ? ' actief' : '';
+        return '<button type="button" class="competentie-knop' + actief + '" data-id="' + c.id +
+          '" title="' + escape(c.naam) + '">' + escape(loLabel(c.naam)) + '</button>';
+      }).join('');
+      houder.querySelectorAll('.competentie-knop').forEach(function (knop) {
+        knop.addEventListener('click', function () {
+          const id = Number(knop.dataset.id);
+          if (geselecteerdeCompetenties.has(id)) {
+            geselecteerdeCompetenties.delete(id);
+            knop.classList.remove('actief');
+          } else {
+            geselecteerdeCompetenties.add(id);
+            knop.classList.add('actief');
+          }
+        });
+      });
+    }
 
     function toonDatum(waarde) {
       if (!waarde) return '-';
