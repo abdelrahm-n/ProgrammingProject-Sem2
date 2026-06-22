@@ -62,6 +62,7 @@ var sidebarConfig = {
     { bestand: 'mentoren.html',       label: 'Mentoren' },
     { bestand: 'bedrijven.html',      label: 'Bedrijven' },
     { bestand: 'stages.html',         label: 'Stages' },
+    { bestand: 'competenties.html',   label: 'Competenties' },
     { bestand: 'documenten.html',     label: 'Documenten' }
   ]
 }

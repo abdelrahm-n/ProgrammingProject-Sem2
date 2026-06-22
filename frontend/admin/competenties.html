@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stageplatform - Admin - Competenties</title>
+  <link rel="stylesheet" href="../css/stijl.css" />
+  <link rel="stylesheet" href="../css/admin.css" />
+</head>
+<body>
+
+  <div id="app">
+    <header class="header">
+      <div class="header-logo">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+        </svg>
+        <span class="header-logo-text">Stageplatform</span>
+      </div>
+      <div class="header-actions">
+        <span class="header-rol-badge">Admin</span>
+        <button class="btn-terug" onclick="window.location.href='../index.html'">Terug</button>
+      </div>
+    </header>
+
+    <div class="app-body">
+      <nav class="sidebar"></nav>
+
+      <main class="content-area">
+
+        <section class="dashboard-welcome">
+          <h1>Competenties</h1>
+        </section>
+
+        <section class="dashboard-card">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;margin-bottom:16px;">
+            <div style="display:flex;gap:8px;align-items:center;">
+              <label for="opleidingSelect" style="font-weight:600;">Opleiding</label>
+              <select id="opleidingSelect" style="padding:8px 12px;border:1px solid #D8D8D8;border-radius:4px;"></select>
+            </div>
+            <button class="btn btn--primair" onclick="openNieuw()">+ Nieuwe competentie</button>
+          </div>
+          <p style="color:#64748b;margin:0 0 12px;">Het gewicht (1 t/m 5) bepaalt hoe zwaar een competentie meetelt. Samen vormen ze 100% van de eindscore.</p>
+          <div id="comp-lijst"></div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Modal nieuw/bewerken -->
+  <div id="compModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;justify-content:center;align-items:center;">
+    <div style="background:white;border-radius:8px;padding:24px;max-width:520px;width:92%;max-height:90vh;overflow:auto;">
+      <h3 id="modalTitel" style="margin-top:0;">Nieuwe competentie</h3>
+      <form id="compForm" class="formulier" novalidate>
+        <input type="hidden" id="compId" />
+        <div class="form-group">
+          <label for="naam">Naam</label>
+          <input type="text" id="naam" placeholder="LO1 - Beheersing van het planningsproces" required />
+        </div>
+        <div class="form-group">
+          <label for="beschrijving">Omschrijving</label>
+          <textarea id="beschrijving" rows="2" placeholder="Korte omschrijving van de competentie"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="gewicht">Gewicht (1 = laag, 5 = hoog)</label>
+          <select id="gewicht">
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3" selected>3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="rubric_volledig">Rubriek - sterk (5)</label>
+          <textarea id="rubric_volledig" rows="2"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="rubric_goed">Rubriek - goed (3)</label>
+          <textarea id="rubric_goed" rows="2"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="rubric_onvoldoende">Rubriek - onvoldoende (1)</label>
+          <textarea id="rubric_onvoldoende" rows="2"></textarea>
+        </div>
+        <p id="compMelding" class="melding"></p>
+        <div class="form-acties">
+          <button type="submit" class="btn btn--primair">Opslaan</button>
+          <button type="button" class="btn btn--secundair" onclick="sluitModal()">Annuleren</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="../js/nav.js"></script>
+  <script>
+    const API_URL = "http://localhost:3000";
+    const token = localStorage.getItem("token") || "";
+    let competenties = [];
+
+    function escape(t){ if(t==null) return ""; const d=document.createElement("div"); d.textContent=t; return d.innerHTML; }
+
+    async function laadOpleidingen() {
+      const res = await fetch(API_URL + "/api/admin/opleidingen", { headers: { "Authorization": "Bearer " + token } });
+      if (!res.ok) return;
+      const opleidingen = await res.json();
+      const sel = document.getElementById("opleidingSelect");
+      sel.innerHTML = "";
+      opleidingen.forEach(o => {
+        const opt = document.createElement("option");
+        opt.value = o.id;
+        opt.textContent = o.naam + (o.afkorting ? " (" + o.afkorting + ")" : "");
+        sel.appendChild(opt);
+      });
+      sel.addEventListener("change", laadCompetenties);
+      laadCompetenties();
+    }
+
+    async function laadCompetenties() {
+      const opleidingId = document.getElementById("opleidingSelect").value;
+      const lijst = document.getElementById("comp-lijst");
+      const res = await fetch(API_URL + "/api/competenties?opleiding_id=" + opleidingId, { headers: { "Authorization": "Bearer " + token } });
+      if (!res.ok) { lijst.innerHTML = "<p>Kan competenties niet laden.</p>"; return; }
+      competenties = await res.json();
+
+      if (competenties.length === 0) {
+        lijst.innerHTML = "<p>Nog geen competenties voor deze opleiding. Voeg er een toe.</p>";
+        return;
+      }
+
+      const totaalGewicht = competenties.reduce((s, c) => s + Number(c.gewicht || 0), 0);
+
+      let html = '<table class="aanvraag-tabel" style="width:100%;border-collapse:collapse;">' +
+        '<thead><tr style="border-bottom:2px solid #e2e8f0;text-align:left;">' +
+        '<th style="padding:10px;">Competentie</th>' +
+        '<th style="padding:10px;">Gewicht</th>' +
+        '<th style="padding:10px;">Aandeel</th>' +
+        '<th style="padding:10px;">Acties</th>' +
+        '</tr></thead><tbody>';
+
+      competenties.forEach(c => {
+        const pct = totaalGewicht > 0 ? Math.round(Number(c.gewicht) / totaalGewicht * 100) : 0;
+        html += '<tr style="border-bottom:1px solid #e2e8f0;">' +
+          '<td style="padding:10px;"><strong>' + escape(c.naam) + '</strong><br><span style="color:#64748b;font-size:0.9em;">' + escape(c.beschrijving || "") + '</span></td>' +
+          '<td style="padding:10px;">' + escape(c.gewicht) + '</td>' +
+          '<td style="padding:10px;">' + pct + '%</td>' +
+          '<td style="padding:10px;white-space:nowrap;">' +
+            '<button class="btn btn--secundair" style="padding:4px 10px;font-size:0.8em;" onclick="openBewerk(' + c.id + ')">Bewerken</button> ' +
+            '<button class="btn btn--secundair" style="padding:4px 10px;font-size:0.8em;color:#990018;" onclick="verwijder(' + c.id + ')">Verwijderen</button>' +
+          '</td></tr>';
+      });
+
+      html += '</tbody></table>';
+      html += '<p style="margin-top:12px;font-weight:600;">Totaal gewicht: ' + totaalGewicht + ' = 100% van de eindscore</p>';
+      lijst.innerHTML = html;
+    }
+
+    function openNieuw() {
+      document.getElementById("modalTitel").textContent = "Nieuwe competentie";
+      document.getElementById("compForm").reset();
+      document.getElementById("compId").value = "";
+      document.getElementById("gewicht").value = "3";
+      document.getElementById("compMelding").textContent = "";
+      document.getElementById("compModal").style.display = "flex";
+    }
+
+    function openBewerk(id) {
+      const c = competenties.find(x => x.id === id);
+      if (!c) return;
+      document.getElementById("modalTitel").textContent = "Competentie bewerken";
+      document.getElementById("compId").value = c.id;
+      document.getElementById("naam").value = c.naam || "";
+      document.getElementById("beschrijving").value = c.beschrijving || "";
+      document.getElementById("gewicht").value = String(c.gewicht || 3);
+      document.getElementById("rubric_volledig").value = c.rubric_volledig || "";
+      document.getElementById("rubric_goed").value = c.rubric_goed || "";
+      document.getElementById("rubric_onvoldoende").value = c.rubric_onvoldoende || "";
+      document.getElementById("compMelding").textContent = "";
+      document.getElementById("compModal").style.display = "flex";
+    }
+
+    function sluitModal() { document.getElementById("compModal").style.display = "none"; }
+
+    document.getElementById("compForm").addEventListener("submit", async function(e) {
+      e.preventDefault();
+      const id = document.getElementById("compId").value;
+      const melding = document.getElementById("compMelding");
+      const body = {
+        naam: document.getElementById("naam").value.trim(),
+        beschrijving: document.getElementById("beschrijving").value.trim(),
+        gewicht: Number(document.getElementById("gewicht").value),
+        rubric_volledig: document.getElementById("rubric_volledig").value.trim(),
+        rubric_goed: document.getElementById("rubric_goed").value.trim(),
+        rubric_onvoldoende: document.getElementById("rubric_onvoldoende").value.trim()
+      };
+      if (!body.naam) { melding.className = "melding melding--fout"; melding.textContent = "Naam is verplicht."; return; }
+
+      let res;
+      if (id) {
+        res = await fetch(API_URL + "/api/competenties/" + id, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+          body: JSON.stringify(body)
+        });
+      } else {
+        body.opleiding_id = Number(document.getElementById("opleidingSelect").value);
+        res = await fetch(API_URL + "/api/competenties", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+          body: JSON.stringify(body)
+        });
+      }
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) { melding.className = "melding melding--fout"; melding.textContent = data.fout || "Opslaan mislukt."; return; }
+      sluitModal();
+      laadCompetenties();
+    });
+
+    async function verwijder(id) {
+      if (!confirm("Deze competentie verwijderen?")) return;
+      const res = await fetch(API_URL + "/api/competenties/" + id, {
+        method: "DELETE",
+        headers: { "Authorization": "Bearer " + token }
+      });
+      if (res.ok) laadCompetenties();
+    }
+
+    laadOpleidingen();
+  </script>
+
+</body>
+</html>
