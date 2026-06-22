@@ -83,11 +83,13 @@ if (sidebar) {
 
   if (links) {
     var huidigePagina = window.location.pathname.split('/').pop() || 'dashboard.html'
+    var huidigePaginaVol = huidigePagina + window.location.search
     var html = ''
 
     for (var i = 0; i < links.length; i++) {
       var link = links[i]
-      var actief = link.bestand === huidigePagina ? ' actief' : ''
+      /* Vergelijk inclusief query (?fase=...) zodat tussentijds/eind apart oplichten */
+      var actief = (link.bestand === huidigePaginaVol || link.bestand === huidigePagina) ? ' actief' : ''
       html += '<a href="' + link.bestand + '" class="nav-item' + actief + '">' + link.label + '</a>'
     }
 
