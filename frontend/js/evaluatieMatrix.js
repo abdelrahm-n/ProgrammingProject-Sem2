@@ -33,18 +33,44 @@ function veldNamen() {
   return { score: null, comment: null }
 }
 
+/* Zijn alle competenties voor een bepaalde rol-kolom al ingevuld? */
+function alleIngevuld(veld) {
+  return beoordelingen.length > 0 && beoordelingen.every(b => b[veld] != null)
+}
+
+/* Reden waarom de ingelogde rol (nog) niet mag invullen, of null als het mag.
+   Volgorde: eerst de student, dan de mentor, dan de docent. */
+function bewerkBlokkade() {
+  if (!momentId) return 'Er is nog geen evaluatie aangemaakt.'
+  if (fase === 'eind' && !eindOntgrendeld()) {
+    return 'De eindevaluatie is vergrendeld tot het einde van je stage' +
+      (stageEinddatum ? ' (' + new Date(stageEinddatum).toLocaleDateString('nl-BE') + ')' : '') + '.'
+  }
+  if (dbRol === 'student') return null
+  if (dbRol === 'stagementor') {
+    return alleIngevuld('student_score') ? null : 'Wacht tot de student de evaluatie heeft ingevuld.'
+  }
+  if (dbRol === 'docent') {
+    return alleIngevuld('mentor_score') ? null : 'Wacht tot de mentor de evaluatie heeft ingevuld.'
+  }
+  return 'Geen toegang.'
+}
+
 /* Mag de ingelogde rol nog invullen in deze fase? */
 function magBewerken() {
-  if (!momentId) return false
-  if (fase === 'eind' && !eindOntgrendeld()) return false
-  return ['student', 'stagementor', 'docent'].includes(dbRol)
+  return bewerkBlokkade() === null
 }
 
 function eindOntgrendeld() {
   /* Mentor en docent kunnen invullen zodra de eindevaluatie bestaat */
   if (dbRol !== 'student') return true
   if (!stageEinddatum) return false
-  return new Date() >= new Date(stageEinddatum)
+  /* De student vult de eindevaluatie in op de laatste dag(en) van de stage:
+     vanaf de dag vóór de einddatum tot en met de einddatum. */
+  const eind = new Date(stageEinddatum)
+  const drempel = new Date(eind)
+  drempel.setDate(eind.getDate() - 1)
+  return new Date() >= drempel
 }
 
 function typeNaamVoorFase(f) {
@@ -189,12 +215,17 @@ function render() {
   const v = veldNamen()
   const ingevuld = beoordelingen.filter(b => b[v.score] != null).length
 
-  /* Kop: voortgang + indienen */
+  /* Kop: voortgang + indienen, of uitleg waarom je (nog) niet mag invullen */
   if (magBewerken()) {
     html += `<div style="display:flex;align-items:center;gap:14px;margin-bottom:12px">
       <strong>${ingevuld}/${beoordelingen.length}</strong> <span style="color:#64748b">competenties ingevuld</span>
       <button class="btn btn--primair btn--sm" ${ingevuld < beoordelingen.length ? 'disabled' : ''} onclick="dienIn()">Indienen</button>
     </div>`
+  } else {
+    const reden = bewerkBlokkade()
+    if (reden) {
+      html += `<div style="background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:10px;padding:10px 14px;margin-bottom:12px">${esc(reden)} Je kunt de scores hieronder wel al bekijken.</div>`
+    }
   }
 
   /* Legende */
