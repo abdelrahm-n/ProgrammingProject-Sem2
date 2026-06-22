@@ -127,6 +127,12 @@
             html += '<p><strong>Reflectie:</strong> ' + escape(d.reflectie) + '</p>';
             html += '<p><strong>Leerpunten:</strong> ' + escape(d.problemen_leerpunten) + '</p>';
 
+            if (d.competenties && d.competenties.length) {
+              html += '<p style="margin-top:6px;">' + d.competenties.map(function(c) {
+                return '<span class="lo-badge">' + escape(String(c.naam).split(/\s*-\s*/)[0].trim()) + '</span>';
+              }).join(' ') + '</p>';
+            }
+
             if (d.feedback && d.feedback.length) {
               d.feedback.forEach(function(f) {
                 html += '<p style="margin-top:6px;"><em>' + escape(f.voornaam + ' ' + f.achternaam) + ' (' + escape(f.rol) + '):</em> ' + escape(f.feedback) + '</p>';
