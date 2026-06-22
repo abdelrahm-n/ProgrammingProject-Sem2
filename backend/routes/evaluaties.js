@@ -156,7 +156,7 @@ router.get('/:id/beoordelingen', controleerToken, async (req, res) => {
        FROM competentie_beoordeling cb
        JOIN competentie c ON cb.competentie_id = c.id
        WHERE cb.evaluatie_moment_id = ?
-       ORDER BY c.naam`,
+       ORDER BY c.id`,
       [req.params.id]
     )
     res.json(rijen)

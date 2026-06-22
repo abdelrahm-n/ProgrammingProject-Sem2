@@ -13,7 +13,7 @@ router.get('/', controleerToken, async (req, res) => {
       sql += ' AND opleiding_id = ?'
       params.push(req.query.opleiding_id)
     }
-    sql += ' ORDER BY naam'
+    sql += ' ORDER BY id'
     const [rijen] = await db.query(sql, params)
     res.json(rijen)
   } catch (err) {
