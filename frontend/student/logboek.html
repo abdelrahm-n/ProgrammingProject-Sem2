@@ -380,6 +380,8 @@
         }
         modal.classList.add('hidden');
         e.target.reset();
+        geselecteerdeCompetenties.clear();
+        bouwCompetentieKnoppen();
         laadLogboek();
       } catch (err) {
         fout.textContent = 'Kan geen verbinding maken met de server.';
