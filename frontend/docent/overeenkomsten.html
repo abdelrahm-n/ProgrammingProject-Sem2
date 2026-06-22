@@ -69,3 +69,16 @@
       const cls = getekend ? 'badge--goedgekeurd' : 'badge--afgekeurd';
       return '<span class="badge ' + cls + '">' + label + '</span>';
     }
+
+    function resultaat(o) {
+      const volledig = o.getekend_door_student && o.getekend_door_bedrijf && o.getekend_door_school;
+      if (o.gevalideerd_op || o.status === 'gevalideerd') {
+        return '<span class="badge badge--goedgekeurd">Gelukt - stage actief</span>';
+      }
+      if (volledig) {
+        return '<span class="badge badge--goedgekeurd">Volledig getekend</span>';
+      }
+      return '<span class="badge badge--ingediend">In behandeling</span>';
+    }
+
+    function bouwTabel(data) {
