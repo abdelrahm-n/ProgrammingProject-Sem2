@@ -296,6 +296,7 @@
                 <div><em>Taken:</em> ${escape(d.uitgevoerde_taken)}</div>
                 <div><em>Reflectie:</em> ${escape(d.reflectie) || '-'}</div>
                 <div><em>Problemen:</em> ${escape(d.problemen_leerpunten) || '-'}</div>
+                ${competentieBadges(d.competenties)}
               </div>`).join('')
           : '<p>Geen dagen in deze week.</p>';
 
