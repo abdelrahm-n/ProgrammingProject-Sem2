@@ -12,27 +12,21 @@
   <div class="login-wrapper">
     <div class="login-kaart">
 
-      <a href="index.html" class="login-terug">← Andere rol kiezen</a>
-
       <h1 id="loginTitel">Inloggen</h1>
-      <p class="login-subtitel">EhB – Stageplatform</p>
+      <p class="login-subtitel">EhB - Stageplatform</p>
 
       <form id="loginForm" novalidate>
 
         <div class="form-group">
-          <label for="gebruikersnaam">Gebruikersnaam</label>
-          <div class="email-wrapper">
-            <input
-              type="text"
-              id="gebruikersnaam"
-              name="gebruikersnaam"
-              placeholder="voornaam.achternaam"
-              autocomplete="username"
-              required
-            />
-            <span class="email-domein" id="emailDomein">@student.ehb.be</span>
-          </div>
-          <small>Formaat: voornaam.achternaam<span id="domeinHint">@student.ehb.be</span></small>
+          <label for="email">E-mailadres</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="voornaam.achternaam@student.ehb.be"
+            autocomplete="username"
+            required
+          />
         </div>
 
         <div class="form-group">
@@ -58,8 +52,6 @@
         <p id="foutmelding" class="melding melding--fout" hidden></p>
 
         <button type="submit" class="btn btn--primair btn--login">Inloggen</button>
-
-        <button type="button" id="devLoginBtn" class="btn btn--secundair btn--dev-login">Dev-login (geen wachtwoord)</button>
 
         <button type="button" id="vergetenBtn" style="background:none;border:none;color:#8B0015;text-decoration:underline;cursor:pointer;margin-top:12px;font-size:0.9em;">Wachtwoord vergeten?</button>
         <p id="resetMelding" class="melding" hidden></p>

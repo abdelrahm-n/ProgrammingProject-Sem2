@@ -79,6 +79,20 @@ INSERT INTO stagecommissielid (persoon_id, commissie_rol) VALUES
 INSERT INTO administratie (persoon_id, dienst) VALUES
 (13, 'Stagedienst');
 
+-- Eenvoudige demo-accounts (1 per rol), wachtwoord demo123, elk met een eigen bcrypt-zout
+INSERT INTO persoon (id, voornaam, achternaam, email, wachtwoord_hash, rol, actief) VALUES
+(14, 'Demo', 'Admin',     'admin@admin.ehb.be',         '$2a$10$wtIF66NXxSQgagpEAgQ9zOnXvLNmXYznQnu208/sIgzDxOVA72lXu', 'admin',          TRUE),
+(15, 'Demo', 'Student',   'student@student.ehb.be',     '$2a$10$FtFTjnKh.12hBNfiXXuWrOsrwpQXhsWhn5l9dblOrP.Cy9eaXCpMS', 'student',        TRUE),
+(16, 'Demo', 'Docent',    'docent@docent.ehb.be',       '$2a$10$bRCU2W1t/xFo15MdUnaaC.cYv6tV.8vsQZWFaWEKHeuSu4xH.SagG', 'docent',         TRUE),
+(17, 'Demo', 'Mentor',    'mentor@mentor.ehb.be',       '$2a$10$ilqD9VZwVigln8AOmTRf5.gRBEH/XytuZSNgYt.vI/qujWuVJSKre', 'stagementor',    TRUE),
+(18, 'Demo', 'Commissie', 'commissie@commissie.ehb.be', '$2a$10$jlfYMfcyiymMdZEC1aH63uq3U4ASnXRTDu0LDmk78nJb9505K7nFq', 'stagecommissie', TRUE);
+
+INSERT INTO student (persoon_id, studentnummer, opleiding_id) VALUES (15, 'r9000001', 1);
+INSERT INTO docent (persoon_id, vakgroep) VALUES (16, 'Toegepaste Informatica');
+INSERT INTO stagementor (persoon_id, functie, bedrijf_id) VALUES (17, 'Stagementor', 1);
+INSERT INTO stagecommissielid (persoon_id, commissie_rol) VALUES (18, 'Lid');
+INSERT INTO administratie (persoon_id, dienst) VALUES (14, 'Stagedienst');
+
 INSERT IGNORE INTO competentie (id, opleiding_id, naam, beschrijving, gewicht, rubric_volledig, rubric_goed, rubric_onvoldoende, actief) VALUES
 (1,  1, 'LO1 - Beheersing van het planningsproces',
        'De lerende professional beheerst het volledige planningsproces.',

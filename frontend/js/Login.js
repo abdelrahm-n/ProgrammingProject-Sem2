@@ -1,24 +1,5 @@
 const API_URL = 'http://localhost:3000';
 
-const urlParams = new URLSearchParams(window.location.search);
-const rol = urlParams.get('rol') || 'student';
-
-const domeinen = {
-  student: '@student.ehb.be',
-  docent: '@docent.ehb.be',
-  mentor: '@mentor.ehb.be',
-  commissie: '@commissie.ehb.be',
-  admin: '@admin.ehb.be'
-};
-
-const rolNamen = {
-  student: 'Student',
-  docent: 'Docent',
-  mentor: 'Stagementor',
-  commissie: 'Stagecommissie',
-  admin: 'Administratie'
-};
-
 const dashboards = {
   student: 'student/dashboard.html',
   docent: 'docent/dashboard.html',
@@ -27,20 +8,14 @@ const dashboards = {
   admin: 'admin/dashboard.html'
 };
 
-const domein = domeinen[rol] || domeinen.student;
 const foutmelding = document.getElementById('foutmelding');
-
-document.getElementById('loginTitel').textContent = 'Inloggen als ' + rolNamen[rol];
-document.getElementById('emailDomein').textContent = domein;
-document.getElementById('domeinHint').textContent = domein;
 
 document.getElementById('toonWachtwoord').addEventListener('click', function () {
   const veld = document.getElementById('wachtwoord');
   veld.type = veld.type === 'password' ? 'text' : 'password';
 });
 
-/* Bewaar de sessiegegevens uit het server-antwoord in localStorage.
-   Het id en studentnummer zijn nodig om enkel de eigen gegevens op te halen. */
+/* Bewaar de sessiegegevens uit het server-antwoord in localStorage. */
 function bewaarSessie(data) {
   localStorage.setItem('token', data.token);
   localStorage.setItem('rol', data.rol);
@@ -51,22 +26,20 @@ function bewaarSessie(data) {
   localStorage.setItem('opleiding', data.opleiding || '');
 }
 
-/* Verwerk het loginformulier */
+/* Inloggen met het volledige e-mailadres */
 document.getElementById('loginForm').addEventListener('submit', async function (e) {
   e.preventDefault();
 
-  const gebruikersnaam = document.getElementById('gebruikersnaam').value.trim();
+  const email = document.getElementById('email').value.trim();
   const wachtwoord = document.getElementById('wachtwoord').value;
 
   foutmelding.hidden = true;
 
-  if (!gebruikersnaam || !wachtwoord) {
-    foutmelding.textContent = 'Vul alle velden in.';
+  if (!email || !wachtwoord) {
+    foutmelding.textContent = 'Vul je e-mailadres en wachtwoord in.';
     foutmelding.hidden = false;
     return;
   }
-
-  const email = gebruikersnaam + domein;
 
   try {
     const antwoord = await fetch(API_URL + '/api/auth/login', {
@@ -83,50 +56,10 @@ document.getElementById('loginForm').addEventListener('submit', async function (
       return;
     }
 
-    /* Sla de sessiegegevens op in localStorage */
     bewaarSessie(data);
 
-    /* Map database rol terug naar frontend rol voor redirect */
-    const rolOmgekeerd = {
-      stagementor: 'mentor',
-      stagecommissie: 'commissie'
-    };
-    const frontendRol = rolOmgekeerd[data.rol] || data.rol;
-    window.location.href = dashboards[frontendRol] || 'index.html';
-
-  } catch (fout) {
-    foutmelding.textContent = 'Kan geen verbinding maken met de server.';
-    foutmelding.hidden = false;
-  }
-});
-
-/* Dev-login: snel inloggen als de eerste demo-gebruiker van de gekozen rol.
-   Loopt via de server zodat je een echt token krijgt en met de database werkt. */
-document.getElementById('devLoginBtn').addEventListener('click', async function () {
-  const foutmelding = document.getElementById('foutmelding');
-  foutmelding.hidden = true;
-
-  try {
-    const antwoord = await fetch(API_URL + '/api/auth/dev-login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ rol })
-    });
-
-    const data = await antwoord.json();
-
-    if (!antwoord.ok) {
-      foutmelding.textContent = data.fout || 'Dev-login mislukt. Draai eerst node seed.js.';
-      foutmelding.hidden = false;
-      return;
-    }
-
-    bewaarSessie(data);
-
-    const rolOmgekeerd = {
-      stagementor: 'mentor',
-      stagecommissie: 'commissie'
-    };
+    /* Map database-rol terug naar frontend-rol voor de juiste redirect */
+    const rolOmgekeerd = { stagementor: 'mentor', stagecommissie: 'commissie' };
     const frontendRol = rolOmgekeerd[data.rol] || data.rol;
     window.location.href = dashboards[frontendRol] || 'index.html';
 
@@ -139,12 +72,12 @@ document.getElementById('devLoginBtn').addEventListener('click', async function 
 /* Wachtwoord vergeten: stuur een reset-link naar het e-mailadres */
 document.getElementById('vergetenBtn').addEventListener('click', async function () {
   const resetMelding = document.getElementById('resetMelding');
-  const gebruikersnaam = document.getElementById('gebruikersnaam').value.trim();
+  const email = document.getElementById('email').value.trim();
   resetMelding.hidden = true;
 
-  if (!gebruikersnaam) {
+  if (!email) {
     resetMelding.className = 'melding melding--fout';
-    resetMelding.textContent = 'Vul eerst je gebruikersnaam in.';
+    resetMelding.textContent = 'Vul eerst je e-mailadres in.';
     resetMelding.hidden = false;
     return;
   }
@@ -153,7 +86,7 @@ document.getElementById('vergetenBtn').addEventListener('click', async function 
     const antwoord = await fetch(API_URL + '/api/auth/wachtwoord-vergeten', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: gebruikersnaam + domein })
+      body: JSON.stringify({ email })
     });
     const data = await antwoord.json();
     resetMelding.className = 'melding melding--succes';
