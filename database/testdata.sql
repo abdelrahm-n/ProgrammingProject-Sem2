@@ -158,6 +158,12 @@ INSERT IGNORE INTO competentie (id, opleiding_id, naam, beschrijving, gewicht, r
        'De student toont onvoldoende ethisch en deontologisch handelen.',
        TRUE);
 
+-- Zelfde competentieset voor de andere opleidingen (MCT, EICT)
+INSERT INTO competentie (opleiding_id, naam, beschrijving, gewicht, rubric_volledig, rubric_goed, rubric_onvoldoende, actief)
+  SELECT 2, naam, beschrijving, gewicht, rubric_volledig, rubric_goed, rubric_onvoldoende, TRUE FROM competentie WHERE opleiding_id = 1;
+INSERT INTO competentie (opleiding_id, naam, beschrijving, gewicht, rubric_volledig, rubric_goed, rubric_onvoldoende, actief)
+  SELECT 3, naam, beschrijving, gewicht, rubric_volledig, rubric_goed, rubric_onvoldoende, TRUE FROM competentie WHERE opleiding_id = 1;
+
 INSERT INTO stagevoorstel
   (id, student_id, bedrijf_id, mentor_id, academiejaar_id, omschrijving_opdracht, functie, startdatum, einddatum, status_id, aangemaakt_op)
 VALUES
