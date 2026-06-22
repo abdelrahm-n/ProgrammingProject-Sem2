@@ -103,6 +103,21 @@ window.kiesStudent = async function (i) {
   render()
 }
 
+/* Docent maakt het evaluatiemoment aan voor de gekozen student */
+window.maakMoment = async function () {
+  const datum = new Date().toISOString().split('T')[0]
+  const res = await fetch(API_URL + '/api/evaluaties', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+    body: JSON.stringify({ stage_id: gekozenStageId, type_id: fase === 'eind' ? 2 : 1, datum })
+  })
+  const d = await res.json().catch(() => ({}))
+  if (!res.ok) { alert(d.fout || 'Aanmaken mislukt'); return }
+  await laadMomenten()
+  await laadBeoordelingen()
+  render()
+}
+
 window.terugNaarStudenten = function () {
   gekozenStageId = null
   gekozenStudentNaam = ''
@@ -160,7 +175,13 @@ function render() {
   }
 
   if (!momentId) {
-    html += `<div class="dashboard-card"><p>Er is nog geen ${fase === 'eind' ? 'eindevaluatie' : 'tussentijdse evaluatie'} aangemaakt door je begeleider.</p></div>`
+    const label = fase === 'eind' ? 'eindevaluatie' : 'tussentijdse evaluatie'
+    if (dbRol === 'docent' && gekozenStageId) {
+      html += `<div class="dashboard-card"><p>Er is nog geen ${label} voor deze student.</p>
+        <button class="btn btn--primair btn--sm" onclick="maakMoment()">Maak ${label} aan</button></div>`
+    } else {
+      html += `<div class="dashboard-card"><p>Er is nog geen ${label} aangemaakt door je begeleider.</p></div>`
+    }
     root.innerHTML = html
     return
   }
