@@ -58,3 +58,14 @@
       d.textContent = t;
       return d.innerHTML;
     }
+
+    function toonDatum(waarde) {
+      if (!waarde) return '-';
+      return new Date(waarde).toLocaleDateString('nl-BE');
+    }
+
+    /* Handtekeningbadge per partij (alleen-lezen) */
+    function handtekening(label, getekend) {
+      const cls = getekend ? 'badge--goedgekeurd' : 'badge--afgekeurd';
+      return '<span class="badge ' + cls + '">' + label + '</span>';
+    }
