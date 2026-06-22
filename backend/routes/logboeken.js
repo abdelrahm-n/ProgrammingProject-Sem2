@@ -145,7 +145,7 @@ router.get('/mijn', controleerToken, async (req, res) => {
 /* POST /api/logboeken/dag - voeg een dagelijks logboekitem toe (dynamisch).
    De juiste week wordt automatisch gezocht of aangemaakt. */
 router.post('/dag', controleerToken, async (req, res) => {
-  const { datum, uitgevoerde_taken, reflectie, problemen_leerpunten } = req.body
+  const { datum, uitgevoerde_taken, reflectie, problemen_leerpunten, competenties } = req.body
 
   if (!datum || !uitgevoerde_taken) {
     return res.status(400).json({ fout: 'Datum en uitgevoerde taken zijn verplicht' })
