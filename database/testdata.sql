@@ -93,6 +93,18 @@ INSERT INTO stagementor (persoon_id, functie, bedrijf_id) VALUES (17, 'Stagement
 INSERT INTO stagecommissielid (persoon_id, commissie_rol) VALUES (18, 'Lid');
 INSERT INTO administratie (persoon_id, dienst) VALUES (14, 'Stagedienst');
 
+-- Jeanine Mentora (mentor) en Joachim Jonckheere (docent) voor Steve
+INSERT INTO persoon (id, voornaam, achternaam, email, wachtwoord_hash, rol, actief) VALUES
+(19, 'Jeanine', 'Mentora',   'jeanine.mentora@mentor.ehb.be',      '$2a$10$nob6YQXhElqJgiGfpkqVDuw6wXddLC4jXKx2380obf.gr3fsyPIqO', 'stagementor', TRUE),
+(20, 'Joachim', 'Jonckheere', 'joachim.jonckheere@docent.ehb.be',  '$2a$10$nob6YQXhElqJgiGfpkqVDuw6wXddLC4jXKx2380obf.gr3fsyPIqO', 'docent',      TRUE);
+INSERT INTO stagementor (persoon_id, functie, bedrijf_id) VALUES (19, 'Stagementor', 1);
+INSERT INTO docent (persoon_id, vakgroep) VALUES (20, 'Toegepaste Informatica');
+
+-- Steve Stampertje (voorbeeldstudent)
+INSERT INTO persoon (id, voornaam, achternaam, email, wachtwoord_hash, rol, actief) VALUES
+(21, 'Steve', 'Stampertje', 'steve.stampertje@student.ehb.be', '$2a$10$nob6YQXhElqJgiGfpkqVDuw6wXddLC4jXKx2380obf.gr3fsyPIqO', 'student', TRUE);
+INSERT INTO student (persoon_id, studentnummer, opleiding_id) VALUES (21, 'r0850199', 1);
+
 INSERT IGNORE INTO competentie (id, opleiding_id, naam, beschrijving, gewicht, rubric_volledig, rubric_goed, rubric_onvoldoende, actief) VALUES
 (1,  1, 'LO1 - Beheersing van het planningsproces',
        'De lerende professional beheerst het volledige planningsproces.',
@@ -211,6 +223,21 @@ INSERT INTO stage
   (id, stageovereenkomst_id, student_id, bedrijf_id, mentor_id, docent_id, startdatum, einddatum, actief, aangemaakt_op)
 VALUES
   (1, 1, 1, 1, 8, 6, '2026-02-03', '2026-06-15', TRUE, '2026-01-15 11:10:00');
+
+-- Steve Stampertje: stage met Jeanine (mentor) en Joachim (docent), einddatum = vandaag
+INSERT INTO stagevoorstel
+  (id, student_id, bedrijf_id, mentor_id, docent_id, academiejaar_id, omschrijving_opdracht, functie, startdatum, einddatum, status_id, aangemaakt_op)
+VALUES
+  (6, 21, 1, 19, 20, 1, 'Bouwen van een interne tool voor het beheren van evaluaties.', 'Junior Developer',
+   '2026-02-03', '2026-06-22', 3, '2025-11-20 09:00:00');
+INSERT INTO stageovereenkomst
+  (id, stagevoorstel_id, getekend_door_student, getekend_door_bedrijf, getekend_door_school, status_id, gevalideerd_door_id, gevalideerd_op, aangemaakt_op)
+VALUES
+  (2, 6, TRUE, TRUE, TRUE, 3, 14, '2026-01-15 11:00:00', '2025-12-01 10:05:00');
+INSERT INTO stage
+  (id, stageovereenkomst_id, student_id, bedrijf_id, mentor_id, docent_id, startdatum, einddatum, actief, aangemaakt_op)
+VALUES
+  (2, 2, 21, 1, 19, 20, '2026-02-03', '2026-06-22', TRUE, '2026-01-15 11:10:00');
 
 -- De student heeft zijn weken ingediend; de mentor heeft nog niets goedgekeurd
 -- (status 2 = 'ingediend', geen mentor-feedback of afcheck-datum).
