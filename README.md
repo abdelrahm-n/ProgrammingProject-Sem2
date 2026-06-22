@@ -1,64 +1,140 @@
 # Stageplatform
 
-Platform voor stagebeheer bij EhB Toegepaste Informatica.
+Webapplicatie voor het volledige stageproces bij EhB Toegepaste Informatica:
+van stageaanvraag en goedkeuring, over de stageovereenkomst en wekelijkse
+logboeken, tot de tussentijdse en finale evaluatie op competenties.
+
+## Technologie
+
+- **Frontend:** statische HTML, CSS en vanilla JavaScript
+- **Backend:** Node.js met Express (REST API)
+- **Database:** MySQL
+- **Authenticatie:** JWT (JSON Web Tokens) + bcrypt-wachtwoordhashes (met zout)
 
 ## Projectstructuur
 
-- `frontend/` - statische HTML, CSS en JavaScript
-- `backend/`  - Node.js/Express API
-- `database/` - SQL scripts voor de database
-  - `tabellen.sql` - maakt de database en alle tabellen aan
-  - `testdata.sql` - vult alle demodata (gebruikers, opleidingen, bedrijven,
-    stagevoorstellen, een actieve stage, logboeken en evaluaties)
+```
+frontend/                Statische webapp (per rol een map)
+  index.html             Stuurt door naar de loginpagina
+  login.html             Inloggen met volledig e-mailadres
+  reset-wachtwoord.html  Nieuw wachtwoord instellen via reset-link
+  student/   docent/   mentor/   stagecommissie/   admin/
+  js/                    Logica per pagina (o.a. evaluatieMatrix.js, nav.js)
+  css/                   Stijlbestanden
 
-## Database opzetten
+backend/                 Node.js/Express API
+  server.js              Start de server en serveert ook de frontend
+  db.js                  MySQL-connectiepool
+  seed.js                Zet de database op (tabellen + demodata)
+  .env                   DB-gegevens, JWT_SECRET en poort
+  middleware/            controleerToken.js (JWT-controle)
+  routes/                auth, stages, stageovereenkomst, logboeken,
+                         evaluaties, competenties, admin, docent, mentor, ...
 
-Alle demodata staat in `database/testdata.sql` (dus in de database, niet in
-JavaScript). Zet de database in één keer op met:
-
-```bash
-cd backend
-npm install
-node seed.js
+database/
+  tabellen.sql           Maakt de database en alle tabellen aan
+  testdata.sql           Vult alle demodata (gebruikers, opleidingen,
+                         bedrijven, competenties, een actieve stage, ...)
 ```
 
-`node seed.js` voert `database/tabellen.sql` en `database/testdata.sql` uit.
-Pas de databasegegevens (host, gebruiker, wachtwoord) aan in `backend/.env`.
+## Lokaal draaien
 
-## Backend starten
+**Vereisten:** Node.js en een draaiende MySQL-server.
 
-```bash
-cd backend
-npm run dev      # of: npm start
-```
+1. Stel de databasegegevens in `backend/.env` in:
 
-De API draait standaard op http://localhost:3000.
+   ```
+   DB_HOST=localhost
+   DB_PORT=3306
+   DB_NAME=stage_monitoring
+   DB_USER=root
+   DB_PASSWORD=<jouw MySQL-wachtwoord>
+   JWT_SECRET=geheim_sleutel_stageplatform
+   PORT=3000
+   ```
 
-## Frontend openen
+2. Installeer de afhankelijkheden en zet de database op:
 
-Open de map `frontend/` met een statische webserver, bijvoorbeeld:
+   ```bash
+   cd backend
+   npm install
+   node seed.js
+   ```
 
-```bash
-python -m http.server 5500 --directory frontend
-```
+   `node seed.js` voert `database/tabellen.sql` en `database/testdata.sql` uit.
 
-Surf daarna naar http://localhost:5500/index.html.
+3. Start de server:
+
+   ```bash
+   npm start        # of: npm run dev (met nodemon)
+   ```
+
+4. Open de app op **http://localhost:3000**.
+
+> De backend serveert zelf de frontend. Open de app dus via
+> `http://localhost:3000` en **niet** via een aparte Live Server (poort 5500),
+> anders kloppen de API-aanroepen niet.
 
 ## Demo-accounts
 
-Alle demo-gebruikers hebben hetzelfde wachtwoord: **demo123**
+Inloggen gebeurt met het **volledige e-mailadres**. Alle demo-accounts hebben
+het wachtwoord **`demo123`**.
 
-| Rol            | E-mail                            |
-|----------------|-----------------------------------|
-| Student        | amira.bensalem@student.ehb.be     |
-| Student        | luca.desmedt@student.ehb.be       |
-| Docent         | thomas.wouters@docent.ehb.be      |
-| Stagementor    | pieter.desmedt@mentor.ehb.be      |
-| Stagecommissie | katrien.lenaerts@commissie.ehb.be |
-| Administratie  | nele.pauwels@admin.ehb.be         |
+| Rol            | E-mail                      |
+|----------------|-----------------------------|
+| Administratie  | `admin@admin.ehb.be`        |
+| Student        | `student@student.ehb.be`    |
+| Docent         | `docent@docent.ehb.be`      |
+| Stagementor    | `mentor@mentor.ehb.be`      |
+| Stagecommissie | `commissie@commissie.ehb.be`|
 
-Op de loginpagina kies je eerst je rol en typ je enkel het deel vóór de @
-(bijv. `nele.pauwels`). Het domein wordt automatisch toegevoegd.
+Daarnaast zijn er nog uitgewerkte demo-gebruikers met realistische data, ook
+met wachtwoord `demo123`, o.a. `amira.bensalem@student.ehb.be`,
+`thomas.wouters@docent.ehb.be`, `pieter.desmedt@mentor.ehb.be`,
+`katrien.lenaerts@commissie.ehb.be` en `nele.pauwels@admin.ehb.be`.
 
-Met de knop **Snel inloggen (dev)** op de loginpagina log je via de server in
-als de eerste demo-gebruiker van de gekozen rol (met een echt token).
+## Rollen en stageproces
+
+- **Student** – dient een stagevoorstel in, ondertekent de overeenkomst, vult
+  het logboek in en geeft zijn zelfevaluatie per competentie.
+- **Administratie** – beheert gebruikers en competenties en koppelt een mentor
+  en docent aan een student.
+- **Stagecommissie** – beoordeelt het stagevoorstel en ondertekent de
+  overeenkomst namens de hogeschool.
+- **Stagementor (bedrijf)** – ondertekent de overeenkomst, checkt de logboeken
+  af en evalueert de student.
+- **Docent** – volgt de student op (logboeken, evaluaties) maar **tekent niet
+  mee**; kan de overeenkomst wel alleen-lezen bekijken.
+
+**Ondertekenvolgorde:** student → mentor → stagecommissie. Zodra alle partijen
+getekend hebben, wordt de stage actief.
+
+### Evaluatie
+
+De evaluatie verloopt op **competenties** (door de admin beheerd, elk met een
+gewicht van 1 t/m 5; samen 100% van de score). Per competentie geven student,
+mentor en docent een score op 5 met motivering. Er is een **tussentijdse**
+evaluatie (bijsturend) en een **eindevaluatie**; bij de eindevaluatie berekent
+het systeem automatisch het gewogen eindcijfer zodra de docent indient.
+
+## Hoe de data wordt opgeslagen
+
+Alle gegevens staan in de **MySQL-database** (`stage_monitoring`), niet in
+JavaScript. Belangrijkste tabellen:
+
+- `persoon` + rol-tabellen (`student`, `docent`, `stagementor`,
+  `stagecommissielid`, `administratie`)
+- `bedrijf`, `opleiding`, `academiejaar`
+- `stagevoorstel`, `stageovereenkomst`, `stage`
+- `logboek_week`, `logboek_dag_item`, `logboek_feedback`
+- `competentie`, `evaluatie_moment`, `competentie_beoordeling`
+- `notificatie`
+
+**Beveiliging:**
+
+- Wachtwoorden worden nooit in klare tekst bewaard maar als **bcrypt-hash met
+  een eigen zout per gebruiker** (`wachtwoord_hash`).
+- Na het inloggen krijgt de gebruiker een **JWT-token**; beschermde routes
+  controleren dat token via `middleware/controleerToken.js`.
+- Gevoelige acties zijn afgeschermd per rol (bv. enkel de stagecommissie kan
+  een voorstel beoordelen; ondertekenen kan enkel door de juiste partij).
