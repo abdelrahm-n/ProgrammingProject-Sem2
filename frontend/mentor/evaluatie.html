@@ -6,24 +6,6 @@
   <title>Stageplatform - Stagementor - Evaluatie</title>
   <link rel="stylesheet" href="../css/stijl.css" />
   <link rel="stylesheet" href="../css/mentor.css" />
-  <style>
-    .eval-titel {
-      font-size: 16px;
-      font-weight: 800;
-      letter-spacing: 0.04em;
-      color: #111827;
-      margin: 0 0 22px 0;
-    }
-    .eval-tabel { width: 100%; max-width: 900px; border-collapse: collapse; }
-    .eval-tabel th {
-      text-align: left; font-size: 13px; font-weight: 600; color: #6b7280; padding: 0 16px 14px 0;
-    }
-    .eval-tabel td {
-      padding: 18px 16px 18px 0; font-size: 16px; color: #111827; border-top: 1px solid #ececec;
-    }
-    .eval-evalueren { color: #111827; text-decoration: none; font-weight: 600; }
-    .eval-evalueren:hover { text-decoration: underline; }
-  </style>
 </head>
 <body>
 
@@ -42,73 +24,20 @@
     </header>
 
     <div class="app-body">
-      <nav class="sidebar">
-        <a href="dashboard.html" class="nav-item">Dashboard</a>
-        <a href="stagiairs.html" class="nav-item">Stagiairs</a>
-        <a href="logboeken.html" class="nav-item">Logboeken</a>
-        <a href="evaluatie.html" class="nav-item actief">Evaluatie</a>
-        <a href="../index.html" class="nav-item" id="uitlogBtn" style="margin-top:auto">Uitloggen</a>
-      </nav>
+      <nav class="sidebar"></nav>
 
       <main class="content-area">
-        <h2 class="eval-titel">Evaluatie</h2>
+        <div class="view-header">
+          <h1 class="view-titel">Evaluatie</h1>
+          <p class="view-subtitel">Kies een stagiair en vul per competentie je score (1-5) en motivering in.</p>
+        </div>
 
-        <table class="eval-tabel">
-          <thead>
-            <tr>
-              <th style="width:30%">Naam</th>
-              <th style="width:45%">Richting</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody id="studentenBody">
-            <tr><td colspan="3">Laden...</td></tr>
-          </tbody>
-        </table>
+        <div id="evalRoot"></div>
       </main>
     </div>
   </div>
 
   <script src="../js/nav.js"></script>
-  <script>
-    const API_URL = 'http://localhost:3000';
-    const token = localStorage.getItem('token') || '';
-    const body = document.getElementById('studentenBody');
-
-    function escape(t){ if(t==null) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
-
-    (async function () {
-      let studenten;
-      try {
-        const res = await fetch(API_URL + '/api/mentor/mijn-stagiairs', {
-          headers: { 'Authorization': 'Bearer ' + token }
-        });
-        if (!res.ok) throw new Error('niet ok');
-        studenten = await res.json();
-      } catch (e) {
-        body.innerHTML = '<tr><td colspan="3">Kon studenten niet laden. Log opnieuw in als stagementor.</td></tr>';
-        return;
-      }
-
-      if (!studenten.length) {
-        body.innerHTML = '<tr><td colspan="3">Je hebt nog geen toegewezen stagiairs.</td></tr>';
-        return;
-      }
-
-      body.innerHTML = '';
-      studenten.forEach(s => {
-        const naam = s.voornaam + ' ' + s.achternaam;
-        const url = `evaluatie-student.html?stage=${s.stage_id}`
-          + `&naam=${encodeURIComponent(naam)}`
-          + `&opleiding=${encodeURIComponent(s.opleiding || '')}`;
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${escape(naam)}</td>
-          <td>${escape(s.opleiding) || '-'}</td>
-          <td><a href="${url}" class="eval-evalueren">Evalueren</a></td>`;
-        body.appendChild(tr);
-      });
-    })();
-  </script>
+  <script src="../js/evaluatieMatrix.js"></script>
 </body>
 </html>

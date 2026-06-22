@@ -16,6 +16,11 @@ let momenten = []
 let beoordelingen = []
 let stageEinddatum = null
 
+/* Voor mentor/docent: eerst een student kiezen */
+let studenten = []
+let gekozenStageId = null
+let gekozenStudentNaam = ''
+
 const root = document.getElementById('evalRoot')
 
 function esc(t) { if (t == null) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML }
@@ -36,6 +41,8 @@ function magBewerken() {
 }
 
 function eindOntgrendeld() {
+  /* Mentor en docent kunnen invullen zodra de eindevaluatie bestaat */
+  if (dbRol !== 'student') return true
   if (!stageEinddatum) return false
   return new Date() >= new Date(stageEinddatum)
 }
@@ -47,15 +54,61 @@ function typeNaamVoorFase(f) {
 /* ---- data laden ---- */
 
 async function laadMomenten() {
-  /* Student haalt zijn eigen momenten op */
-  const res = await fetch(API_URL + '/api/evaluaties/mijn', { headers: { 'Authorization': 'Bearer ' + token } })
-  momenten = res.ok ? await res.json() : []
+  if (dbRol === 'student') {
+    /* Student haalt zijn eigen momenten op */
+    const res = await fetch(API_URL + '/api/evaluaties/mijn', { headers: { 'Authorization': 'Bearer ' + token } })
+    momenten = res.ok ? await res.json() : []
 
-  /* Einddatum van de stage ophalen voor de vergrendeling van de eindevaluatie */
-  try {
-    const r2 = await fetch(API_URL + '/api/stages/mijn/actief', { headers: { 'Authorization': 'Bearer ' + token } })
-    if (r2.ok) { const d = await r2.json(); stageEinddatum = d.stage ? d.stage.einddatum : null }
-  } catch (e) { /* geen actieve stage */ }
+    /* Einddatum van de stage voor de vergrendeling van de eindevaluatie */
+    try {
+      const r2 = await fetch(API_URL + '/api/stages/mijn/actief', { headers: { 'Authorization': 'Bearer ' + token } })
+      if (r2.ok) { const d = await r2.json(); stageEinddatum = d.stage ? d.stage.einddatum : null }
+    } catch (e) { /* geen actieve stage */ }
+  } else {
+    /* Mentor/docent: momenten van de gekozen stage */
+    momenten = []
+    if (gekozenStageId) {
+      const res = await fetch(API_URL + '/api/evaluaties/stage/' + gekozenStageId, { headers: { 'Authorization': 'Bearer ' + token } })
+      momenten = res.ok ? await res.json() : []
+    }
+  }
+}
+
+/* Mentor/docent: lijst van toegewezen studenten */
+async function laadStudenten() {
+  const res = await fetch(API_URL + '/api/logboeken/studenten', { headers: { 'Authorization': 'Bearer ' + token } })
+  studenten = res.ok ? await res.json() : []
+}
+
+function renderPicker() {
+  if (!studenten.length) { root.innerHTML = '<div class="dashboard-card"><p>Je hebt nog geen toegewezen studenten.</p></div>'; return }
+  let html = '<div class="dashboard-card" style="padding:0;overflow:hidden"><table style="width:100%;border-collapse:collapse">'
+  html += '<thead><tr style="border-bottom:1px solid #e2e8f0;text-align:left"><th style="padding:12px 14px;color:#64748b">Student</th><th style="padding:12px 14px;color:#64748b">Bedrijf</th><th style="width:24px"></th></tr></thead><tbody>'
+  studenten.forEach((s, i) => {
+    html += `<tr style="border-bottom:1px solid #f1f5f9;cursor:pointer" onclick="kiesStudent(${i})">
+      <td style="padding:12px 14px"><strong>${esc((s.voornaam + ' ' + s.achternaam).trim())}</strong></td>
+      <td style="padding:12px 14px;color:#64748b">${esc(s.bedrijf || '-')}</td>
+      <td style="padding:12px 6px;color:#cbd5e1">›</td></tr>`
+  })
+  html += '</tbody></table></div>'
+  root.innerHTML = html
+}
+
+window.kiesStudent = async function (i) {
+  const s = studenten[i]
+  gekozenStageId = s.stage_id
+  gekozenStudentNaam = (s.voornaam + ' ' + s.achternaam).trim()
+  await laadMomenten()
+  await laadBeoordelingen()
+  render()
+}
+
+window.terugNaarStudenten = function () {
+  gekozenStageId = null
+  gekozenStudentNaam = ''
+  momenten = []
+  beoordelingen = []
+  renderPicker()
 }
 
 async function laadBeoordelingen() {
@@ -85,6 +138,14 @@ function pil(score, eigen) {
 
 function render() {
   let html = ''
+
+  /* Mentor/docent: naam van de gekozen student + terug naar de lijst */
+  if (dbRol !== 'student') {
+    html += `<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+      <button class="btn btn--secundair btn--sm" onclick="terugNaarStudenten()">← Andere student</button>
+      <strong>${esc(gekozenStudentNaam)}</strong>
+    </div>`
+  }
 
   /* Tabs tussentijds / eind */
   html += `<div style="display:flex;gap:8px;margin-bottom:16px">
@@ -279,8 +340,13 @@ window.dienIn = async function () {
 /* ---- start ---- */
 async function start() {
   if (!token) { root.innerHTML = '<p>Niet ingelogd.</p>'; return }
-  await laadMomenten()
-  await laadBeoordelingen()
-  render()
+  if (dbRol === 'student') {
+    await laadMomenten()
+    await laadBeoordelingen()
+    render()
+  } else {
+    await laadStudenten()
+    renderPicker()
+  }
 }
 start()
