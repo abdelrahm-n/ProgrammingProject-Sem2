@@ -1,23 +1,42 @@
 <!DOCTYPE html>
 <html lang="nl">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Stageplatform - Student - Zelfevaluatie</title>
   <link rel="stylesheet" href="../css/stijl.css" />
   <link rel="stylesheet" href="../css/student.css" />
-</head>
+  <style>
+    .ze-titel { font-size:24px; font-weight:800; color:#1E1E1E; margin:0 0 6px 0; }
+    .ze-intro { color:#6b7280; font-size:14px; margin:0 0 22px 0; max-width:760px; }
 
+    .ze-card { background:#fff; border:1px solid #e3e3e3; border-radius:12px; padding:18px; margin-bottom:18px; box-shadow:0 3px 10px rgba(15,23,42,.04); }
+    .ze-head { display:flex; justify-content:space-between; align-items:baseline; margin-bottom:14px; gap:12px; }
+    .ze-head h3 { margin:0; font-size:16px; font-weight:800; color:#1E1E1E; }
+    .ze-gewicht { font-size:12px; color:#6b7280; white-space:nowrap; }
+
+    .ze-opties { display:grid; grid-template-columns:1fr 1fr 1fr 92px; gap:10px; align-items:stretch; }
+    .ze-optie { border:1px solid #d8d8d8; border-radius:8px; padding:10px 12px; cursor:pointer; font-size:12px; color:#374151; line-height:1.45; transition:border-color .12s, box-shadow .12s, background .12s; }
+    .ze-optie input { display:none; }
+    .ze-optie strong { display:block; margin-bottom:4px; color:#1E1E1E; font-size:12.5px; }
+    .ze-optie.gekozen { border-color:var(--rol-accent,#8B0015); box-shadow:0 0 0 2px rgba(139,0,21,.12); background:#fff7f8; }
+    .ze-score { border:1px solid #d8d8d8; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:20px; font-weight:800; color:#1E1E1E; background:#fafafa; }
+
+    .ze-reflectie { width:100%; min-height:60px; margin-top:12px; padding:10px 12px; border:1px solid #d8d8d8; border-radius:8px; font-family:inherit; font-size:14px; color:#1E1E1E; background:#f9f9f9; resize:vertical; line-height:1.5; }
+
+    .ze-acties { display:flex; justify-content:center; margin-top:8px; }
+    .ze-indienen { background:#6b7280; color:#fff; border:none; padding:12px 34px; border-radius:999px; font-size:15px; font-weight:600; cursor:pointer; }
+    .ze-indienen:hover { background:#4b5563; }
+    .ze-melding { display:none; margin-top:14px; font-weight:600; text-align:center; }
+  </style>
+</head>
 <body>
 
   <div id="app">
     <header class="header">
       <div class="header-logo">
         <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M12 2L2 7l10 5 10-5-10-5z" />
-          <path d="M2 17l10 5 10-5" />
-          <path d="M2 12l10 5 10-5" />
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
         </svg>
         <span class="header-logo-text">Stageplatform</span>
       </div>
@@ -28,42 +47,18 @@
     </header>
 
     <div class="app-body">
-      <nav class="sidebar">
-        <a href="dashboard.html" class="nav-item">Dashboard</a>
-        <a href="logboek.html" class="nav-item">Logboek</a>
-        <a href="evaluatie.html" class="nav-item actief">Evaluatie</a>
-        <a href="profiel.html" class="nav-item">Profiel</a>
-        <a href="../index.html" class="nav-item" id="uitlogBtn" style="margin-top:auto">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-            <polyline points="16 17 21 12 16 7" />
-            <line x1="21" y1="12" x2="9" y2="12" />
-          </svg>
-          Uitloggen
-        </a>
-      </nav>
+      <nav class="sidebar"></nav>
 
       <main class="content-area">
-        <div class="view-header">
-          <h1 class="view-titel">Zelfevaluatie + tussentijdse evaluatie</h1>
-          <p class="view-subtitel">
-            Kies per competentie de score die het best bij je past en voeg een korte reflectie toe.
-            Deze zelfevaluatie wordt samen met de mentor besproken tijdens de tussentijdse evaluatie.
-          </p>
-        </div>
+        <h1 class="ze-titel">Zelfevaluatie - tussentijdse evaluatie</h1>
+        <p class="ze-intro">Kies per competentie de rubriek die het best bij je past. De score wordt daarna automatisch bepaald. Geef daarna een korte beschrijving van je vooruitgang.</p>
 
-        <div class="zelfevaluatie-wrapper">
-          <div id="competentieLijst"></div>
+        <div id="competentieLijst"></div>
 
-          <button type="button" class="btn btn--primair" id="indienenBtn" style="margin-top:8px;">indienen</button>
-          <p id="evalMelding" style="display:none; margin-top:12px; font-weight:600;"></p>
+        <div class="ze-acties">
+          <button type="button" class="ze-indienen" id="indienenBtn">Indienen</button>
         </div>
-
-        <!-- Feedback van de mentor (alleen-lezen, verschijnt zodra de mentor beoordeeld heeft) -->
-        <div id="mentorFeedbackSectie" style="display:none; margin-top:28px;">
-          <h2 style="font-size:20px; font-weight:800; margin:0 0 14px 0;">Feedback van je mentor</h2>
-          <div id="mentorFeedbackLijst"></div>
-        </div>
+        <p id="evalMelding" class="ze-melding"></p>
       </main>
     </div>
   </div>
@@ -76,103 +71,83 @@
     const melding = document.getElementById('evalMelding');
     const indienenBtn = document.getElementById('indienenBtn');
 
-    const scoreOpties = [
-      { punten: 5, label: 'Sterk',        tekst: 'Ik voer deze competentie sterk uit en neem initiatief.' },
-      { punten: 3, label: 'Goed',         tekst: 'Ik kan dit meestal zelfstandig toepassen.' },
-      { punten: 1, label: 'Onvoldoende',  tekst: 'Ik ontwikkel deze competentie nog onvoldoende.' }
-    ];
-
     let evaluatieId = null;
     let beoordelingen = [];
 
-    function escape(t){ if(t==null) return ''; const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
+    const escape = (t) => { if (t == null) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; };
+    function toonMelding(tekst, kleur) { melding.textContent = tekst; melding.style.color = kleur; melding.style.display = 'block'; }
 
-    function toonMelding(tekst, kleur) {
-      melding.textContent = tekst;
-      melding.style.color = kleur;
-      melding.style.display = 'block';
+    function opties(b) {
+      return [
+        { punten: 5, label: 'Sterk',       tekst: b.rubric_volledig    || 'Ik voer deze competentie sterk uit.' },
+        { punten: 3, label: 'Goed',        tekst: b.rubric_goed        || 'Ik kan dit meestal zelfstandig toepassen.' },
+        { punten: 0, label: 'Onvoldoende', tekst: b.rubric_onvoldoende || 'Ik ontwikkel deze competentie nog onvoldoende.' }
+      ];
     }
 
-    function renderCompetenties() {
+    function render() {
       lijst.innerHTML = '';
       beoordelingen.forEach((b, i) => {
-        const card = document.createElement('div');
-        card.className = 'competentie-card';
-        const optiesHtml = scoreOpties.map(o => `
-          <label class="score-optie">
-            <input type="radio" name="score-${i}" value="${o.punten}"
-              ${Number(b.student_score) === o.punten ? 'checked' : ''}
-              onchange="document.getElementById('resultaat-${i}').textContent='${o.punten}/5'">
-            <strong>${o.punten} punt${o.punten > 1 ? 'en' : ''} - ${o.label}</strong><br>
-            <span>${o.tekst}</span>
+        const optHtml = opties(b).map(o => `
+          <label class="ze-optie ${Number(b.student_score) === o.punten ? 'gekozen' : ''}" data-i="${i}" data-score="${o.punten}">
+            <input type="radio" name="score-${i}" value="${o.punten}" ${Number(b.student_score) === o.punten ? 'checked' : ''}>
+            <strong>${o.punten} punten - ${o.label}</strong>
+            <span>${escape(o.tekst)}</span>
           </label>`).join('');
 
+        const card = document.createElement('div');
+        card.className = 'ze-card';
         card.innerHTML = `
-          <div class="competentie-header">
+          <div class="ze-head">
             <h3>${escape(b.competentie_naam)}</h3>
-            <span class="gewicht">Gewicht: ${b.gewicht ?? '-'}</span>
+            <span class="ze-gewicht">${b.gewicht != null ? 'Gewicht: ' + b.gewicht + '%' : ''}</span>
           </div>
-          <div class="score-keuzes">
-            ${optiesHtml}
-            <div class="score-resultaat" id="resultaat-${i}">${b.student_score != null ? b.student_score + '/5' : '-/5'}</div>
+          <div class="ze-opties">
+            ${optHtml}
+            <div class="ze-score" id="score-res-${i}">${b.student_score != null ? b.student_score + '/5' : '-/5'}</div>
           </div>
-          <textarea id="reflectie-${i}" placeholder="In deze tekstbox kan je je reflectie schrijven over deze competentie...">${escape(b.student_reflectie)}</textarea>`;
+          <textarea class="ze-reflectie" id="reflectie-${i}" placeholder="Geef hier een korte beschrijving van je vooruitgang voor deze competentie...">${escape(b.student_reflectie)}</textarea>`;
         lijst.appendChild(card);
+      });
+
+      // Klik op een rubriek-vakje -> selecteren + score tonen
+      lijst.querySelectorAll('.ze-optie').forEach(opt => {
+        opt.addEventListener('click', () => {
+          const i = opt.dataset.i, score = opt.dataset.score;
+          lijst.querySelectorAll(`.ze-optie[data-i="${i}"]`).forEach(o => o.classList.remove('gekozen'));
+          opt.classList.add('gekozen');
+          opt.querySelector('input').checked = true;
+          document.getElementById('score-res-' + i).textContent = score + '/5';
+        });
       });
     }
 
     async function laad() {
       if (!token) { toonMelding('Je bent niet ingelogd. Log opnieuw in via de startpagina.', '#990018'); return; }
       try {
-        // Zoek de tussentijdse evaluatie van de student
-        const resMomenten = await fetch(API_URL + '/api/evaluaties/mijn', {
-          headers: { 'Authorization': 'Bearer ' + token }
-        });
-        const momenten = await resMomenten.json();
+        const resM = await fetch(API_URL + '/api/evaluaties/mijn', { headers: { 'Authorization': 'Bearer ' + token } });
+        const momenten = await resM.json();
         const tussen = momenten.find(m => m.type_naam === 'tussentijdse_evaluatie') || momenten[0];
-        if (!tussen) {
-          lijst.innerHTML = '<p>Er is nog geen tussentijdse evaluatie aangemaakt door je begeleider.</p>';
-          indienenBtn.style.display = 'none';
-          return;
-        }
+        if (!tussen) { lijst.innerHTML = '<p>Er is nog geen tussentijdse evaluatie aangemaakt door je begeleider.</p>'; indienenBtn.style.display = 'none'; return; }
         evaluatieId = tussen.id;
-
-        const resB = await fetch(API_URL + '/api/evaluaties/' + evaluatieId + '/beoordelingen', {
-          headers: { 'Authorization': 'Bearer ' + token }
-        });
+        const resB = await fetch(API_URL + '/api/evaluaties/' + evaluatieId + '/beoordelingen', { headers: { 'Authorization': 'Bearer ' + token } });
         beoordelingen = await resB.json();
-        renderCompetenties();
-        renderMentorFeedback();
+        render();
       } catch (e) {
         toonMelding('Kon de evaluatie niet laden.', '#990018');
       }
     }
 
-    function renderMentorFeedback() {
-      const metFeedback = beoordelingen.filter(b => b.mentor_score != null || (b.mentor_feedback && b.mentor_feedback.trim()));
-      if (!metFeedback.length) return;
-      document.getElementById('mentorFeedbackSectie').style.display = 'block';
-      document.getElementById('mentorFeedbackLijst').innerHTML = beoordelingen.map(b => `
-        <div class="competentie-card">
-          <div class="competentie-header">
-            <h3>${escape(b.competentie_naam)}</h3>
-            <span class="gewicht">${b.mentor_score != null ? 'Score mentor: ' + b.mentor_score + '/5' : ''}</span>
-          </div>
-          <p style="margin:6px 0 0 0;">${b.mentor_feedback ? escape(b.mentor_feedback) : '<span style="color:#9ca3af">(nog geen feedback)</span>'}</p>
-        </div>`).join('');
-    }
-
     indienenBtn.addEventListener('click', async () => {
       melding.style.display = 'none';
-      // Verzamel per competentie score + reflectie
       const invoer = beoordelingen.map((b, i) => ({
         competentie_id: b.competentie_id,
-        student_score: document.querySelector(`input[name="score-${i}"]:checked`)?.value || null,
+        student_score: document.querySelector(`input[name="score-${i}"]:checked`)?.value ?? null,
         student_reflectie: document.getElementById(`reflectie-${i}`).value.trim()
       }));
 
-      if (invoer.some(x => !x.student_score || !x.student_reflectie)) {
-        toonMelding('Gelieve voor elke competentie een score en reflectie in te vullen.', '#990018');
+      if (invoer.some(x => x.student_score === null || !x.student_reflectie)) {
+        toonMelding('Kies voor elke competentie een rubriek en schrijf een korte beschrijving.', '#990018');
         return;
       }
 
@@ -195,5 +170,4 @@
     laad();
   </script>
 </body>
-
 </html>

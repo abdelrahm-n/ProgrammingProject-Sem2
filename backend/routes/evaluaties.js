@@ -123,8 +123,11 @@ router.post('/', controleerToken, async (req, res) => {
   }
 
   try {
-    const docent_id = req.gebruiker.rol === 'docent' ? req.gebruiker.id : null
-    const mentor_id = req.gebruiker.rol === 'stagementor' ? req.gebruiker.id : null
+    /* Mentor én docent van de stage koppelen, zodat beiden toegang hebben
+       tot dit evaluatiemoment (ongeacht wie het aanmaakt). */
+    const [stageRij] = await db.query('SELECT mentor_id, docent_id FROM stage WHERE id = ?', [stage_id])
+    const mentor_id = stageRij.length ? stageRij[0].mentor_id : null
+    const docent_id = stageRij.length ? stageRij[0].docent_id : null
 
     const [resultaat] = await db.query(
       `INSERT INTO evaluatie_moment (stage_id, docent_id, mentor_id, type_id, datum)
