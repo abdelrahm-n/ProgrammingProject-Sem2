@@ -19,6 +19,48 @@ async function haalStageVanStudent(studentId) {
   return rijen.length > 0 ? rijen[0] : null
 }
 
+/* Haal per dagitem de gekoppelde competenties op voor een hele stage */
+async function haalCompetentieKoppelingen(stageId) {
+  const [rijen] = await db.query(
+    `SELECT ldc.logboek_dag_item_id, c.id AS competentie_id, c.naam
+     FROM logboek_dag_competentie ldc
+     JOIN logboek_dag_item ldi ON ldc.logboek_dag_item_id = ldi.id
+     JOIN logboek_week lw ON ldi.logboek_week_id = lw.id
+     JOIN competentie c ON ldc.competentie_id = c.id
+     WHERE lw.stage_id = ?
+     ORDER BY c.id`,
+    [stageId]
+  )
+  return rijen
+}
+
+/* Haal de actieve competenties op van de opleiding van een student */
+async function haalCompetentiesVanStudent(studentId) {
+  const [rijen] = await db.query(
+    `SELECT c.id, c.naam
+     FROM competentie c
+     JOIN student st ON st.opleiding_id = c.opleiding_id
+     WHERE st.persoon_id = ? AND c.actief = TRUE
+     ORDER BY c.id`,
+    [studentId]
+  )
+  return rijen
+}
+
+/* Koppel een lijst competenties aan een dagitem (vervangt bestaande koppelingen) */
+async function koppelCompetenties(dagItemId, competentieIds) {
+  await db.query('DELETE FROM logboek_dag_competentie WHERE logboek_dag_item_id = ?', [dagItemId])
+  if (!Array.isArray(competentieIds)) return
+  for (const cid of competentieIds) {
+    const id = Number(cid)
+    if (!id) continue
+    await db.query(
+      'INSERT IGNORE INTO logboek_dag_competentie (logboek_dag_item_id, competentie_id) VALUES (?, ?)',
+      [dagItemId, id]
+    )
+  }
+}
+
 /* Bereken maandag en vrijdag van de week waarin een datum valt (ma-vr = 5 dagen) */
 function weekGrenzen(datumString) {
   const datum = new Date(datumString)
