@@ -94,3 +94,15 @@
         html += '<td>' + escape(o.bedrijf_naam || '-') + '</td>';
         html += '<td>' + mentor + '</td>';
         html += '<td>' + periode + '</td>';
+        html += '<td class="handtekeningen-cell">' +
+          handtekening('Student', o.getekend_door_student) + ' ' +
+          handtekening('Mentor', o.getekend_door_bedrijf) + ' ' +
+          handtekening('Commissie', o.getekend_door_school) + '</td>';
+        html += '<td>' + resultaat(o) + '</td>';
+        html += '</tr>';
+      });
+      html += '</tbody></table>';
+      return html;
+    }
+
+    async function laadOvereenkomsten() {
