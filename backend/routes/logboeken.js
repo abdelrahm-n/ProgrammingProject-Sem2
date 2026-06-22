@@ -121,13 +121,21 @@ router.get('/mijn', controleerToken, async (req, res) => {
       [stage.id]
     )
 
-    /* Dagitems onder hun week hangen */
+    /* Gekoppelde competenties per dagitem ophalen */
+    const koppelingen = await haalCompetentieKoppelingen(stage.id)
+
+    /* Dagitems onder hun week hangen, inclusief gekoppelde competenties */
     const wekenMetItems = weken.map(w => ({
       ...w,
-      dagen: items.filter(i => i.logboek_week_id === w.id)
+      dagen: items
+        .filter(i => i.logboek_week_id === w.id)
+        .map(i => ({ ...i, competenties: koppelingen.filter(k => k.logboek_dag_item_id === i.id) }))
     }))
 
-    res.json({ stage, weken: wekenMetItems })
+    /* Competentielijst van de opleiding van de student (voor de keuzeknoppen) */
+    const competenties = await haalCompetentiesVanStudent(req.gebruiker.id)
+
+    res.json({ stage, weken: wekenMetItems, competenties })
   } catch (err) {
     console.error(err)
     res.status(500).json({ fout: 'Serverfout' })
