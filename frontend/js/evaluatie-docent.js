@@ -75,26 +75,18 @@ async function laadEvaluaties(stageId) {
           <p class="tekst-muted">Laden...</p>
         </div>
         <div class="formulier-kaart" style="border-top:1px solid var(--color-border-light)">
-          <div class="form-rij form-rij--2">
-            <div class="form-group">
-              <label>Eindscore</label>
-              <input type="number" min="0" max="20" step="0.5"
-                id="eindscore-${ev.id}"
-                value="${ev.eindresultaat_score !== null ? ev.eindresultaat_score : ''}"
-                placeholder="0 t/m 20"
-              />
-            </div>
-            <div class="form-group">
-              <label>Algemene feedback</label>
-              <input type="text"
-                id="algfeedback-${ev.id}"
-                value="${ev.algemene_feedback || ''}"
-                placeholder="Optionele algemene feedback..."
-              />
-            </div>
+          <p style="margin:0 0 10px;font-size:13px;color:var(--sub)">Het eindcijfer wordt automatisch gewogen berekend uit jouw scores per competentie.</p>
+          <div class="form-group">
+            <label>Algemene feedback</label>
+            <input type="text"
+              id="algfeedback-${ev.id}"
+              value="${ev.algemene_feedback || ''}"
+              placeholder="Optionele algemene feedback..."
+            />
           </div>
-          <div class="form-acties">
-            <button class="btn btn--primair btn--sm" onclick="sluitEvaluatieAf(${ev.id})">Eindscore opslaan</button>
+          <div class="form-acties" style="align-items:center;gap:12px">
+            <button class="btn btn--primair btn--sm" onclick="sluitEvaluatieAf(${ev.id})">Afsluiten en eindcijfer berekenen</button>
+            ${ev.eindresultaat_score !== null ? '<strong>Eindcijfer: ' + ev.eindresultaat_score + '/20</strong>' : ''}
           </div>
         </div>
       `
@@ -129,28 +121,47 @@ async function laadBeoordelingen(evaluatieId) {
       rij.style.borderBottom = '1px solid var(--color-border-light)'
       rij.style.padding = '16px 0'
 
+      const scoreOpties = [1,2,3,4,5].map(n =>
+        `<option value="${n}" ${Number(b.docent_score) === n ? 'selected' : ''}>${n}/5</option>`).join('')
+
       rij.innerHTML = `
-        <p style="font-weight:bold;margin-bottom:8px">${b.competentie_naam}</p>
+        <p style="font-weight:bold;margin-bottom:8px">${b.competentie_naam} <span style="font-weight:400;color:var(--faint)">(gewicht ${b.gewicht})</span></p>
 
         ${b.student_score != null ? `<p style="margin-bottom:4px"><em>Zelfscore student:</em> ${b.student_score}/5</p>` : ''}
         ${b.student_reflectie ? `<p style="margin-bottom:8px"><em>Reflectie student:</em> ${b.student_reflectie}</p>` : '<p class="tekst-muted" style="margin-bottom:8px">Student heeft nog geen reflectie ingevuld.</p>'}
-        ${b.mentor_score !== null ? `<p style="margin-bottom:8px"><strong>Score mentor:</strong> ${b.mentor_score}/10 &mdash; ${b.mentor_feedback || 'geen feedback'}</p>` : ''}
+        ${b.mentor_score != null ? `<p style="margin-bottom:8px"><strong>Score mentor:</strong> ${b.mentor_score}/5 &mdash; ${b.mentor_feedback || 'geen feedback'}</p>` : ''}
 
-        <div class="form-group" style="max-width:400px">
-          <label>Jouw feedback (docent)</label>
-          <textarea
-            id="docentfeedback-${evaluatieId}-${b.competentie_id}"
-            class="feedback-input"
-            rows="2"
-            placeholder="Geef feedback op deze competentie..."
-          >${b.docent_feedback || ''}</textarea>
+        <div style="background:#fafafa;border:1px solid #eee;border-radius:8px;padding:8px 11px;margin:6px 0 10px;font-size:12.5px;line-height:1.5">
+          <strong>Rubriek</strong><br>
+          5 (sterk): ${b.rubric_volledig || '-'}<br>
+          3 (goed): ${b.rubric_goed || '-'}<br>
+          1 (onvoldoende): ${b.rubric_onvoldoende || '-'}
+        </div>
+
+        <div class="form-rij form-rij--2">
+          <div class="form-group" style="max-width:160px">
+            <label>Jouw score (docent)</label>
+            <select id="docentscore-${evaluatieId}-${b.competentie_id}">
+              <option value="">—</option>
+              ${scoreOpties}
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Jouw feedback (docent)</label>
+            <textarea
+              id="docentfeedback-${evaluatieId}-${b.competentie_id}"
+              class="feedback-input"
+              rows="2"
+              placeholder="Motiveer je score op deze competentie..."
+            >${b.docent_feedback || ''}</textarea>
+          </div>
         </div>
 
         <div class="form-acties">
           <button
             class="btn btn--primair btn--sm"
             onclick="slaDocentFeedbackOp(${evaluatieId}, ${b.competentie_id})"
-          >Feedback opslaan</button>
+          >Opslaan</button>
         </div>
       `
 
@@ -189,9 +200,10 @@ async function maakEvaluatie(stageId) {
   }
 }
 
-/* Sla docent feedback op per competentie */
+/* Sla docent score + feedback op per competentie */
 async function slaDocentFeedbackOp(evaluatieId, competentieId) {
   const feedback = document.getElementById('docentfeedback-' + evaluatieId + '-' + competentieId).value
+  const scoreVeld = document.getElementById('docentscore-' + evaluatieId + '-' + competentieId).value
 
   try {
     const antwoord = await fetch(API_URL + '/api/evaluaties/' + evaluatieId + '/docent-feedback', {
@@ -200,11 +212,15 @@ async function slaDocentFeedbackOp(evaluatieId, competentieId) {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + token
       },
-      body: JSON.stringify({ competentie_id: competentieId, docent_feedback: feedback })
+      body: JSON.stringify({
+        competentie_id: competentieId,
+        docent_feedback: feedback,
+        docent_score: scoreVeld ? Number(scoreVeld) : null
+      })
     })
 
     if (antwoord.ok) {
-      alert('Feedback opgeslagen.')
+      alert('Opgeslagen.')
     } else {
       alert('Opslaan mislukt.')
     }
@@ -213,9 +229,8 @@ async function slaDocentFeedbackOp(evaluatieId, competentieId) {
   }
 }
 
-/* Sla de eindscore op en sluit de evaluatie af */
+/* Sluit de evaluatie af: het eindcijfer wordt automatisch berekend */
 async function sluitEvaluatieAf(evaluatieId) {
-  const score    = document.getElementById('eindscore-' + evaluatieId).value
   const feedback = document.getElementById('algfeedback-' + evaluatieId).value
 
   try {
@@ -225,16 +240,16 @@ async function sluitEvaluatieAf(evaluatieId) {
         'Content-Type': 'application/json',
         'Authorization': 'Bearer ' + token
       },
-      body: JSON.stringify({
-        eindresultaat_score: score ? parseFloat(score) : null,
-        algemene_feedback: feedback || null
-      })
+      body: JSON.stringify({ algemene_feedback: feedback || null })
     })
 
+    const data = await antwoord.json().catch(() => ({}))
+
     if (antwoord.ok) {
-      alert('Eindscore opgeslagen.')
+      alert('Evaluatie afgesloten. Eindcijfer: ' + data.eindscore + '/20')
+      laadEvaluaties(stageSelectie.value)
     } else {
-      alert('Opslaan mislukt.')
+      alert(data.fout || 'Afsluiten mislukt.')
     }
   } catch (fout) {
     alert('Kan geen verbinding maken met de server.')
