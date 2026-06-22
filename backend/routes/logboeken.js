@@ -204,6 +204,9 @@ router.post('/dag', controleerToken, async (req, res) => {
       [weekId, datum, uitgevoerde_taken, reflectie || null, problemen_leerpunten || null]
     )
 
+    /* Koppel de geselecteerde competenties aan dit nieuwe dagitem */
+    await koppelCompetenties(item.insertId, competenties)
+
     res.status(201).json({ id: item.insertId, logboek_week_id: weekId, bericht: 'Logboekitem toegevoegd' })
   } catch (err) {
     console.error(err)
