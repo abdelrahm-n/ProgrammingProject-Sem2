@@ -106,3 +106,15 @@
     }
 
     async function laadOvereenkomsten() {
+      const houder = document.getElementById('overzichtLijst');
+      try {
+        const resp = await fetch(API_URL + '/api/docent/overeenkomsten', {
+          headers: { 'Authorization': 'Bearer ' + token }
+        });
+        if (!resp.ok) {
+          houder.innerHTML = '<p>Kan de overeenkomsten niet laden.</p>';
+          return;
+        }
+        const data = await resp.json();
+        if (!data || data.length === 0) {
+          houder.innerHTML = '<p>Er zijn nog geen overeenkomsten voor jouw studenten.</p>';
