@@ -29,24 +29,28 @@ window.fetch = function () {
 // --- Dynamische sidebar ---
 var sidebarConfig = {
   student: [
-    { bestand: 'dashboard.html',      label: 'Dashboard' },
-    { bestand: 'logboek.html',        label: 'Logboek' },
-    { bestand: 'evaluatie.html',      label: 'Evaluatie' },
-    { bestand: 'profiel.html',        label: 'Profiel' }
+    { bestand: 'dashboard.html',                  label: 'Dashboard' },
+    { bestand: 'logboek.html',                    label: 'Logboek' },
+    { bestand: 'evaluatie.html?fase=tussentijds', label: 'Tussentijdse evaluatie' },
+    { bestand: 'evaluatie.html?fase=eind',        label: 'Eindevaluatie' },
+    { bestand: 'profiel.html',                    label: 'Profiel' }
   ],
   docent: [
-    { bestand: 'dashboard.html',      label: 'Dashboard' },
-    { bestand: 'studenten.html',      label: 'Studenten' },
-    { bestand: 'logboeken.html',      label: 'Logboeken' },
-    { bestand: 'evaluatie.html',      label: 'Evaluatie' },
-    { bestand: 'profiel.html',        label: 'Profiel' }
+    { bestand: 'dashboard.html',                  label: 'Dashboard' },
+    { bestand: 'studenten.html',                  label: 'Studenten' },
+    { bestand: 'logboeken.html',                  label: 'Logboeken' },
+    { bestand: 'overeenkomsten.html',             label: 'Overeenkomsten' },
+    { bestand: 'evaluatie.html?fase=tussentijds', label: 'Tussentijdse evaluatie' },
+    { bestand: 'evaluatie.html?fase=eind',        label: 'Eindevaluatie' },
+    { bestand: 'profiel.html',                    label: 'Profiel' }
   ],
   stagementor: [
-    { bestand: 'dashboard.html',      label: 'Dashboard' },
-    { bestand: 'stagiairs.html',      label: 'Stagiairs' },
-    { bestand: 'logboeken.html',      label: 'Logboeken' },
-    { bestand: 'evaluatie.html',      label: 'Evaluatie' },
-    { bestand: 'profiel.html',        label: 'Profiel' }
+    { bestand: 'dashboard.html',                  label: 'Dashboard' },
+    { bestand: 'stagiairs.html',                  label: 'Stagiairs' },
+    { bestand: 'logboeken.html',                  label: 'Logboeken' },
+    { bestand: 'evaluatie.html?fase=tussentijds', label: 'Tussentijdse evaluatie' },
+    { bestand: 'evaluatie.html?fase=eind',        label: 'Eindevaluatie' },
+    { bestand: 'profiel.html',                    label: 'Profiel' }
   ],
   stagecommissie: [
     { bestand: 'dashboard.html',      label: 'Dashboard' },
