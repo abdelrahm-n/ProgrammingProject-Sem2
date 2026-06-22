@@ -82,3 +82,15 @@
     }
 
     function bouwTabel(data) {
+      let html = '<table><thead><tr>' +
+        '<th>Student</th><th>Bedrijf</th><th>Mentor</th><th>Periode</th>' +
+        '<th>Handtekeningen</th><th>Resultaat</th></tr></thead><tbody>';
+      data.forEach(function (o) {
+        const naam = escape(o.student_voornaam + ' ' + o.student_achternaam);
+        const mentor = o.mentor_voornaam ? escape(o.mentor_voornaam + ' ' + o.mentor_achternaam) : '-';
+        const periode = toonDatum(o.startdatum) + ' - ' + toonDatum(o.einddatum);
+        html += '<tr>';
+        html += '<td><strong>' + naam + '</strong></td>';
+        html += '<td>' + escape(o.bedrijf_naam || '-') + '</td>';
+        html += '<td>' + mentor + '</td>';
+        html += '<td>' + periode + '</td>';
