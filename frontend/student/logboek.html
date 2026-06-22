@@ -325,7 +325,11 @@
 
     // Modal
     const modal = document.getElementById('newLogboekModal');
-    document.querySelector('.btn.btn--primair').addEventListener('click', () => modal.classList.remove('hidden'));
+    document.querySelector('.btn.btn--primair').addEventListener('click', () => {
+      geselecteerdeCompetenties.clear();
+      bouwCompetentieKnoppen();
+      modal.classList.remove('hidden');
+    });
     document.getElementById('closeModal').addEventListener('click', () => modal.classList.add('hidden'));
     document.getElementById('cancelModal').addEventListener('click', () => modal.classList.add('hidden'));
 
