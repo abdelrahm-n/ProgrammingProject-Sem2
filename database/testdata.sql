@@ -190,10 +190,13 @@ INSERT INTO stageovereenkomst
 VALUES
   (1, 1, TRUE, TRUE, TRUE, 3, 13, '2026-01-15 11:00:00', '2025-12-01 10:05:00');
 
+-- De administratie heeft een docent toegewezen aan de goedgekeurde aanvraag
+UPDATE stagevoorstel SET docent_id = 6 WHERE id = 1;
+
 INSERT INTO stage
   (id, stageovereenkomst_id, student_id, bedrijf_id, mentor_id, docent_id, startdatum, einddatum, actief, aangemaakt_op)
 VALUES
-  (1, 1, 1, 1, 8, 6, '2026-02-03', '2026-06-26', TRUE, '2026-01-15 11:10:00');
+  (1, 1, 1, 1, 8, 6, '2026-02-03', '2026-06-15', TRUE, '2026-01-15 11:10:00');
 
 -- De student heeft zijn weken ingediend; de mentor heeft nog niets goedgekeurd
 -- (status 2 = 'ingediend', geen mentor-feedback of afcheck-datum).
