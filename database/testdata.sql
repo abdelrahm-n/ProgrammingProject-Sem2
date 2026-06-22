@@ -168,7 +168,7 @@ INSERT INTO stagevoorstel
   (id, student_id, bedrijf_id, mentor_id, academiejaar_id, omschrijving_opdracht, functie, startdatum, einddatum, status_id, aangemaakt_op)
 VALUES
   (1, 1, 1, 8, 1, 'Ontwikkelen van een intern HR-dashboard met React en een Node.js API.', 'Full-stack Developer',
-   '2026-02-03', '2026-06-26', 3, '2025-11-20 09:00:00'),
+   '2026-02-03', '2026-06-15', 3, '2025-11-20 09:00:00'),
   (2, 2, 2, 9, 1, 'Opzetten van een CI/CD-pipeline en containeriseren van microservices.', 'DevOps Engineer',
    '2026-02-10', '2026-06-19', 1, '2026-01-05 14:30:00'),
   (3, 3, 3, 10, 1, 'Bouwen van een interactieve productcatalogus met Three.js.', 'Frontend Developer',
