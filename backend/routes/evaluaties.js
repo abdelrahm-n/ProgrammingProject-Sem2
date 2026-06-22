@@ -126,6 +126,9 @@ router.get('/stage/:stageId', controleerToken, async (req, res) => {
       return res.status(403).json({ fout: 'Je mag alleen je eigen stage evalueren' })
     }
 
+    /* Zorg dat de evaluatiemomenten bestaan voor deze stage */
+    await zorgVoorEvaluatieMomenten(req.params.stageId)
+
     const [rijen] = await db.query(
       `SELECT em.*, et.naam AS type_naam
        FROM evaluatie_moment em
