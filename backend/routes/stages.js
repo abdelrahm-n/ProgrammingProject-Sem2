@@ -457,6 +457,10 @@ router.get('/:id', controleerToken, async (req, res) => {
 
 /* Stagecommissie beoordeelt een voorstel (alleen stagecommissie) */
 router.post('/:id/beoordeling', controleerToken, async (req, res) => {
+  if (req.gebruiker.rol !== 'stagecommissie') {
+    return res.status(403).json({ fout: 'Alleen de stagecommissie mag een voorstel beoordelen' })
+  }
+
   const { beslissing, feedback } = req.body
 
   if (!beslissing) {

@@ -149,6 +149,9 @@ router.get("/commissie/:id", controleerToken, async (req, res) => {
 
 /* PUT /api/stageovereenkomst/commissie/:id/onderteken - commissie ondertekent als school */
 router.put("/commissie/:id/onderteken", controleerToken, async (req, res) => {
+  if (req.gebruiker.rol !== 'stagecommissie') {
+    return res.status(403).json({ fout: 'Alleen de stagecommissie mag als hogeschool ondertekenen' })
+  }
   try {
     const [check] = await db.query(
       "SELECT getekend_door_school FROM stageovereenkomst WHERE id = ?",
@@ -422,6 +425,9 @@ router.get("/voorstel/:persoonId", controleerToken, async (req, res) => {
 
 /* PUT /api/stageovereenkomst/:stagevoorstelId/onderteken-student */
 router.put("/:stagevoorstelId/onderteken-student", controleerToken, async (req, res) => {
+  if (req.gebruiker.rol !== 'student') {
+    return res.status(403).json({ fout: 'Alleen de student mag als student ondertekenen' })
+  }
   try {
     const { stagevoorstelId } = req.params
 
@@ -489,6 +495,9 @@ router.put("/:stagevoorstelId/onderteken-student", controleerToken, async (req, 
 
 /* PUT /api/stageovereenkomst/:stagevoorstelId/onderteken-bedrijf */
 router.put("/:stagevoorstelId/onderteken-bedrijf", controleerToken, async (req, res) => {
+  if (req.gebruiker.rol !== 'stagementor') {
+    return res.status(403).json({ fout: 'Alleen de mentor mag als bedrijf ondertekenen' })
+  }
   try {
     const { stagevoorstelId } = req.params
 
@@ -556,6 +565,9 @@ router.put("/:stagevoorstelId/onderteken-bedrijf", controleerToken, async (req, 
 
 /* PUT /api/stageovereenkomst/:stagevoorstelId/onderteken-school */
 router.put("/:stagevoorstelId/onderteken-school", controleerToken, async (req, res) => {
+  if (req.gebruiker.rol !== 'stagecommissie') {
+    return res.status(403).json({ fout: 'Alleen de stagecommissie mag als hogeschool ondertekenen' })
+  }
   try {
     const { stagevoorstelId } = req.params
 
