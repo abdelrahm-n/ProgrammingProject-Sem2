@@ -49,7 +49,7 @@
               <span class="eval-waarde" id="beoordelaar">-</span>
             </div>
             <div class="eval-rij">
-              <span class="eval-label">Zelfreflectie (eindevaluatie)</span>
+              <span class="eval-label">Eindevaluatie</span>
               <span class="eval-mid" id="eindeDeadline">-</span>
               <span class="eval-waarde"><span class="eval-status eval-status--wacht" id="eindeStatus">In afwachting</span></span>
             </div>
@@ -60,15 +60,22 @@
             <div class="eval-rij">
               <span class="eval-label">Tussentijdsevaluatie</span>
               <span class="eval-mid" id="tussenDatum">-</span>
-              <span class="eval-waarde"><span class="eval-status eval-status--gepland" id="tussenStatus">Gepland</span></span>
+              <span class="eval-waarde"><span class="eval-status eval-status--wacht" id="tussenStatus">In afwachting</span></span>
             </div>
             <div class="eval-rij">
               <span class="eval-label">Zelfreflectie</span>
               <span class="eval-mid" id="tussenDeadline">-</span>
               <span class="eval-waarde" id="zelfreflectieActie">
-                <button type="button" class="btn-eval-invullen" onclick="window.location.href='zelfevaluatie.html'">Invullen</button>
+                <a href="zelfevaluatie.html" class="eval-status eval-status--wacht" style="text-decoration:none; cursor:pointer;">In afwachting</a>
               </span>
             </div>
+          </div>
+
+          <!-- Tussentijdse bespreking aanvragen -->
+          <div class="eval-card" style="display:block;">
+            <h3 style="margin:0 0 4px 0; font-size:16px; font-weight:800;">Tussentijdse bespreking met je mentor</h3>
+            <p style="margin:0 0 14px 0; color:#6b7280; font-size:13px;">Vraag een gesprek aan om je tussentijdse evaluatie te bespreken.</p>
+            <div id="besprekingInhoud" style="font-size:14px; color:#374151;">Laden...</div>
           </div>
         </div>
       </main>
@@ -126,15 +133,22 @@
             headers: { 'Authorization': 'Bearer ' + token }
           });
           const beoordelingen = await resB.json();
+
+          // Zelfreflectie van de student: ingediend?
           const ingediend = beoordelingen.length > 0 &&
             beoordelingen.every(b => b.student_score != null && b.student_reflectie);
-
           if (ingediend) {
-            const t = document.getElementById('tussenStatus');
-            t.textContent = 'In afwachting';
-            t.className = 'eval-status eval-status--wacht';
             document.getElementById('zelfreflectieActie').innerHTML =
               '<span class="eval-status eval-status--ingediend">Ingediend</span>';
+          }
+
+          // Heeft de mentor de evaluatie ingediend? -> "Openen" tonen
+          const mentorKlaar = beoordelingen.length > 0 &&
+            beoordelingen.every(b => b.mentor_score != null);
+          if (mentorKlaar) {
+            const t = document.getElementById('tussenStatus');
+            t.outerHTML = '<a href="tussentijdse-evaluatie.html" class="eval-status" ' +
+              'style="background:var(--rol-accent,#8B0015);color:#fff;text-decoration:none;cursor:pointer;">Openen</a>';
           }
         }
 
@@ -143,15 +157,88 @@
             headers: { 'Authorization': 'Bearer ' + token }
           });
           const eindeBeoordelingen = await resEB.json();
-          const eindeIngediend = eindeBeoordelingen.length > 0 &&
-            eindeBeoordelingen.every(b => b.student_score != null && b.student_reflectie);
 
-          if (eindeIngediend) {
-            document.getElementById('eindeStatus').textContent = 'Ingediend';
-            document.getElementById('eindeStatus').className = 'eval-status eval-status--ingediend';
+          // Heeft de mentor de eindevaluatie ingediend? -> "Openen" tonen
+          const mentorKlaarEind = eindeBeoordelingen.length > 0 &&
+            eindeBeoordelingen.every(b => b.mentor_score != null);
+          if (mentorKlaarEind) {
+            const e = document.getElementById('eindeStatus');
+            e.outerHTML = '<a href="eindevaluatie.html" class="eval-status" ' +
+              'style="background:var(--rol-accent,#8B0015);color:#fff;text-decoration:none;cursor:pointer;">Openen</a>';
           }
         }
       } catch (e) { /* laat standaard waarden staan */ }
+    })();
+  </script>
+
+  <!-- Tussentijdse bespreking aanvragen bij de mentor -->
+  <script>
+    (function () {
+      const API_URL = 'http://localhost:3000';
+      const token = localStorage.getItem('token') || '';
+      const box = document.getElementById('besprekingInhoud');
+      if (!box) return;
+
+      const statusLabel = { aangevraagd: 'Aangevraagd', bevestigd: 'Bevestigd', geweigerd: 'Geweigerd' };
+      const statusClass = { aangevraagd: 'eval-status--wacht', bevestigd: 'eval-status--ingediend', geweigerd: 'eval-status--ingediend' };
+      const esc = (t) => { if (t == null) return ''; const d = document.createElement('div'); d.textContent = t; return d.innerHTML; };
+
+      function toonFormulier() {
+        box.innerHTML = `
+          <textarea id="bespBericht" placeholder="Waarover wil je het hebben? (optioneel)" style="width:100%;min-height:60px;padding:10px;border:1px solid #d8d8d8;border-radius:8px;font-family:inherit;font-size:14px;"></textarea>
+          <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin-top:10px;">
+            <label style="font-size:13px;color:#374151;">Voorkeursdatum:
+              <input type="date" id="bespDatum" style="padding:8px;border:1px solid #d8d8d8;border-radius:8px;">
+            </label>
+            <button type="button" id="bespBtn" class="btn-eval-invullen">Bespreking aanvragen</button>
+          </div>
+          <p id="bespMelding" style="display:none;margin-top:10px;font-weight:600;"></p>`;
+        document.getElementById('bespBtn').addEventListener('click', aanvragen);
+      }
+
+      async function aanvragen() {
+        const m = document.getElementById('bespMelding');
+        const bericht = document.getElementById('bespBericht').value.trim();
+        const datum = document.getElementById('bespDatum').value;
+        try {
+          const res = await fetch(API_URL + '/api/besprekingen', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+            body: JSON.stringify({ bericht, voorkeur_datum: datum || null })
+          });
+          const r = await res.json();
+          if (!res.ok) { m.textContent = r.fout || 'Aanvragen mislukt.'; m.style.color = '#990018'; m.style.display = 'block'; return; }
+          laad();
+        } catch (e) { m.textContent = 'Kan geen verbinding maken met de server.'; m.style.color = '#990018'; m.style.display = 'block'; }
+      }
+
+      function toonStatus(b) {
+        const lbl = statusLabel[b.status] || b.status;
+        const cls = statusClass[b.status] || 'eval-status--wacht';
+        box.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+            <div>
+              ${b.voorkeur_datum ? '<div style="font-size:13px;color:#6b7280;">Voorkeursdatum: ' + new Date(b.voorkeur_datum).toLocaleDateString('nl-BE') + '</div>' : ''}
+              ${b.bericht ? '<div style="margin-top:4px;">' + esc(b.bericht) + '</div>' : '<div style="color:#9ca3af;">Geen bericht</div>'}
+            </div>
+            <span class="eval-status ${cls}">${lbl}</span>
+          </div>
+          ${b.mentor_antwoord ? '<p style="margin:10px 0 0;"><strong>Antwoord mentor:</strong> ' + esc(b.mentor_antwoord) + '</p>' : ''}
+          ${b.status === 'geweigerd' ? '<button type="button" id="bespOpnieuw" class="btn-eval-invullen" style="margin-top:10px;">Opnieuw aanvragen</button>' : ''}`;
+        const opn = document.getElementById('bespOpnieuw');
+        if (opn) opn.addEventListener('click', toonFormulier);
+      }
+
+      async function laad() {
+        if (!token) { box.textContent = 'Log in als student om een bespreking aan te vragen.'; return; }
+        try {
+          const res = await fetch(API_URL + '/api/besprekingen/mijn', { headers: { 'Authorization': 'Bearer ' + token } });
+          const lijst = await res.json();
+          if (Array.isArray(lijst) && lijst.length) toonStatus(lijst[0]);
+          else toonFormulier();
+        } catch (e) { box.textContent = 'Kon de bespreking niet laden.'; }
+      }
+      laad();
     })();
   </script>
 </body>

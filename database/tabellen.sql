@@ -436,3 +436,25 @@ CREATE TABLE notificatie (
     FOREIGN KEY (ontvanger_id)
         REFERENCES persoon(id)
 );
+
+-- TUSSENTIJDSE BESPREKING (student vraagt aan, mentor ziet/bevestigt)
+
+CREATE TABLE bespreking (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    stage_id INT,
+    student_id INT,
+    mentor_id INT,
+
+    bericht TEXT,
+    voorkeur_datum DATE NULL,
+
+    status VARCHAR(20) DEFAULT 'aangevraagd',
+    mentor_antwoord TEXT NULL,
+
+    aangemaakt_op TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (stage_id)   REFERENCES stage(id),
+    FOREIGN KEY (student_id) REFERENCES persoon(id),
+    FOREIGN KEY (mentor_id)  REFERENCES persoon(id)
+);

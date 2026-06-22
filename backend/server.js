@@ -15,6 +15,7 @@ import notificatiesRoutes      from './routes/notificaties.js'
 import documentenRoutes        from './routes/documenten.js'
 import docentRoutes            from './routes/docent.js'
 import mentorRoutes            from './routes/mentor.js'
+import besprekingenRoutes      from './routes/besprekingen.js'
 
 dotenv.config()
 
@@ -45,6 +46,7 @@ app.use('/api/notificaties',      notificatiesRoutes)
 app.use('/api/documenten',        documentenRoutes)
 app.use('/api/docent',            docentRoutes)
 app.use('/api/mentor',            mentorRoutes)
+app.use('/api/besprekingen',      besprekingenRoutes)
 
 app.listen(PORT, () => {
   console.log(`Server draait op http://localhost:${PORT}`)
