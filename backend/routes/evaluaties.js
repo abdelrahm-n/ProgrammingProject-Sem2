@@ -4,6 +4,52 @@ import controleerToken from '../middleware/controleerToken.js'
 
 const router = express.Router()
 
+/* Zorg dat er voor een actieve stage altijd een tussentijdse- én een
+   eindevaluatiemoment bestaat (met competentierijen). Zo werkt de
+   evaluatie automatisch zodra de stage is gestart, zonder handmatige actie. */
+async function zorgVoorEvaluatieMomenten(stageId) {
+  const [stageRij] = await db.query(
+    'SELECT id, student_id, mentor_id, docent_id FROM stage WHERE id = ?',
+    [stageId]
+  )
+  if (stageRij.length === 0) return
+  const stage = stageRij[0]
+
+  const [stud] = await db.query('SELECT opleiding_id FROM student WHERE persoon_id = ?', [stage.student_id])
+  if (stud.length === 0) return
+  const opleidingId = stud[0].opleiding_id
+
+  const [comps] = await db.query(
+    'SELECT id FROM competentie WHERE opleiding_id = ? AND actief = TRUE',
+    [opleidingId]
+  )
+
+  const typeNamen = ['tussentijdse_evaluatie', 'eindevaluatie']
+  for (const naam of typeNamen) {
+    const [t] = await db.query('SELECT id FROM evaluatie_type WHERE naam = ?', [naam])
+    if (t.length === 0) continue
+    const typeId = t[0].id
+
+    const [bestaat] = await db.query(
+      'SELECT id FROM evaluatie_moment WHERE stage_id = ? AND type_id = ?',
+      [stageId, typeId]
+    )
+    if (bestaat.length > 0) continue
+
+    const datum = new Date().toISOString().slice(0, 10)
+    const [r] = await db.query(
+      'INSERT INTO evaluatie_moment (stage_id, docent_id, mentor_id, type_id, datum) VALUES (?, ?, ?, ?, ?)',
+      [stageId, stage.docent_id, stage.mentor_id, typeId, datum]
+    )
+    for (const c of comps) {
+      await db.query(
+        'INSERT INTO competentie_beoordeling (evaluatie_moment_id, competentie_id) VALUES (?, ?)',
+        [r.insertId, c.id]
+      )
+    }
+  }
+}
+
 /* Haal een evaluatie op en controleer of de gebruiker het mag zien.
    Studenten: alleen eigen evaluaties. Mentoren/docenten: alleen hun eigen stages. */
 async function haalEvaluatieOpMetToegang(req, res, evaluatieId) {
