@@ -9,8 +9,8 @@ const dbRol = rolRaw === 'mentor' ? 'stagementor' : rolRaw === 'commissie' ? 'st
 
 const SCORE_LBL = { 1: 'Onvoldoende', 2: 'Matig', 3: 'Voldoende', 4: 'Goed', 5: 'Uitstekend' }
 
-/* fase = 'tussentijds' | 'eind' */
-let fase = 'tussentijds'
+/* fase = 'tussentijds' | 'eind' (begininstelling uit de sidebar-link ?fase=) */
+let fase = new URLSearchParams(window.location.search).get('fase') === 'eind' ? 'eind' : 'tussentijds'
 let momentId = null
 let momenten = []
 let beoordelingen = []
