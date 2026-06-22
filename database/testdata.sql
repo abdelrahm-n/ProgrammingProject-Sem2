@@ -222,20 +222,57 @@ VALUES
   (2, 8, 'Goed dat je Docker hebt opgezet, maar check de versie-eisen in de README.', '2026-02-05 08:30:00'),
   (4, 8, 'Mooi dat je de API hebt getest. Gebruik voortaan ook Jest voor unit tests.', '2026-02-09 08:30:00');
 
+-- Logboekdagen gekoppeld aan competenties (LO-badges in de logboekweergave)
+INSERT INTO logboek_dag_competentie (logboek_dag_item_id, competentie_id) VALUES
+  (1, 6), (1, 8),
+  (2, 3), (2, 4),
+  (3, 2), (3, 3),
+  (4, 3), (4, 7),
+  (5, 6), (5, 9),
+  (6, 2), (6, 3);
+
+-- Twee evaluatiemomenten voor de actieve stage van Amira:
+--   moment 1 = tussentijdse evaluatie (type 1) -> volledig ingevuld als demo
+--   moment 2 = eindevaluatie (type 2) -> volledig ingevuld met eindcijfer
 INSERT INTO evaluatie_moment
   (id, stage_id, docent_id, mentor_id, type_id, datum, eindresultaat_score, algemene_feedback)
 VALUES
-  (1, 1, 6, 8, 1, '2026-04-15', NULL, NULL);
+  (1, 1, 6, 8, 1, '2026-04-15', NULL, NULL),
+  (2, 1, 6, 8, 2, '2026-06-12', 15.6,
+   'Sterke stage met duidelijke groei. Goede technische bijdrage en professionele houding.');
 
--- De student heeft zijn reflectie ingevuld; de mentor en docent hebben nog
--- niets beoordeeld (mentor_score / mentor_feedback / docent_feedback blijven leeg).
+-- TUSSENTIJDSE EVALUATIE (moment 1): student, mentor en docent volledig ingevuld.
+-- Deze scores helpen de student om te weten waar hij nog op moet werken.
 INSERT IGNORE INTO competentie_beoordeling
-  (evaluatie_moment_id, competentie_id, student_reflectie, student_score, mentor_score, mentor_feedback, docent_feedback)
+  (evaluatie_moment_id, competentie_id, student_reflectie, student_score, mentor_score, mentor_feedback, docent_score, docent_feedback)
 VALUES
-  (1, 1, 'Ik plan elke dag mijn taken en gebruik Jira.', 3, NULL, NULL, NULL),
-  (1, 2, 'Ik heb een dashboard ontworpen met React.', 5, NULL, NULL, NULL),
-  (1, 3, 'Ik implementeer functionaliteiten in onze app.', 3, NULL, NULL, NULL),
-  (1, 4, 'Ik heb Docker en Node.js opgezet voor het project.', 1, NULL, NULL, NULL);
+  (1, 1,  'Ik plan elke dag mijn taken en gebruik Jira.',                3, 3, 'Planning is in orde, blijf de sprintdoelen bewaken.',          3, 'Degelijke planning, hou dit aan.'),
+  (1, 2,  'Ik heb een dashboard ontworpen met React.',                   4, 4, 'Mooi ontwerp, denk aan herbruikbare componenten.',            4, 'Goed ontwerp, sterke structuur.'),
+  (1, 3,  'Ik implementeer functionaliteiten in onze app.',              3, 3, 'Implementatie groeit, vraag tijdig om code review.',          3, 'Op schema, blijf testen.'),
+  (1, 4,  'Ik heb Docker en Node.js opgezet voor het project.',          2, 3, 'Infrastructuur komt goed, documenteer je setup.',             3, 'Voldoende, blijf bijleren over CI/CD.'),
+  (1, 5,  'Ik onderzoek libraries voor datavisualisatie.',               3, 3, 'Goede onderzoekshouding, vergelijk meer alternatieven.',      3, 'Onderzoek is correct onderbouwd.'),
+  (1, 6,  'Ik communiceer in de daily stand-up.',                        3, 4, 'Communicatie is duidelijk, blijf proactief.',                 3, 'Communiceert helder met het team.'),
+  (1, 7,  'Ik los bugs op met een gestructureerde aanpak.',              3, 3, 'Goede aanpak, gebruik meer debugging-tools.',                 3, 'Probleemoplossing is in orde.'),
+  (1, 8,  'Ik vraag feedback en pas die toe.',                           4, 4, 'Sterk: verwerkt feedback heel goed.',                         4, 'Mooie persoonlijke groei.'),
+  (1, 9,  'Ik kom afspraken na en ben stipt.',                           4, 4, 'Zeer professionele houding.',                                 4, 'Betrouwbaar en stipt.'),
+  (1, 10, 'Ik denk mee over verbeteringen.',                             3, 3, 'Toont initiatief, durf meer voorstellen te doen.',            3, 'Ondernemend, kan nog groeien.'),
+  (1, 11, 'Ik ga zorgvuldig om met bedrijfsdata.',                       4, 4, 'Gaat correct om met vertrouwelijke gegevens.',                4, 'Ethisch correct.');
+
+-- EINDEVALUATIE (moment 2): iedereen ingevuld. De docent-score telt als eindscore.
+INSERT IGNORE INTO competentie_beoordeling
+  (evaluatie_moment_id, competentie_id, student_reflectie, student_score, mentor_score, mentor_feedback, docent_score, docent_feedback)
+VALUES
+  (2, 1,  'Mijn planning is sterk verbeterd doorheen de stage.',         4, 4, 'Plant zelfstandig en realistisch.',                           4, 'Sterke planning op het einde.'),
+  (2, 2,  'Ik ontwerp nu volledige features zelfstandig.',               4, 5, 'Uitstekend ontwerp, denkt aan de gebruiker.',                 4, 'Zeer goed ontwerpwerk.'),
+  (2, 3,  'Ik heb meerdere modules volledig geïmplementeerd.',           4, 4, 'Kwaliteitsvolle implementatie.',                              4, 'Solide implementatie.'),
+  (2, 4,  'Ik beheer nu de Docker- en CI/CD-pipeline.',                  3, 4, 'Goede vooruitgang in infrastructuur.',                        3, 'Voldoende tot goed.'),
+  (2, 5,  'Ik onderbouw keuzes met onderzoek.',                          4, 4, 'Sterke onderzoekende houding.',                               4, 'Goed onderbouwd.'),
+  (2, 6,  'Ik presenteerde mijn werk aan het team.',                     4, 4, 'Heldere, professionele communicatie.',                        4, 'Communiceert uitstekend.'),
+  (2, 7,  'Ik los complexe problemen zelfstandig op.',                   4, 4, 'Sterk probleemoplossend vermogen.',                           4, 'Zeer goed.'),
+  (2, 8,  'Ik blijf reflecteren en bijleren.',                           5, 5, 'Uitzonderlijke leerhouding.',                                 5, 'Uitstekende groei.'),
+  (2, 9,  'Ik werk professioneel en betrouwbaar.',                       5, 5, 'Voorbeeldige professionele attitude.',                        5, 'Zeer professioneel.'),
+  (2, 10, 'Ik nam initiatief voor nieuwe features.',                     3, 4, 'Toont mooi ondernemerschap.',                                 4, 'Ondernemend.'),
+  (2, 11, 'Ik handel steeds ethisch met data.',                          5, 5, 'Onberispelijk ethisch handelen.',                             5, 'Voorbeeldig.');
 
 INSERT INTO notificatie (ontvanger_id, titel, boodschap, gelezen) VALUES
 (1, 'Stagevoorstel goedgekeurd',    'Je stagevoorstel bij iO Belgium werd goedgekeurd.', FALSE),
