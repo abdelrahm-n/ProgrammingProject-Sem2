@@ -90,6 +90,13 @@ async function haalEvaluatieOpMetToegang(req, res, evaluatieId) {
 /* Haal eigen evaluaties op (student) */
 router.get('/mijn', controleerToken, async (req, res) => {
   try {
+    /* Voor een actieve stage de evaluatiemomenten automatisch aanmaken */
+    const [actieveStage] = await db.query(
+      'SELECT id FROM stage WHERE student_id = ? AND actief = TRUE ORDER BY aangemaakt_op DESC LIMIT 1',
+      [req.gebruiker.id]
+    )
+    if (actieveStage.length > 0) await zorgVoorEvaluatieMomenten(actieveStage[0].id)
+
     const [rijen] = await db.query(
       `SELECT em.*, et.naam AS type_naam
        FROM evaluatie_moment em
