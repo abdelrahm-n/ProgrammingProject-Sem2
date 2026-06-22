@@ -420,6 +420,24 @@ CREATE TABLE competentie_beoordeling (
         REFERENCES competentie(id)
 );
 
+-- LOGBOEK DAG ITEM GEKOPPELD AAN COMPETENTIES
+
+CREATE TABLE logboek_dag_competentie (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    logboek_dag_item_id INT,
+    competentie_id INT,
+
+    UNIQUE KEY uniek_dag_competentie (logboek_dag_item_id, competentie_id),
+
+    FOREIGN KEY (logboek_dag_item_id)
+        REFERENCES logboek_dag_item(id)
+        ON DELETE CASCADE,
+
+    FOREIGN KEY (competentie_id)
+        REFERENCES competentie(id)
+);
+
 -- NOTIFICATIE
 
 CREATE TABLE notificatie (
