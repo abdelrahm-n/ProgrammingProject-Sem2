@@ -100,6 +100,16 @@ if (sidebar) {
   }
 }
 
+/* Toon de naam van de ingelogde gebruiker rechtsboven (student) */
+var rolBadge = document.querySelector('.header-rol-badge')
+if (rolBadge) {
+  var ingelogdeRol = localStorage.getItem('rol')
+  var ingelogdeNaam = localStorage.getItem('naam')
+  if (ingelogdeRol === 'student' && ingelogdeNaam) {
+    rolBadge.textContent = ingelogdeNaam
+  }
+}
+
 // --- Uitlog functionaliteit ---
 var uitlogBtn = document.getElementById('uitlogBtn')
 if (uitlogBtn) {
