@@ -362,7 +362,8 @@
         datum: datumValue,
         uitgevoerde_taken: document.getElementById('takenInput').value.trim(),
         reflectie: document.getElementById('reflectieInput').value.trim(),
-        problemen_leerpunten: document.getElementById('problemenInput').value.trim()
+        problemen_leerpunten: document.getElementById('problemenInput').value.trim(),
+        competenties: Array.from(geselecteerdeCompetenties)
       };
 
       try {
