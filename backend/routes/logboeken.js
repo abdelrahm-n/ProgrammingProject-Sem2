@@ -281,9 +281,13 @@ async function haalWekenVanStage(stageId) {
     [stageId]
   )
 
+  /* Gekoppelde competenties per dagitem */
+  const koppelingen = await haalCompetentieKoppelingen(stageId)
+
   const dagen = items.map(i => ({
     ...i,
-    feedback: feedback.filter(f => f.logboek_dag_item_id === i.id)
+    feedback: feedback.filter(f => f.logboek_dag_item_id === i.id),
+    competenties: koppelingen.filter(k => k.logboek_dag_item_id === i.id)
   }))
   return weken.map(w => ({ ...w, dagen: dagen.filter(d => d.logboek_week_id === w.id) }))
 }
