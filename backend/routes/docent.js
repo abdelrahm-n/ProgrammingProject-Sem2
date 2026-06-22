@@ -44,6 +44,40 @@ router.get('/mijn-studenten', controleerToken, isDocent, async (req, res) => {
   }
 })
 
+/* GET /api/docent/overeenkomsten - alleen-lezen overzicht van de stageovereenkomsten
+   van de studenten van deze docent. De docent tekent NIET; hij kan enkel inspecteren
+   of de aanvraag gelukt is (mentor + commissie tekenen). */
+router.get('/overeenkomsten', controleerToken, isDocent, async (req, res) => {
+  try {
+    const [rijen] = await db.query(
+      `SELECT so.id AS overeenkomst_id,
+              so.getekend_door_student, so.getekend_door_bedrijf, so.getekend_door_school,
+              so.gevalideerd_op,
+              os.naam AS status,
+              sv.startdatum, sv.einddatum, sv.omschrijving_opdracht,
+              sp.voornaam AS student_voornaam, sp.achternaam AS student_achternaam,
+              b.naam AS bedrijf_naam,
+              mp.voornaam AS mentor_voornaam, mp.achternaam AS mentor_achternaam
+       FROM stageovereenkomst so
+       JOIN stagevoorstel sv ON so.stagevoorstel_id = sv.id
+       JOIN overeenkomst_status os ON so.status_id = os.id
+       JOIN student st ON sv.student_id = st.persoon_id
+       JOIN persoon sp ON st.persoon_id = sp.id
+       JOIN bedrijf b ON sv.bedrijf_id = b.id
+       LEFT JOIN stagementor sm ON sv.mentor_id = sm.persoon_id
+       LEFT JOIN persoon mp ON sm.persoon_id = mp.id
+       WHERE sv.docent_id = ?
+          OR EXISTS (SELECT 1 FROM stage s WHERE s.stageovereenkomst_id = so.id AND s.docent_id = ?)
+       ORDER BY so.aangemaakt_op DESC`,
+      [req.gebruiker.id, req.gebruiker.id]
+    )
+    res.json(rijen)
+  } catch (err) {
+    console.error(err)
+    res.status(500).json({ fout: 'Serverfout' })
+  }
+})
+
 /* GET /api/docent/student/:studentId/stages - haal alle stages op voor een specifieke student */
 router.get('/student/:studentId/stages', controleerToken, isDocent, async (req, res) => {
   try {
