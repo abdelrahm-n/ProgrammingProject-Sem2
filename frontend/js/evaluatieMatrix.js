@@ -5,7 +5,7 @@
 const API_URL = 'http://localhost:3000'
 const token = localStorage.getItem('token') || ''
 const rolRaw = localStorage.getItem('rol') || ''
-const dbRol = rolRaw === 'mentor' ? 'stagementor' : rolRaw === 'commissie' ? 'stagecommissie' : rolRaw
+const mijnRol = rolRaw === 'mentor' ? 'stagementor' : rolRaw === 'commissie' ? 'stagecommissie' : rolRaw
 
 const SCORE_LBL = { 1: 'Onvoldoende', 2: 'Matig', 3: 'Voldoende', 4: 'Goed', 5: 'Uitstekend' }
 
@@ -27,9 +27,9 @@ function esc(t) { if (t == null) return ''; const d = document.createElement('di
 
 /* Welke score/comment-kolom is van de ingelogde rol */
 function veldNamen() {
-  if (dbRol === 'student') return { score: 'student_score', comment: 'student_reflectie' }
-  if (dbRol === 'stagementor') return { score: 'mentor_score', comment: 'mentor_feedback' }
-  if (dbRol === 'docent') return { score: 'docent_score', comment: 'docent_feedback' }
+  if (mijnRol === 'student') return { score: 'student_score', comment: 'student_reflectie' }
+  if (mijnRol === 'stagementor') return { score: 'mentor_score', comment: 'mentor_feedback' }
+  if (mijnRol === 'docent') return { score: 'docent_score', comment: 'docent_feedback' }
   return { score: null, comment: null }
 }
 
@@ -46,11 +46,11 @@ function bewerkBlokkade() {
     return 'De eindevaluatie is vergrendeld tot het einde van je stage' +
       (stageEinddatum ? ' (' + new Date(stageEinddatum).toLocaleDateString('nl-BE') + ')' : '') + '.'
   }
-  if (dbRol === 'student') return null
-  if (dbRol === 'stagementor') {
+  if (mijnRol === 'student') return null
+  if (mijnRol === 'stagementor') {
     return alleIngevuld('student_score') ? null : 'Wacht tot de student de evaluatie heeft ingevuld.'
   }
-  if (dbRol === 'docent') {
+  if (mijnRol === 'docent') {
     return alleIngevuld('mentor_score') ? null : 'Wacht tot de mentor de evaluatie heeft ingevuld.'
   }
   return 'Geen toegang.'
@@ -63,7 +63,7 @@ function magBewerken() {
 
 function eindOntgrendeld() {
   /* Mentor en docent kunnen invullen zodra de eindevaluatie bestaat */
-  if (dbRol !== 'student') return true
+  if (mijnRol !== 'student') return true
   /* Zodra de docent het eindcijfer heeft ingediend is de eindevaluatie zichtbaar */
   const eindMoment = momenten.find(m => m.type_naam === 'eindevaluatie')
   if (eindMoment && eindMoment.eindresultaat_score != null) return true
@@ -82,7 +82,7 @@ function typeNaamVoorFase(f) {
 /* ---- data laden ---- */
 
 async function laadMomenten() {
-  if (dbRol === 'student') {
+  if (mijnRol === 'student') {
     /* Student haalt zijn eigen momenten op */
     const res = await fetch(API_URL + '/api/evaluaties/mijn', { headers: { 'Authorization': 'Bearer ' + token } })
     momenten = res.ok ? await res.json() : []
@@ -184,7 +184,7 @@ function render() {
   let html = ''
 
   /* Mentor/docent: naam van de gekozen student + terug naar de lijst */
-  if (dbRol !== 'student') {
+  if (mijnRol !== 'student') {
     html += `<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
       <button class="btn btn--secundair btn--sm" onclick="terugNaarStudenten()">← Andere student</button>
       <strong>${esc(gekozenStudentNaam)}</strong>
@@ -205,7 +205,7 @@ function render() {
 
   if (!momentId) {
     const label = fase === 'eind' ? 'eindevaluatie' : 'tussentijdse evaluatie'
-    if (dbRol === 'docent' && gekozenStageId) {
+    if (mijnRol === 'docent' && gekozenStageId) {
       html += `<div class="dashboard-card"><p>Er is nog geen ${label} voor deze student.</p>
         <button class="btn btn--primair btn--sm" onclick="maakMoment()">Maak ${label} aan</button></div>`
     } else {
@@ -250,9 +250,9 @@ function render() {
   beoordelingen.forEach((b, i) => {
     html += `<tr style="border-bottom:1px solid #f1f5f9;cursor:pointer" onclick="openComp(${i})">
       <td style="padding:12px 14px"><strong>${esc(b.competentie_naam)}</strong></td>
-      <td style="padding:12px 6px;text-align:center">${pil(b.student_score, dbRol === 'student')}</td>
-      <td style="padding:12px 6px;text-align:center">${pil(b.mentor_score, dbRol === 'stagementor')}</td>
-      <td style="padding:12px 6px;text-align:center">${pil(b.docent_score, dbRol === 'docent')}</td>
+      <td style="padding:12px 6px;text-align:center">${pil(b.student_score, mijnRol === 'student')}</td>
+      <td style="padding:12px 6px;text-align:center">${pil(b.mentor_score, mijnRol === 'stagementor')}</td>
+      <td style="padding:12px 6px;text-align:center">${pil(b.docent_score, mijnRol === 'docent')}</td>
       <td style="padding:12px 6px;color:#cbd5e1">›</td>
     </tr>`
   })
@@ -309,9 +309,9 @@ window.openComp = function (i) {
   }
 
   let anderen = ''
-  if (dbRol !== 'student') anderen += blok('Student', 'student', b.student_score, b.student_reflectie)
-  if (dbRol !== 'stagementor') anderen += blok('Mentor', 'mentor', b.mentor_score, b.mentor_feedback)
-  if (dbRol !== 'docent') anderen += blok('Docent', 'docent', b.docent_score, b.docent_feedback)
+  if (mijnRol !== 'student') anderen += blok('Student', 'student', b.student_score, b.student_reflectie)
+  if (mijnRol !== 'stagementor') anderen += blok('Mentor', 'mentor', b.mentor_score, b.mentor_feedback)
+  if (mijnRol !== 'docent') anderen += blok('Docent', 'docent', b.docent_score, b.docent_feedback)
 
   const rubriek = `<div style="background:#fafafa;border:1px solid #eee;border-radius:8px;padding:10px 12px;margin-top:12px;font-size:12.5px;line-height:1.6">
     <strong>Rubriek</strong><br>
@@ -356,10 +356,10 @@ window.slaCompOp = async function (i) {
   if (!score) { alert('Kies eerst een score.'); return }
 
   let url, body
-  if (dbRol === 'student') {
+  if (mijnRol === 'student') {
     url = '/api/evaluaties/' + momentId + '/reflectie'
     body = { competentie_id: b.competentie_id, student_score: score, student_reflectie: comment }
-  } else if (dbRol === 'stagementor') {
+  } else if (mijnRol === 'stagementor') {
     url = '/api/evaluaties/' + momentId + '/score'
     body = { competentie_id: b.competentie_id, mentor_score: score, mentor_feedback: comment }
   } else {
@@ -382,7 +382,7 @@ window.slaCompOp = async function (i) {
 
 window.dienIn = async function () {
   /* Docent eindevaluatie -> afsluiten met automatisch eindcijfer */
-  if (dbRol === 'docent' && fase === 'eind') {
+  if (mijnRol === 'docent' && fase === 'eind') {
     const res = await fetch(API_URL + '/api/evaluaties/' + momentId + '/afsluiten', {
       method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
       body: JSON.stringify({})
@@ -400,7 +400,7 @@ async function start() {
   if (!root) return
   if (!token) { root.innerHTML = '<p>Niet ingelogd.</p>'; return }
   try {
-    if (dbRol === 'student') {
+    if (mijnRol === 'student') {
       await laadMomenten()
       await laadBeoordelingen()
       render()
