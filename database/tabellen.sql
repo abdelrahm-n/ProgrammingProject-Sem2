@@ -410,6 +410,7 @@ CREATE TABLE competentie_beoordeling (
     student_score INT,
     mentor_score INT,
     mentor_feedback TEXT,
+    docent_score INT,
     docent_feedback TEXT,
 
     FOREIGN KEY (evaluatie_moment_id)

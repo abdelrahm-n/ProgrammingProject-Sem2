@@ -224,9 +224,9 @@ router.put('/:id/score', controleerToken, async (req, res) => {
   }
 })
 
-/* Docent geeft feedback per competentie */
+/* Docent geeft score (1-5) en/of feedback per competentie */
 router.put('/:id/docent-feedback', controleerToken, async (req, res) => {
-  const { competentie_id, docent_feedback } = req.body
+  const { competentie_id, docent_feedback, docent_score } = req.body
 
   if (!competentie_id) {
     return res.status(400).json({ fout: 'Competentie is verplicht' })
@@ -242,20 +242,42 @@ router.put('/:id/docent-feedback', controleerToken, async (req, res) => {
 
     await db.query(
       `UPDATE competentie_beoordeling
-       SET docent_feedback = ?
+       SET docent_feedback = ?, docent_score = COALESCE(?, docent_score)
        WHERE evaluatie_moment_id = ? AND competentie_id = ?`,
-      [docent_feedback || null, req.params.id, competentie_id]
+      [docent_feedback || null, (docent_score ?? null), req.params.id, competentie_id]
     )
-    res.json({ bericht: 'Feedback opgeslagen' })
+    res.json({ bericht: 'Opgeslagen' })
   } catch (err) {
     console.error(err)
     res.status(500).json({ fout: 'Serverfout' })
   }
 })
 
-/* Docent sluit evaluatie af met eindscore */
+/* Bereken het gewogen eindcijfer (op 20) uit de docent-scores per competentie */
+async function berekenEindscore(evaluatieMomentId) {
+  const [rows] = await db.query(
+    `SELECT cb.docent_score, c.gewicht
+     FROM competentie_beoordeling cb
+     JOIN competentie c ON cb.competentie_id = c.id
+     WHERE cb.evaluatie_moment_id = ?`,
+    [evaluatieMomentId]
+  )
+  let somGewicht = 0, somGewogen = 0, allesGescoord = rows.length > 0
+  for (const r of rows) {
+    if (r.docent_score == null) { allesGescoord = false; continue }
+    const g = Number(r.gewicht) || 1
+    somGewicht += g
+    somGewogen += Number(r.docent_score) * g
+  }
+  if (!allesGescoord || somGewicht === 0) return null
+  /* gewogen gemiddelde op 5 -> herschalen naar 20, 1 decimaal */
+  const gemiddeldeOp5 = somGewogen / somGewicht
+  return Math.round(gemiddeldeOp5 / 5 * 20 * 10) / 10
+}
+
+/* Docent sluit de evaluatie af: eindcijfer wordt automatisch gewogen berekend */
 router.put('/:id/afsluiten', controleerToken, async (req, res) => {
-  const { eindresultaat_score, algemene_feedback } = req.body
+  const { algemene_feedback } = req.body
 
   try {
     const evaluatie = await haalEvaluatieOpMetToegang(req, res, req.params.id)
@@ -265,13 +287,18 @@ router.put('/:id/afsluiten', controleerToken, async (req, res) => {
       return res.status(403).json({ fout: 'Alleen docenten mogen evaluaties afsluiten' })
     }
 
+    const eindscore = await berekenEindscore(req.params.id)
+    if (eindscore == null) {
+      return res.status(400).json({ fout: 'Geef eerst aan elke competentie een score voordat je afsluit' })
+    }
+
     await db.query(
       `UPDATE evaluatie_moment
        SET eindresultaat_score = ?, algemene_feedback = ?
        WHERE id = ?`,
-      [eindresultaat_score || null, algemene_feedback || null, req.params.id]
+      [eindscore, algemene_feedback || null, req.params.id]
     )
-    res.json({ bericht: 'Evaluatie afgesloten' })
+    res.json({ bericht: 'Evaluatie afgesloten', eindscore })
   } catch (err) {
     console.error(err)
     res.status(500).json({ fout: 'Serverfout' })
