@@ -1024,3 +1024,45 @@
 @media (max-width: 420px) {
   .progress-info { grid-template-columns: 1fr; }
 }
+
+/* Competentie-keuzeknoppen in de logboek-modal */
+.competentie-knoppen {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.competentie-knop {
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  color: #334155;
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.competentie-knop:hover {
+  border-color: #1e6fb8;
+}
+.competentie-knop.actief {
+  background: #1e6fb8;
+  border-color: #1e6fb8;
+  color: #fff;
+}
+
+/* LO-badges bij een logboekdag */
+.lo-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+.lo-badge {
+  background: #e3effb;
+  color: #1e6fb8;
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-size: 12px;
+  font-weight: 700;
+}
