@@ -118,3 +118,15 @@
         const data = await resp.json();
         if (!data || data.length === 0) {
           houder.innerHTML = '<p>Er zijn nog geen overeenkomsten voor jouw studenten.</p>';
+          return;
+        }
+        houder.innerHTML = bouwTabel(data);
+      } catch (err) {
+        houder.innerHTML = '<p>Kan geen verbinding maken met de server.</p>';
+      }
+    }
+
+    laadOvereenkomsten();
+  </script>
+</body>
+</html>
