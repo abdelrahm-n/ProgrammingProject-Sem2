@@ -64,9 +64,11 @@ function magBewerken() {
 function eindOntgrendeld() {
   /* Mentor en docent kunnen invullen zodra de eindevaluatie bestaat */
   if (dbRol !== 'student') return true
+  /* Zodra de docent het eindcijfer heeft ingediend is de eindevaluatie zichtbaar */
+  const eindMoment = momenten.find(m => m.type_naam === 'eindevaluatie')
+  if (eindMoment && eindMoment.eindresultaat_score != null) return true
   if (!stageEinddatum) return false
-  /* De student vult de eindevaluatie in op de laatste dag(en) van de stage:
-     vanaf de dag vóór de einddatum tot en met de einddatum. */
+  /* Anders pas vanaf de dag vóór de einddatum tot en met de einddatum. */
   const eind = new Date(stageEinddatum)
   const drempel = new Date(eind)
   drempel.setDate(eind.getDate() - 1)
@@ -178,6 +180,7 @@ function pil(score, eigen) {
 }
 
 function render() {
+  try {
   let html = ''
 
   /* Mentor/docent: naam van de gekozen student + terug naar de lijst */
@@ -256,6 +259,9 @@ function render() {
 
   html += `</tbody></table></div>`
   root.innerHTML = html
+  } catch (e) {
+    root.innerHTML = '<div class="dashboard-card"><p>Fout bij weergeven van de evaluatie: ' + esc(e.message) + '</p></div>'
+  }
 }
 
 window.zetFase = async function (f) {
@@ -391,14 +397,20 @@ window.dienIn = async function () {
 
 /* ---- start ---- */
 async function start() {
+  if (!root) return
   if (!token) { root.innerHTML = '<p>Niet ingelogd.</p>'; return }
-  if (dbRol === 'student') {
-    await laadMomenten()
-    await laadBeoordelingen()
-    render()
-  } else {
-    await laadStudenten()
-    renderPicker()
+  try {
+    if (dbRol === 'student') {
+      await laadMomenten()
+      await laadBeoordelingen()
+      render()
+    } else {
+      await laadStudenten()
+      renderPicker()
+    }
+  } catch (e) {
+    root.innerHTML = '<div class="dashboard-card"><p>Kon de evaluatie niet laden: ' + esc(e.message) +
+      '</p><p>Controleer of de backend draait (npm start) en open de app via http://localhost:3000.</p></div>'
   }
 }
 start()
